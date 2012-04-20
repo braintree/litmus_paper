@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "ipvs_litmus"
   gem.require_paths = ["lib"]
-  gem.version       = IpvsLitmus::VERSION
+  gem.version       = IPVSLitmus::VERSION
 
   gem.add_dependency "sinatra", "~> 1.3.2"
 

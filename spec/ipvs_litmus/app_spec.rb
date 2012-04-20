@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe IpvsLitmus::App do
+describe IPVSLitmus::App do
   def app
-    IpvsLitmus::App
+    IPVSLitmus::App
   end
 
   describe "GET /status" do
