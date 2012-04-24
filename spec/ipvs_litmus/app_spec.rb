@@ -8,25 +8,34 @@ describe IPVSLitmus::App do
   describe "GET /status" do
     it "works" do
       get "/status"
+
       last_response.should be_ok
     end
   end
 
   describe "GET /:service/status" do
     it "is successful when the service is passing" do
-      IPVSLitmus.services['test'] = AlwaysSuccessCheck.new
+      test_service = IPVSLitmus::Service.new([AlwaysAvailableDependency.new], [ConstantAnalogCheck.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
       get "/test/status"
+
       last_response.should be_ok
+      last_response.body.should match(/Health: 100/)
     end
 
     it "is 'service unavailable' when the check fails" do
-      IPVSLitmus.services['test'] = AlwaysFailCheck.new
+      test_service = IPVSLitmus::Service.new([NeverAvailableDependency.new], [ConstantAnalogCheck.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
       get "/test/status"
+
       last_response.status.should == 503
     end
 
     it "is 'not found' when the service is unknown" do
       get "/unknown/status"
+
       last_response.status.should == 404
     end
   end
