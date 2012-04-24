@@ -2,8 +2,10 @@ require 'net/http'
 require 'uri'
 
 require 'bundler/setup'
-require 'facter'
 require 'sinatra'
+
+require 'facter'
+require 'facts/loadaverage'
 
 require 'ipvs_litmus/app'
 require 'ipvs_litmus/hardware'

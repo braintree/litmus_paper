@@ -21,7 +21,7 @@ module IPVSLitmus
     end
 
     def load
-      `uptime | cut -d':' -f4 | cut -d' ' -f2`.chomp.to_f
+      Facter.value('loadaverage').split(' ').first.to_f
     end
   end
 end
