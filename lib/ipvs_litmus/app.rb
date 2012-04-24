@@ -8,10 +8,12 @@ module IPVSLitmus
       service = IPVSLitmus.services[params[:service]]
       if service.nil?
         [404, "NOT FOUND"]
-      elsif service.health > 0
-        [200, "Health: #{service.health}"]
       else
-        [503, "FAIL"]
+        health = service.current_health
+        response_code = health.ok? ? 200 : 503
+        body = "Health: #{health.value}\n"
+        body << health.summary
+        [response_code, body]
       end
     end
   end

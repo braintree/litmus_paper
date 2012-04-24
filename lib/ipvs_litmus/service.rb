@@ -9,12 +9,16 @@ module IPVSLitmus
       health > 0
     end
 
-    def health
-      return 0 unless @dependencies.all?(&:available?)
-
-      @checks.inject(0) do |health, check|
-        health += check.health
+    def current_health
+      health = IPVSLitmus::Health.new
+      @dependencies.each do |dependency|
+        health.ensure(dependency)
       end
+
+      @checks.each do |check|
+        health.perform(check)
+      end
+      health
     end
   end
 end

@@ -22,6 +22,8 @@ describe IPVSLitmus::App do
 
       last_response.should be_ok
       last_response.body.should match(/Health: 100/)
+      last_response.body.should match(/AlwaysAvailableDependency: OK/)
+      last_response.body.should match(/ConstantAnalogCheck: 100/)
     end
 
     it "is 'service unavailable' when the check fails" do

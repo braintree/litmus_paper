@@ -3,7 +3,7 @@ class ConstantAnalogCheck
     @constant = constant
   end
 
-  def health
+  def current_health
     @constant
   end
 end
