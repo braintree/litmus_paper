@@ -21,4 +21,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rspec", "2.9.0"
   gem.add_development_dependency "rack-test", "0.6.1"
   gem.add_development_dependency "rake"
+  gem.add_development_dependency "rake_commit", "0.13"
 end
