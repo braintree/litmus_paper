@@ -10,6 +10,7 @@ describe IPVSLitmus::App do
       get "/status"
 
       last_response.should be_ok
+      last_response.header["Content-Type"].should == "text/plain"
     end
   end
 
@@ -21,6 +22,7 @@ describe IPVSLitmus::App do
       get "/test/status"
 
       last_response.should be_ok
+      last_response.header["Content-Type"].should == "text/plain"
       last_response.body.should match(/Health: 100/)
       last_response.body.should match(/AlwaysAvailableDependency: OK/)
       last_response.body.should match(/ConstantMetric: 100/)
@@ -33,12 +35,14 @@ describe IPVSLitmus::App do
       get "/test/status"
 
       last_response.status.should == 503
+      last_response.header["Content-Type"].should == "text/plain"
     end
 
     it "is 'not found' when the service is unknown" do
       get "/unknown/status"
 
       last_response.status.should == 404
+      last_response.header["Content-Type"].should == "text/plain"
     end
   end
 end
