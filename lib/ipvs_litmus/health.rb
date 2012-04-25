@@ -18,14 +18,18 @@ module IPVSLitmus
       @value
     end
 
-    def perform(check)
-      @value += check.current_health
-      @summary << "#{check.class}: #{check.current_health}\n"
+    def perform(metric)
+      health = metric.current_health
+
+      @value += health
+      @summary << "#{metric.class}: #{health}\n"
     end
 
     def ensure(dependency)
-      @dependencies_available &&= dependency.available?
-      @summary << "#{dependency.class}: #{dependency.available? ? 'OK' : 'FAIL'}\n"
+      available = dependency.available?
+
+      @dependencies_available &&= available
+      @summary << "#{dependency.class}: #{available ? 'OK' : 'FAIL'}\n"
     end
   end
 end

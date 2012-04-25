@@ -43,7 +43,7 @@ describe IPVSLitmus::Health do
       health.summary.should match(/AlwaysAvailableDependency: OK/)
     end
 
-    it "includes the health of individual checks" do
+    it "includes the health of individual metrics" do
       health = IPVSLitmus::Health.new
       health.perform(ConstantMetric.new(12))
       health.perform(ConstantMetric.new(34))
@@ -52,8 +52,20 @@ describe IPVSLitmus::Health do
       health.summary.should match(/ConstantMetric: 34/)
     end
 
-    it "only runs each dependency and check once" do
-      pending("NYI")
+    it "only runs each metric once" do
+      health = IPVSLitmus::Health.new
+      metric = ConstantMetric.new(12)
+      metric.should_receive(:current_health).once.and_return(12)
+
+      health.perform(metric)
+    end
+
+    it "only runs each dependency once" do
+      health = IPVSLitmus::Health.new
+      dependency = AlwaysAvailableDependency.new
+      dependency.should_receive(:available?).once.and_return(true)
+
+      health.ensure(dependency)
     end
   end
 end
