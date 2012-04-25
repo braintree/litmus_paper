@@ -6,7 +6,7 @@ module IPVSLitmus
         @expected_content = Regexp.new(options.fetch(:contnet, '.*'))
       end
 
-      def success?
+      def available?
         response = Net::HTTP.get_response(URI.parse(@uri))
         _successful_response?(response) && _body_matches?(response)
       end
