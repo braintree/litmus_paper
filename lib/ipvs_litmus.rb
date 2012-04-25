@@ -11,6 +11,7 @@ require 'ipvs_litmus/app'
 require 'ipvs_litmus/dependency/http'
 require 'ipvs_litmus/hardware'
 require 'ipvs_litmus/health'
+require 'ipvs_litmus/metric/available_memory'
 require 'ipvs_litmus/service'
 
 module IPVSLitmus
