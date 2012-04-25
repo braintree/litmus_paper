@@ -17,8 +17,10 @@ module IPVSLitmus
       end
 
       def memory_total
+        return @memory_total unless @memory_total.nil?
+
         size, scale = @facter.value('memorytotal').split(' ')
-        size.to_i * MULTIPLIER[scale]
+        @memory_total = size.to_i * MULTIPLIER[scale]
       end
 
       def memory_free

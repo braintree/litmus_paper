@@ -11,7 +11,7 @@ module IPVSLitmus
       end
 
       def processor_count
-        @facter.value('processorcount').to_i
+        @processor_count ||= @facter.value('processorcount').to_i
       end
 
       def load_average

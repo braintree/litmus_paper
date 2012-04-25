@@ -20,6 +20,14 @@ describe IPVSLitmus::Metric::CPULoad do
       cpu_load = IPVSLitmus::Metric::CPULoad.new(50)
       cpu_load.processor_count.should > 0
     end
+
+    it "is cached" do
+      Facter.should_receive(:value).once.and_return("10")
+      cpu_load = IPVSLitmus::Metric::CPULoad.new(50)
+      cpu_load.processor_count
+      cpu_load.processor_count
+      cpu_load.processor_count
+    end
   end
 
   describe "#load_average" do

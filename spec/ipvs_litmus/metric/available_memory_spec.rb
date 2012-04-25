@@ -13,6 +13,14 @@ describe IPVSLitmus::Metric::AvailableMemory do
         metric = IPVSLitmus::Metric::AvailableMemory.new(50)
         metric.memory_total.should > 1_000
       end
+
+      it "is cached" do
+        Facter.should_receive(:value).once.and_return("10 MB")
+        metric = IPVSLitmus::Metric::AvailableMemory.new(50)
+        metric.memory_total
+        metric.memory_total
+        metric.memory_total
+      end
     end
 
     describe "#memory_free" do
