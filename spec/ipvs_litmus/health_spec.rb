@@ -4,13 +4,13 @@ describe IPVSLitmus::Health do
   describe "ok?" do
     it "is true when health is greater than 0" do
       health = IPVSLitmus::Health.new
-      health.perform(ConstantAnalogCheck.new(50))
+      health.perform(ConstantMetric.new(50))
       health.should be_ok
     end
 
     it "is false when health is 0" do
       health = IPVSLitmus::Health.new
-      health.perform(ConstantAnalogCheck.new(0))
+      health.perform(ConstantMetric.new(0))
       health.should_not be_ok
     end
   end
@@ -18,8 +18,8 @@ describe IPVSLitmus::Health do
   describe "perform" do
     it "executes the check and adds its value to its health" do
       health = IPVSLitmus::Health.new
-      health.perform(ConstantAnalogCheck.new(50))
-      health.perform(ConstantAnalogCheck.new(25))
+      health.perform(ConstantMetric.new(50))
+      health.perform(ConstantMetric.new(25))
       health.value.should == 75
     end
   end
@@ -28,7 +28,7 @@ describe IPVSLitmus::Health do
     it "checks the dependency and modifies the value accordingly" do
       health = IPVSLitmus::Health.new
       health.ensure(NeverAvailableDependency.new)
-      health.perform(ConstantAnalogCheck.new(50))
+      health.perform(ConstantMetric.new(50))
       health.value.should == 0
     end
   end
@@ -45,11 +45,11 @@ describe IPVSLitmus::Health do
 
     it "includes the health of individual checks" do
       health = IPVSLitmus::Health.new
-      health.perform(ConstantAnalogCheck.new(12))
-      health.perform(ConstantAnalogCheck.new(34))
+      health.perform(ConstantMetric.new(12))
+      health.perform(ConstantMetric.new(34))
 
-      health.summary.should match(/ConstantAnalogCheck: 12/)
-      health.summary.should match(/ConstantAnalogCheck: 34/)
+      health.summary.should match(/ConstantMetric: 12/)
+      health.summary.should match(/ConstantMetric: 34/)
     end
 
     it "only runs each dependency and check once" do

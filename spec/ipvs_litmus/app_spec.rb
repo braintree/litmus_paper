@@ -15,7 +15,7 @@ describe IPVSLitmus::App do
 
   describe "GET /:service/status" do
     it "is successful when the service is passing" do
-      test_service = IPVSLitmus::Service.new([AlwaysAvailableDependency.new], [ConstantAnalogCheck.new(100)])
+      test_service = IPVSLitmus::Service.new([AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
       get "/test/status"
@@ -23,11 +23,11 @@ describe IPVSLitmus::App do
       last_response.should be_ok
       last_response.body.should match(/Health: 100/)
       last_response.body.should match(/AlwaysAvailableDependency: OK/)
-      last_response.body.should match(/ConstantAnalogCheck: 100/)
+      last_response.body.should match(/ConstantMetric: 100/)
     end
 
     it "is 'service unavailable' when the check fails" do
-      test_service = IPVSLitmus::Service.new([NeverAvailableDependency.new], [ConstantAnalogCheck.new(100)])
+      test_service = IPVSLitmus::Service.new([NeverAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
       get "/test/status"

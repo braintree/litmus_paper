@@ -1,4 +1,4 @@
-class ConstantAnalogCheck
+class ConstantMetric
   def initialize(constant)
     @constant = constant
   end
