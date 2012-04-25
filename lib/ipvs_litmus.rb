@@ -8,9 +8,9 @@ require 'facter'
 require 'facts/loadaverage'
 
 require 'ipvs_litmus/app'
+require 'ipvs_litmus/dependency/http'
 require 'ipvs_litmus/hardware'
 require 'ipvs_litmus/health'
-require 'ipvs_litmus/http_check'
 require 'ipvs_litmus/service'
 
 module IPVSLitmus
