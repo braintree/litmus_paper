@@ -29,8 +29,8 @@ module IPVSLitmus
       @health_files ||= [
         [0, IPVSLitmus.config_dir.join('down', @name)],
         [100, IPVSLitmus.config_dir.join('up', @name)],
-        [0, IPVSLitmus.config_dir.join('server_down')],
-        [100, IPVSLitmus.config_dir.join('server_up')]
+        [0, IPVSLitmus.config_dir.join('global_down')],
+        [100, IPVSLitmus.config_dir.join('global_up')]
       ]
     end
 

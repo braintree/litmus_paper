@@ -22,10 +22,10 @@ describe IPVSLitmus::Service do
       service.current_health.summary.should == "Down for testing"
     end
 
-    it "is 0 when a server down file exists" do
+    it "is 0 when a global down file exists" do
       service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(50)])
 
-      write_server_down_file 'Down for testing'
+      write_global_down_file 'Down for testing'
 
       service.current_health.value.should == 0
       service.current_health.summary.should == "Down for testing"
@@ -40,10 +40,10 @@ describe IPVSLitmus::Service do
       service.current_health.summary.should == "Up for testing"
     end
 
-    it "is 100 when a server up file exists" do
+    it "is 100 when a global up file exists" do
       service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(50)])
 
-      write_server_up_file 'Up for testing'
+      write_global_up_file 'Up for testing'
 
       service.current_health.value.should == 100
       service.current_health.summary.should == "Up for testing"

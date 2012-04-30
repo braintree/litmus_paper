@@ -4,16 +4,16 @@ RSpec.configure do |config|
   end
 end
 
-def write_server_up_file(message)
+def write_global_up_file(message)
   FileUtils.mkdir_p IPVSLitmus.config_dir
-  File.open(IPVSLitmus.config_dir.join('server_up'), 'w') do |file|
+  File.open(IPVSLitmus.config_dir.join('global_up'), 'w') do |file|
     file.puts message
   end
 end
 
-def write_server_down_file(message)
+def write_global_down_file(message)
   FileUtils.mkdir_p IPVSLitmus.config_dir
-  File.open(IPVSLitmus.config_dir.join('server_down'), 'w') do |file|
+  File.open(IPVSLitmus.config_dir.join('global_down'), 'w') do |file|
     file.puts message
   end
 end
