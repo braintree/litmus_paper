@@ -1,6 +1,6 @@
 module IPVSLitmus
   class Service
-    def initialize(name, dependencies, checks)
+    def initialize(name, dependencies = [], checks = [])
       @name = name
       @dependencies = dependencies
       @checks = checks
@@ -23,6 +23,14 @@ module IPVSLitmus
         health.perform(check)
       end
       health
+    end
+
+    def measure_health(metric_class, options)
+      @checks << metric_class.new(options[:weight])
+    end
+
+    def depends(dependency_class, *args)
+      @dependencies << dependency_class.new(*args)
     end
 
     def _health_files

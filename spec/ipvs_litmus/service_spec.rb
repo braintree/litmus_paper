@@ -1,20 +1,27 @@
 require 'spec_helper'
 
 describe IPVSLitmus::Service do
-
   describe "health" do
     it "is the sum of all the metrics' weight" do
-      service = IPVSLitmus::Service.new('test', [], [ConstantMetric.new(50), ConstantMetric.new(25)])
+      service = IPVSLitmus::Service.new('test')
+      service.measure_health ConstantMetric, :weight => 50
+      service.measure_health ConstantMetric, :weight => 25
+
       service.current_health.value.should == 75
     end
 
     it "is 0 when a dependency fails" do
-      service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(50)])
+      service = IPVSLitmus::Service.new('test')
+      service.depends NeverAvailableDependency
+      service.measure_health ConstantMetric, :weight => 50
+
       service.current_health.value.should == 0
     end
 
     it "is 0 when a down file exists" do
-      service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(50)])
+      service = IPVSLitmus::Service.new('test')
+      service.depends AlwaysAvailableDependency
+      service.measure_health ConstantMetric, :weight => 50
 
       write_down_file 'test', 'Down for testing'
 
@@ -23,7 +30,9 @@ describe IPVSLitmus::Service do
     end
 
     it "is 0 when a global down file exists" do
-      service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(50)])
+      service = IPVSLitmus::Service.new('test')
+      service.depends AlwaysAvailableDependency
+      service.measure_health ConstantMetric, :weight => 50
 
       write_global_down_file 'Down for testing'
 
@@ -32,7 +41,9 @@ describe IPVSLitmus::Service do
     end
 
     it "is 100 when an up file exists" do
-      service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(50)])
+      service = IPVSLitmus::Service.new('test')
+      service.depends NeverAvailableDependency
+      service.measure_health ConstantMetric, :weight => 50
 
       write_up_file 'test', 'Up for testing'
 
@@ -41,7 +52,9 @@ describe IPVSLitmus::Service do
     end
 
     it "is 100 when a global up file exists" do
-      service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(50)])
+      service = IPVSLitmus::Service.new('test')
+      service.depends NeverAvailableDependency
+      service.measure_health ConstantMetric, :weight => 50
 
       write_global_up_file 'Up for testing'
 
