@@ -25,23 +25,19 @@ module IPVSLitmus
       health
     end
 
+    def _health_files
+      @health_files ||= [
+        [0, IPVSLitmus.config_dir.join('down', @name)],
+        [100, IPVSLitmus.config_dir.join('up', @name)],
+        [0, IPVSLitmus.config_dir.join('server_down')],
+        [100, IPVSLitmus.config_dir.join('server_up')]
+      ]
+    end
+
     def _determine_forced_health
-      if File.exists?(_down_file)
-        ForcedHealth.new(0, File.read(_down_file).chomp)
-      elsif File.exists?(_up_file)
-        ForcedHealth.new(100, File.read(_up_file).chomp)
-      else
-        nil
-      end
+      _health_files.map do |health, file|
+        ForcedHealth.new(health, File.read(file).chomp) if File.exists?(file)
+      end.compact.first
     end
-
-    def _down_file
-      IPVSLitmus.config_dir.join('down', @name)
-    end
-
-    def _up_file
-      IPVSLitmus.config_dir.join('up', @name)
-    end
-
   end
 end

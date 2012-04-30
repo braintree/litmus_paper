@@ -56,5 +56,29 @@ describe IPVSLitmus::App do
       last_response.status.should == 503
       last_response.body.should match(/Down for testing/)
     end
+
+    it "is 'service unavailable' when a server down file exists" do
+      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
+      write_server_down_file "Down for testing"
+
+      get "/test/status"
+
+      last_response.status.should == 503
+      last_response.body.should match(/Down for testing/)
+    end
+
+    it "is successful when a server up file exists" do
+      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
+      write_server_up_file "Up for testing"
+
+      get "/test/status"
+
+      last_response.status.should == 200
+      last_response.body.should match(/Up for testing/)
+    end
   end
 end
