@@ -16,7 +16,7 @@ describe IPVSLitmus::App do
 
   describe "GET /:service/status" do
     it "is successful when the service is passing" do
-      test_service = IPVSLitmus::Service.new([AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
       get "/test/status"
@@ -29,7 +29,7 @@ describe IPVSLitmus::App do
     end
 
     it "is 'service unavailable' when the check fails" do
-      test_service = IPVSLitmus::Service.new([NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
       get "/test/status"
@@ -43,6 +43,18 @@ describe IPVSLitmus::App do
 
       last_response.status.should == 404
       last_response.header["Content-Type"].should == "text/plain"
+    end
+
+    it "is 'service unavailable' when a down file exists" do
+      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
+      write_down_file "test", "Down for testing"
+
+      get "/test/status"
+
+      last_response.status.should == 503
+      last_response.body.should match(/Down for testing/)
     end
   end
 end
