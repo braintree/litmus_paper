@@ -5,7 +5,7 @@ describe IPVSLitmus::Configuration do
     it "configures a service" do
       config = IPVSLitmus::Configuration.new(File.expand_path('../support/test.config', File.dirname(__FILE__)))
       services = config.evaluate
-      services.has_key?(:test).should == true
+      services.has_key?('test').should == true
     end
   end
 end

@@ -12,9 +12,9 @@ module IPVSLitmus
     end
 
     def service(name, &block)
-      service = Service.new(name)
+      service = Service.new(name.to_s)
       block.call(service)
-      @services[name] = service
+      @services[name.to_s] = service
     end
   end
 end
