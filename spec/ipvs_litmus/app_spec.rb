@@ -5,12 +5,36 @@ describe IPVSLitmus::App do
     IPVSLitmus::App
   end
 
-  describe "POST /up" do
+  describe "POST /force/*" do
     it "creates a global upfile" do
       test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      post "/up", :reason => "up for testing"
+      post "/force/up", :reason => "up for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+      last_response.body.should match(/up for testing/)
+    end
+
+    it "creates a global downfile" do
+      test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
+      post "/force/down", :reason => "down for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 503
+      last_response.body.should match(/down for testing/)
+    end
+
+    it "creates a service specific upfile" do
+      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
+      post "/force/up/test", :reason => "up for testing"
       last_response.status.should == 201
 
       get "/test/status"
@@ -19,18 +43,18 @@ describe IPVSLitmus::App do
     end
   end
 
-  describe "DELETE /up" do
+  describe "DELETE /force/*" do
     it "removes the global upfile" do
       test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      post "/up", :reason => "up for testing"
+      post "/force/up", :reason => "up for testing"
       last_response.status.should == 201
 
       get "/test/status"
       last_response.status.should == 200
 
-      delete "/up"
+      delete "/force/up"
       last_response.status.should == 200
 
       get "/test/status"
@@ -38,41 +62,17 @@ describe IPVSLitmus::App do
       last_response.body.should_not match(/up for testing/)
     end
 
-    it "404s if there is no upfile" do
-      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
-
-      delete "/up"
-
-      last_response.status.should == 404
-    end
-  end
-
-  describe "POST /down" do
-    it "creates a global downfile" do
-      test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
-      IPVSLitmus.services['test'] = test_service
-
-      post "/down", :reason => "down for testing"
-      last_response.status.should == 201
-
-      get "/test/status"
-      last_response.status.should == 503
-      last_response.body.should match(/down for testing/)
-    end
-  end
-
-  describe "DELETE /down" do
     it "removes the global downfile" do
       test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      post "/down", :reason => "down for testing"
+      post "/force/down", :reason => "down for testing"
       last_response.status.should == 201
 
       get "/test/status"
       last_response.status.should == 503
 
-      delete "/down"
+      delete "/force/down"
       last_response.status.should == 200
 
       get "/test/status"
@@ -80,10 +80,28 @@ describe IPVSLitmus::App do
       last_response.body.should_not match(/down for testing/)
     end
 
-    it "404s if there is no downfile" do
-      test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+    it "removes a service specific upfile" do
+      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
 
-      delete "/down"
+      post "/force/up/test", :reason => "up for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+      last_response.body.should match(/up for testing/)
+
+      delete "/force/up/test"
+      last_response.status.should == 200
+
+      get "/test/status"
+      last_response.status.should == 503
+    end
+
+    it "404s if there is no upfile" do
+      test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+
+      delete "/up"
 
       last_response.status.should == 404
     end

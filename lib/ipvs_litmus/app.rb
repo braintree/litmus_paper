@@ -1,49 +1,47 @@
 module IPVSLitmus
   class App < Sinatra::Base
-    post "/up" do
-      global_upfile = StatusFile.new('global_up')
-      global_upfile.create(params[:reason])
+    post "/force/*" do
+      path = *status_file_path(params[:splat])
+      statusfile = StatusFile.new(*path)
+      statusfile.create(params[:reason])
 
-      [201, "Global up file created"]
+      text 201, "File created"
     end
 
-    delete "/up" do
-      global_upfile = StatusFile.new('global_up')
-      if global_upfile.exists?
-        global_upfile.delete
-        [200, "Global up file deleted"]
+    delete "/force/*" do
+      path = *status_file_path(params[:splat])
+      statusfile = StatusFile.new(*path)
+      if statusfile.exists?
+        statusfile.delete
+        text 200, "File deleted"
       else
-        [404, { "Content-Type" => "text/plain" }, "NOT FOUND"]
-      end
-    end
-
-    post "/down" do
-      global_downfile = StatusFile.new('global_down')
-      global_downfile.create(params[:reason])
-
-      [201, "Global down file created"]
-    end
-
-    delete "/down" do
-      global_downfile = StatusFile.new('global_down')
-      if global_downfile.exists?
-        global_downfile.delete
-        [200, "Global down file deleted"]
-      else
-        [404, { "Content-Type" => "text/plain" }, "NOT FOUND"]
+        text 404, "NOT FOUND"
       end
     end
 
     get "/:service/status" do
       service = IPVSLitmus.services[params[:service]]
       if service.nil?
-        [404, { "Content-Type" => "text/plain" }, "NOT FOUND"]
+        text 404, "NOT FOUND"
       else
         health = service.current_health
         response_code = health.ok? ? 200 : 503
         body = "Health: #{health.value}\n"
         body << health.summary
-        [response_code, { "Content-Type" => "text/plain" }, body]
+        text response_code, body
+      end
+    end
+
+    def text(response_code, body)
+      [response_code, { "Content-Type" => "text/plain" }, body]
+    end
+
+    def status_file_path(splat)
+      path = splat.first.split("/")
+      if path.size == 1
+        ["global_#{path.first}"]
+      else
+        path
       end
     end
   end
