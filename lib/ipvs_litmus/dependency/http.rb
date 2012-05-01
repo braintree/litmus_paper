@@ -7,8 +7,12 @@ module IPVSLitmus
       end
 
       def available?
-        response = Net::HTTP.get_response(URI.parse(@uri))
-        _successful_response?(response) && _body_matches?(response)
+        begin
+          response = Net::HTTP.get_response(URI.parse(@uri))
+          _successful_response?(response) && _body_matches?(response)
+        rescue Exception => e
+          false
+        end
       end
 
       def _successful_response?(response)

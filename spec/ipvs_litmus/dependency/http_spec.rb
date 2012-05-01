@@ -33,5 +33,10 @@ describe IPVSLitmus::Dependency::HTTP do
       check = IPVSLitmus::Dependency::HTTP.new('http://httpstat.us/404')
       check.should_not be_available
     end
+
+    it "is false when the dependency is not available" do
+      check = IPVSLitmus::Dependency::HTTP.new('http://127.0.0.1:7777')
+      check.should_not be_available
+    end
   end
 end
