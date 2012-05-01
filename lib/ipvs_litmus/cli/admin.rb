@@ -6,58 +6,29 @@ module IPVSLitmus
         send(command, argv)
       end
 
-      def down(args)
+      def force(args)
         options = { :port => 9292, :host => 'localhost' }
         opt_parser = _extend_default_parser(options) do |opts|
-          opts.banner = "Usage: litmusctl down <service> [options]"
-          opts.on("-d", "--delete", "Remove downfile") do
+          opts.banner = "Usage: litmusctl force <up|down> [service] [options]"
+          opts.on("-d", "--delete", "Remove status file") do
             options[:delete] = true
           end
-          opts.on("-r", "--reason=reason", String, "Reason for downfile") do |reason|
+          opts.on("-r", "--reason=reason", String, "Reason for status file") do |reason|
             options[:reason] = reason
           end
         end
 
         opt_parser.parse! args
-        service = args.shift
+        direction, service = args
 
         if options[:delete]
-          request = Net::HTTP::Delete.new("/force/down/#{service}")
+          request = Net::HTTP::Delete.new("/force/#{direction}/#{service}")
         else
           if !options.has_key?(:reason)
             print "Reason? "
             options[:reason] = gets.chomp
           end
-          request = Net::HTTP::Post.new("/force/down/#{service}")
-          request.set_form_data('reason' => options[:reason])
-        end
-
-        _litmus_request(options[:host], options[:port], request)
-      end
-
-      def up(args)
-        options = { :port => 9292, :host => 'localhost' }
-        opt_parser = _extend_default_parser(options) do |opts|
-          opts.banner = "Usage: litmusctl up <service> [options]"
-          opts.on("-d", "--delete", "Remove upfile") do
-            options[:delete] = true
-          end
-          opts.on("-r", "--reason=reason", String, "Reason for upfile") do |reason|
-            options[:reason] = reason
-          end
-        end
-
-        opt_parser.parse! args
-        service = args.shift
-
-        if options[:delete]
-          request = Net::HTTP::Delete.new("/force/up/#{service}")
-        else
-          if !options.has_key?(:reason)
-            print "Reason? "
-            options[:reason] = gets.chomp
-          end
-          request = Net::HTTP::Post.new("/force/up/#{service}")
+          request = Net::HTTP::Post.new("/force/#{direction}/#{service}")
           request.set_form_data('reason' => options[:reason])
         end
 

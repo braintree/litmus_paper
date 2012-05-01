@@ -25,18 +25,26 @@ describe 'litmusctl' do
     end
   end
 
-  describe 'down' do
-    it 'creates a downfile for the service' do
-      _litmusctl('down test -r "for testing"').should match("File created")
+  describe "force" do
+    it "can create a global downfile" do
+      _litmusctl('force down -r "for testing"').should match("File created")
 
       status = _litmusctl('status test')
       status.should match(/Health: 0/)
       status.should match(/for testing/)
     end
 
-    it 'removes a downfile for the service' do
-      _litmusctl('down passing_test -r "for testing"').should match("File created")
-      _litmusctl('down passing_test -d').should match("File deleted")
+    it "creates a downfile" do
+      _litmusctl('force down test -r "for testing"').should match("File created")
+
+      status = _litmusctl('status test')
+      status.should match(/Health: 0/)
+      status.should match(/for testing/)
+    end
+
+    it 'removes an upfile for the service' do
+      _litmusctl('force up test -r "for testing"').should match("File created")
+      _litmusctl('force up test -d').should match("File deleted")
 
       status = _litmusctl('status passing_test')
       status.should match(/Health: \d\d/)
@@ -44,30 +52,7 @@ describe 'litmusctl' do
     end
 
     it "returns not found if downfile doesn't exist" do
-      _litmusctl('down test -d').should match("NOT FOUND")
-    end
-  end
-
-  describe 'up' do
-    it 'creates a upfile for the service' do
-      _litmusctl('up test -r "for testing"').should match("File created")
-
-      status = _litmusctl('status test')
-      status.should match(/Health: 100/)
-      status.should match(/for testing/)
-    end
-
-    it 'removes a upfile for the service' do
-      _litmusctl('up test -r "for testing"').should match("File created")
-      _litmusctl('up test -d').should match("File deleted")
-
-      status = _litmusctl('status test')
-      status.should match(/Health: 0/)
-      status.should_not match(/for testing/)
-    end
-
-    it "returns not found if upfile doesn't exist" do
-      _litmusctl('up test -d').should match("NOT FOUND")
+      _litmusctl('force down test -d').should match("NOT FOUND")
     end
   end
 end
