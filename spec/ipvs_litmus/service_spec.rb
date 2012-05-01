@@ -23,7 +23,7 @@ describe IPVSLitmus::Service do
       service.depends AlwaysAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      write_down_file 'test', 'Down for testing'
+      IPVSLitmus::StatusFile.new("down", "test").create("Down for testing")
 
       service.current_health.value.should == 0
       service.current_health.summary.should == "Down for testing"
@@ -34,7 +34,7 @@ describe IPVSLitmus::Service do
       service.depends AlwaysAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      write_global_down_file 'Down for testing'
+      IPVSLitmus::StatusFile.new("down", "test").create("Down for testing")
 
       service.current_health.value.should == 0
       service.current_health.summary.should == "Down for testing"
@@ -45,7 +45,7 @@ describe IPVSLitmus::Service do
       service.depends NeverAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      write_up_file 'test', 'Up for testing'
+      IPVSLitmus::StatusFile.new("up", "test").create("Up for testing")
 
       service.current_health.value.should == 100
       service.current_health.summary.should == "Up for testing"
@@ -56,7 +56,7 @@ describe IPVSLitmus::Service do
       service.depends NeverAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      write_global_up_file 'Up for testing'
+      IPVSLitmus::StatusFile.new("global_up").create("Up for testing")
 
       service.current_health.value.should == 100
       service.current_health.summary.should == "Up for testing"

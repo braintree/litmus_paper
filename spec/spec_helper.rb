@@ -11,6 +11,7 @@ RSpec.configure do |config|
   config.include Rack::Test::Methods
 
   config.before :each do
+    FileUtils.rm_rf(IPVSLitmus.config_dir)
     IPVSLitmus.reset
   end
 end

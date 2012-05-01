@@ -35,16 +35,16 @@ module IPVSLitmus
 
     def _health_files
       @health_files ||= [
-        [0, IPVSLitmus.config_dir.join('down', @name)],
-        [100, IPVSLitmus.config_dir.join('up', @name)],
-        [0, IPVSLitmus.config_dir.join('global_down')],
-        [100, IPVSLitmus.config_dir.join('global_up')]
+        [0, IPVSLitmus::StatusFile.new('down', @name)],
+        [100, IPVSLitmus::StatusFile.new('up', @name)],
+        [0, IPVSLitmus::StatusFile.new('global_down')],
+        [100, IPVSLitmus::StatusFile.new('global_up')]
       ]
     end
 
     def _determine_forced_health
-      _health_files.map do |health, file|
-        ForcedHealth.new(health, File.read(file).chomp) if File.exists?(file)
+      _health_files.map do |health, status_file|
+        ForcedHealth.new(health, status_file.content) if status_file.exists?
       end.compact.first
     end
   end

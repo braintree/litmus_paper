@@ -124,8 +124,8 @@ describe IPVSLitmus::App do
       test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      write_up_file "test", "Up for testing"
-      write_down_file "test", "Down for testing"
+      IPVSLitmus::StatusFile.new("up", "test").create("Up for testing")
+      IPVSLitmus::StatusFile.new("down", "test").create("Down for testing")
 
       get "/test/status"
 
@@ -137,7 +137,7 @@ describe IPVSLitmus::App do
       test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      write_up_file "test", "Up for testing"
+      IPVSLitmus::StatusFile.new("up", "test").create("Up for testing")
 
       get "/test/status"
 
@@ -149,7 +149,7 @@ describe IPVSLitmus::App do
       test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      write_up_file "test", "Up for testing"
+      IPVSLitmus::StatusFile.new("up", "test").create("Up for testing")
 
       get "/test/status"
 
@@ -161,8 +161,8 @@ describe IPVSLitmus::App do
       test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      write_global_down_file "Down for testing"
-      write_global_up_file "Up for testing"
+      IPVSLitmus::StatusFile.new("global_down").create("Down for testing")
+      IPVSLitmus::StatusFile.new("global_up").create("Up for testing")
 
       get "/test/status"
 
@@ -174,7 +174,7 @@ describe IPVSLitmus::App do
       test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      write_global_down_file "Down for testing"
+      IPVSLitmus::StatusFile.new("global_down").create("Down for testing")
 
       get "/test/status"
 
@@ -186,7 +186,7 @@ describe IPVSLitmus::App do
       test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       IPVSLitmus.services['test'] = test_service
 
-      write_global_up_file "Up for testing"
+      IPVSLitmus::StatusFile.new("global_up").create("Up for testing")
 
       get "/test/status"
 

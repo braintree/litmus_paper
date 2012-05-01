@@ -16,6 +16,7 @@ require 'ipvs_litmus/forced_health'
 require 'ipvs_litmus/metric/available_memory'
 require 'ipvs_litmus/metric/cpu_load'
 require 'ipvs_litmus/service'
+require 'ipvs_litmus/status_file'
 
 module IPVSLitmus
   class << self
