@@ -18,12 +18,12 @@ require 'ipvs_litmus/metric/cpu_load'
 require 'ipvs_litmus/service'
 
 module IPVSLitmus
-  def self.services
-    @services ||= {}
+  class << self
+    attr_reader :services, :config_dir
   end
 
-  def self.config_dir
-    @config_dir
+  def self.configure(filename)
+    @services = IPVSLitmus::Configuration.new(filename).evaluate
   end
 
   def self.config_dir=(path)

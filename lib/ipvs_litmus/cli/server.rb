@@ -7,6 +7,13 @@ module IPVSLitmus
 
           opt_parser = OptionParser.new do |opts|
             opts.banner = "Usage: litmus server [mongrel, thin, etc] [options]"
+            opts.on("-c", "--config=file", String,
+                    "Litmus configuration file", "Default: /etc/litmus.conf") { |v| options[:litmus_config] = v }
+            opts.on("-D", "--data-dir=path", String,
+                    "Litmus data directory", "Default: /etc/litmus") { |v| options[:config_dir] = v }
+
+            opts.separator ""
+
             opts.on("-p", "--port=port", Integer,
                     "Runs Litmus on the specified port.", "Default: 9292") { |v| options[:Port] = v }
             opts.on("-b", "--binding=ip", String,
@@ -30,6 +37,19 @@ module IPVSLitmus
 
       def opt_parser
         Options.new
+      end
+
+      def start
+        IPVSLitmus.configure(options[:litmus_config])
+        IPVSLitmus.config_dir = options[:config_dir]
+        super
+      end
+
+      def default_options
+        super.merge(
+          :litmus_config => '/etc/litmus.conf',
+          :config_dir => '/etc/litmus'
+        )
       end
     end
   end
