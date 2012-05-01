@@ -3,7 +3,7 @@ require 'net/http'
 require 'uri'
 
 require 'bundler/setup'
-require 'sinatra'
+require 'sinatra/base'
 
 require 'facter'
 require 'facts/loadaverage'

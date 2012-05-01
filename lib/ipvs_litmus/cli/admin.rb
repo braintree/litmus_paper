@@ -8,24 +8,14 @@ module IPVSLitmus
 
       def down(args)
         options = { :port => 9292, :host => 'localhost' }
-        opt_parser = OptionParser.new do |opts|
+        opt_parser = _extend_default_parser(options) do |opts|
           opts.banner = "Usage: litmusctl down <service> [options]"
-
           opts.on("-d", "--delete", "Remove downfile") do
             options[:delete] = true
           end
-
           opts.on("-r", "--reason=reason", String, "Reason for downfile") do |reason|
             options[:reason] = reason
           end
-
-          opts.on("-p", "--port=port", Integer, "Port litmus is running on", "Default: 9292") do |port|
-            options[:port] = port
-          end
-          opts.on("-h", "--host=ip", String, ":Host litmus is running on", "Default: localhost") do |host|
-            options[:host] = host
-          end
-          opts.on("--help", "Show this help message.") { puts opts; exit }
         end
 
         opt_parser.parse! args
@@ -47,24 +37,14 @@ module IPVSLitmus
 
       def up(args)
         options = { :port => 9292, :host => 'localhost' }
-        opt_parser = OptionParser.new do |opts|
+        opt_parser = _extend_default_parser(options) do |opts|
           opts.banner = "Usage: litmusctl up <service> [options]"
-
-          opts.on("-d", "--delete", "Remove downfile") do
+          opts.on("-d", "--delete", "Remove upfile") do
             options[:delete] = true
           end
-
           opts.on("-r", "--reason=reason", String, "Reason for upfile") do |reason|
             options[:reason] = reason
           end
-
-          opts.on("-p", "--port=port", Integer, "Port litmus is running on", "Default: 9292") do |port|
-            options[:port] = port
-          end
-          opts.on("-h", "--host=ip", String, ":Host litmus is running on", "Default: localhost") do |host|
-            options[:host] = host
-          end
-          opts.on("--help", "Show this help message.") { puts opts; exit }
         end
 
         opt_parser.parse! args
@@ -86,15 +66,8 @@ module IPVSLitmus
 
       def status(args)
         options = { :port => 9292, :host => 'localhost' }
-        opt_parser = OptionParser.new do |opts|
+        opt_parser = _extend_default_parser(options) do |opts|
           opts.banner = "Usage: litmusctl status <service> [options]"
-          opts.on("-p", "--port=port", Integer, "Port litmus is running on", "Default: 9292") do |port|
-            options[:port] = port
-          end
-          opts.on("-h", "--host=ip", String, ":Host litmus is running on", "Default: localhost") do |host|
-            options[:host] = host
-          end
-          opts.on("--help", "Show this help message.") { puts opts; exit }
         end
 
         opt_parser.parse! args
@@ -103,6 +76,19 @@ module IPVSLitmus
         _litmus_request(options[:host], options[:port], Net::HTTP::Get.new("/#{service}/status"))
       end
 
+      def _extend_default_parser(options, &block)
+        OptionParser.new do |opts|
+          block.call(opts)
+
+          opts.on("-p", "--port=port", Integer, "Port litmus is running on", "Default: 9292") do |port|
+            options[:port] = port
+          end
+          opts.on("-h", "--host=ip", String, ":Host litmus is running on", "Default: localhost") do |host|
+            options[:host] = host
+          end
+          opts.on("--help", "Show this help message.") { puts opts; exit }
+        end
+      end
 
       def _litmus_request(host, port, request)
         begin
