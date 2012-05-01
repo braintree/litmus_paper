@@ -17,3 +17,5 @@ RSpec.configure do |config|
 end
 
 IPVSLitmus.config_dir = "/tmp/ipvs"
+
+TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
