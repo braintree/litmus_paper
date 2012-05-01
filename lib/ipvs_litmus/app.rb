@@ -1,7 +1,22 @@
 module IPVSLitmus
   class App < Sinatra::Base
-    get "/status" do
-      [200, { "Content-Type" => "text/plain" }, "OK"]
+    post "/down" do
+      FileUtils.mkdir_p IPVSLitmus.config_dir
+      File.open(IPVSLitmus.config_dir.join('global_down'), 'w') do |file|
+        file.puts params[:reason]
+      end
+
+      [201, "Global down file created"]
+    end
+
+    delete "/down" do
+      global_downfile = IPVSLitmus.config_dir.join('global_down')
+      if File.exists?(global_downfile)
+        FileUtils.rm(global_downfile)
+        [200, "Global down file deleted"]
+      else
+        [404, { "Content-Type" => "text/plain" }, "NOT FOUND"]
+      end
     end
 
     get "/:service/status" do

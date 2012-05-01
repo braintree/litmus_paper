@@ -10,6 +10,9 @@ RSpec.configure do |config|
   config.expect_with :rspec
   config.include Rack::Test::Methods
 
+  config.before :each do
+    IPVSLitmus.reset
+  end
 end
 
 IPVSLitmus.config_dir = "/tmp/ipvs"

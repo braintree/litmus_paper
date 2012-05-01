@@ -5,12 +5,45 @@ describe IPVSLitmus::App do
     IPVSLitmus::App
   end
 
-  describe "GET /status" do
-    it "works" do
-      get "/status"
+  describe "POST /down" do
+    it "creates a global downfile" do
+      test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
 
+      post "/down", :reason => "down for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 503
+      last_response.body.should match(/down for testing/)
+    end
+  end
+
+  describe "DELETE /down" do
+    it "removes the global downfile" do
+      test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      IPVSLitmus.services['test'] = test_service
+
+      post "/down", :reason => "down for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 503
+
+      delete "/down"
+      last_response.status.should == 200
+
+      get "/test/status"
       last_response.should be_ok
-      last_response.header["Content-Type"].should == "text/plain"
+      last_response.body.should_not match(/down for testing/)
+    end
+
+    it "404s if there is no downfile" do
+      test_service = IPVSLitmus::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+
+      delete "/down"
+
+      last_response.status.should == 404
     end
   end
 

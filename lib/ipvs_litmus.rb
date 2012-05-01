@@ -29,4 +29,8 @@ module IPVSLitmus
   def self.config_dir=(path)
     @config_dir = Pathname.new(path)
   end
+
+  def self.reset
+    @services = {}
+  end
 end
