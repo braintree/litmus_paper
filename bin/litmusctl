@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'ipvs_litmus'
+require 'ipvs_litmus/cli/admin'
+
+IPVSLitmus::CLI::Admin.new.run
