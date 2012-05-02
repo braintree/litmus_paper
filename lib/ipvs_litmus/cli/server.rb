@@ -6,7 +6,7 @@ module IPVSLitmus
           args, options = args.dup, {}
 
           opt_parser = OptionParser.new do |opts|
-            opts.banner = "Usage: litmus server [mongrel, thin, etc] [options]"
+            opts.banner = "Usage: litmus [mongrel, thin, etc] [options]"
             opts.on("-c", "--config=file", String,
                     "Litmus configuration file", "Default: /etc/litmus.conf") { |v| options[:litmus_config] = v }
             opts.on("-D", "--data-dir=path", String,
@@ -30,6 +30,7 @@ module IPVSLitmus
 
           opt_parser.parse! args
 
+          options[:config] = File.expand_path("../../../config.ru", File.dirname(__FILE__))
           options[:server] = args.shift
           options
         end
@@ -40,6 +41,11 @@ module IPVSLitmus
       end
 
       def start
+        if !File.exists?(options[:litmus_config])
+          puts "Could not find #{options[:litmus_config]}. Specify correct location with -c file"
+          exit 1
+        end
+
         IPVSLitmus.configure(options[:litmus_config])
         IPVSLitmus.config_dir = options[:config_dir]
         super
