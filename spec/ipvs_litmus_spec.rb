@@ -7,4 +7,16 @@ describe IPVSLitmus do
       IPVSLitmus.services.has_key?('test').should == true
     end
   end
+
+  describe "reload" do
+    it "will reconfigure the services" do
+      IPVSLitmus.configure(TEST_CONFIG)
+      IPVSLitmus.services["bar"] = :service
+
+      Process.kill("HUP", Process.pid)
+
+      IPVSLitmus.services.has_key?('bar').should == false
+      IPVSLitmus.services.has_key?('test').should == true
+    end
+  end
 end

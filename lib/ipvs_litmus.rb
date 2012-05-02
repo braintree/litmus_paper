@@ -24,6 +24,7 @@ module IPVSLitmus
   end
 
   def self.configure(filename)
+    @config_file = filename
     @services = IPVSLitmus::Configuration.new(filename).evaluate
   end
 
@@ -31,7 +32,13 @@ module IPVSLitmus
     @config_dir = Pathname.new(path)
   end
 
+  def self.reload
+    configure(@config_file)
+  end
+
   def self.reset
     @services = {}
   end
 end
+
+Signal.trap("HUP") { IPVSLitmus.reload }
