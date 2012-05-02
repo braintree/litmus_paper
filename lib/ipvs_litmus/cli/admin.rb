@@ -7,7 +7,7 @@ module IPVSLitmus
       end
 
       def force(args)
-        options = { :port => 9292, :host => 'localhost' }
+        options = _default_options
         opt_parser = _extend_default_parser(options) do |opts|
           opts.banner = "Usage: litmusctl force <up|down> [service] [options]"
           opts.on("-d", "--delete", "Remove status file") do
@@ -36,7 +36,7 @@ module IPVSLitmus
       end
 
       def status(args)
-        options = { :port => 9292, :host => 'localhost' }
+        options = _default_options
         opt_parser = _extend_default_parser(options) do |opts|
           opts.banner = "Usage: litmusctl status <service> [options]"
         end
@@ -45,6 +45,10 @@ module IPVSLitmus
         service = args.shift
 
         _litmus_request(options[:host], options[:port], Net::HTTP::Get.new("/#{service}/status"))
+      end
+
+      def _default_options
+        options = { :port => 9292, :host => 'localhost' }
       end
 
       def _extend_default_parser(options, &block)
