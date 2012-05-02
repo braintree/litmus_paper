@@ -1,6 +1,6 @@
 # IpvsLitmus
 
-TODO: Write a gem description
+Backend health tester for HA Services
 
 ## Installation
 

@@ -2,10 +2,10 @@
 require File.expand_path('../lib/ipvs_litmus/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["TODO: Write your name"]
+  gem.authors       = ["Braintreeps"]
   gem.email         = ["code@getbraintree.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Backend health tester for HA Services}
+  gem.summary       = %q{Backend health tester for HA Services}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
