@@ -36,4 +36,11 @@ describe IPVSLitmus::Metric::CPULoad do
       cpu_load.load_average.should > 0.0
     end
   end
+
+  describe "#to_s" do
+    it "is the check name and the maximum weight" do
+      cpu_load = IPVSLitmus::Metric::CPULoad.new(50)
+      cpu_load.to_s.should == "Metric::CPULoad(50)"
+    end
+  end
 end

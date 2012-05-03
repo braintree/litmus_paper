@@ -118,7 +118,7 @@ describe IPVSLitmus::App do
       last_response.header["Content-Type"].should == "text/plain"
       last_response.body.should match(/Health: 100/)
       last_response.body.should match(/AlwaysAvailableDependency: OK/)
-      last_response.body.should match(/ConstantMetric: 100/)
+      last_response.body.should include("ConstantMetric(100): 100")
     end
 
     it "is 'service unavailable' when the check fails" do

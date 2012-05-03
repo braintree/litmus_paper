@@ -48,8 +48,8 @@ describe IPVSLitmus::Health do
       health.perform(ConstantMetric.new(12))
       health.perform(ConstantMetric.new(34))
 
-      health.summary.should match(/ConstantMetric: 12/)
-      health.summary.should match(/ConstantMetric: 34/)
+      health.summary.should include("ConstantMetric(12): 12")
+      health.summary.should include("ConstantMetric(34): 34")
     end
 
     it "only runs each metric once" do

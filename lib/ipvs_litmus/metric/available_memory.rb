@@ -27,6 +27,10 @@ module IPVSLitmus
         size, scale = @facter.value('memoryfree').split(' ')
         size.to_i * MULTIPLIER[scale]
       end
+
+      def to_s
+        "Metric::AvailableMemory(#{@weight})"
+      end
     end
   end
 end

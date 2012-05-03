@@ -22,6 +22,10 @@ module IPVSLitmus
       def _body_matches?(response)
         response.body =~ @expected_content
       end
+
+      def to_s
+        "Dependency::HTTP(#{@uri})"
+      end
     end
   end
 end

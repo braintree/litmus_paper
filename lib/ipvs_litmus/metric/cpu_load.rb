@@ -17,6 +17,10 @@ module IPVSLitmus
       def load_average
         @facter.value('loadaverage').split(' ').first.to_f
       end
+
+      def to_s
+        "Metric::CPULoad(#{@weight})"
+      end
     end
   end
 end

@@ -39,4 +39,11 @@ describe IPVSLitmus::Dependency::HTTP do
       check.should_not be_available
     end
   end
+
+  describe "to_s" do
+    it "is the name of the class and the url" do
+      check = IPVSLitmus::Dependency::HTTP.new('http://httpstat.us/500')
+      check.to_s.should == "Dependency::HTTP(http://httpstat.us/500)"
+    end
+  end
 end

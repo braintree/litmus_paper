@@ -22,14 +22,14 @@ module IPVSLitmus
       health = metric.current_health
 
       @value += health
-      @summary << "#{metric.class}: #{health}\n"
+      @summary << "#{metric}: #{health}\n"
     end
 
     def ensure(dependency)
       available = dependency.available?
 
       @dependencies_available &&= available
-      @summary << "#{dependency.class}: #{available ? 'OK' : 'FAIL'}\n"
+      @summary << "#{dependency}: #{available ? 'OK' : 'FAIL'}\n"
     end
   end
 end

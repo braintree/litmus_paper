@@ -29,5 +29,12 @@ describe IPVSLitmus::Metric::AvailableMemory do
         metric.memory_free.should > 100
       end
     end
+
+    describe "#to_s" do
+      it "is the name of the check and the max weight" do
+        metric = IPVSLitmus::Metric::AvailableMemory.new(50)
+        metric.to_s.should == "Metric::AvailableMemory(50)"
+      end
+    end
   end
 end
