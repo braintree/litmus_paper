@@ -6,6 +6,17 @@ module IPVSLitmus
         send(command, argv)
       end
 
+      def list(args)
+        options = _default_options
+        opt_parser = _extend_default_parser(options) do |opts|
+          opts.banner = "Usage: litmusctl list [options]"
+        end
+        opt_parser.parse! args
+
+        request = Net::HTTP::Get.new("/")
+        _litmus_request(options[:host], options[:port], request)
+      end
+
       def force(args)
         options = _default_options
         opt_parser = _extend_default_parser(options) do |opts|

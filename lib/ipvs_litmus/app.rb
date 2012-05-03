@@ -1,5 +1,12 @@
 module IPVSLitmus
   class App < Sinatra::Base
+    get "/" do
+      output = "Services monitored:\n"
+      output +=  IPVSLitmus.services.keys.join("\n")
+
+      text 200, output
+    end
+
     post "/force/*" do
       path = *status_file_path(params[:splat])
       statusfile = StatusFile.new(*path)

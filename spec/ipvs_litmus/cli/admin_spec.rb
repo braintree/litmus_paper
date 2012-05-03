@@ -14,6 +14,12 @@ describe 'litmusctl' do
     system "kill -9 `cat /tmp/ipvs.pid`"
   end
 
+  describe 'list' do
+    it "returns the list of services running" do
+      _litmusctl('list').should match("test")
+    end
+  end
+
   describe 'status' do
     it 'returns the status of a service' do
       _litmusctl('status test').should match("Health: 0")

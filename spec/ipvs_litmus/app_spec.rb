@@ -5,6 +5,19 @@ describe IPVSLitmus::App do
     IPVSLitmus::App
   end
 
+  describe "GET /" do
+    it "returns the list of services litmus monitors" do
+      IPVSLitmus.services['test'] = IPVSLitmus::Service.new('test')
+      IPVSLitmus.services['another'] = IPVSLitmus::Service.new('another')
+
+      get "/"
+
+      last_response.status.should == 200
+      last_response.body.should include('test')
+      last_response.body.should include('another')
+    end
+  end
+
   describe "POST /force/*" do
     it "creates a global upfile" do
       test_service = IPVSLitmus::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
