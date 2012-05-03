@@ -116,6 +116,7 @@ describe IPVSLitmus::App do
 
       last_response.should be_ok
       last_response.header["Content-Type"].should == "text/plain"
+      last_response.header["X-Health"].should == "100"
       last_response.body.should match(/Health: 100/)
       last_response.body.should match(/AlwaysAvailableDependency: OK/)
       last_response.body.should include("ConstantMetric(100): 100")
@@ -129,6 +130,8 @@ describe IPVSLitmus::App do
 
       last_response.status.should == 503
       last_response.header["Content-Type"].should == "text/plain"
+      last_response.header["X-Health"].should == "0"
+      last_response.body.should match(/Health: 0/)
     end
 
     it "is 'not found' when the service is unknown" do

@@ -22,18 +22,18 @@ module IPVSLitmus
     get "/:service/status" do
       service = IPVSLitmus.services[params[:service]]
       if service.nil?
-        text 404, "NOT FOUND"
+        text 404, "NOT FOUND", { "X-Health" => "0" }
       else
         health = service.current_health
         response_code = health.ok? ? 200 : 503
         body = "Health: #{health.value}\n"
         body << health.summary
-        text response_code, body
+        text response_code, body, { "X-Health" => health.value.to_s }
       end
     end
 
-    def text(response_code, body)
-      [response_code, { "Content-Type" => "text/plain" }, body]
+    def text(response_code, body, headers ={})
+      [response_code, { "Content-Type" => "text/plain" }.merge(headers), body]
     end
 
     def status_file_path(splat)
