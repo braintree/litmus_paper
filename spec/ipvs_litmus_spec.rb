@@ -13,7 +13,7 @@ describe IPVSLitmus do
       IPVSLitmus.configure(TEST_CONFIG)
       IPVSLitmus.services["bar"] = :service
 
-      Process.kill("HUP", Process.pid)
+      IPVSLitmus.reload
 
       IPVSLitmus.services.has_key?('bar').should == false
       IPVSLitmus.services.has_key?('test').should == true
