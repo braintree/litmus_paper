@@ -13,8 +13,8 @@ describe IPVSLitmus::Dependency::HTTP do
     end
 
     it "is false when response is 200, but does not match content" do
-      check = IPVSLitmus::Dependency::HTTP.new('http://httpstat.us/200', :content => "BAD STUFF")
-      check.should be_available
+      check = IPVSLitmus::Dependency::HTTP.new('http://httpstat.us/200', :content => "some text not in the response")
+      check.should_not be_available
     end
 
     it "is true when response is any 200 level response" do

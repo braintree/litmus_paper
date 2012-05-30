@@ -3,7 +3,7 @@ module IPVSLitmus
     class HTTP
       def initialize(uri, options = {})
         @uri = uri
-        @expected_content = Regexp.new(options.fetch(:contnet, '.*'))
+        @expected_content = Regexp.new(options.fetch(:content, '.*'))
       end
 
       def available?
