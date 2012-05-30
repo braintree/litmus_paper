@@ -2,6 +2,16 @@ require 'spec_helper'
 
 describe IPVSLitmus::Dependency::HTTP do
   describe "#available?" do
+    context "http method" do
+      it "uses the given http method when making the request" do
+        check = IPVSLitmus::Dependency::HTTP.new('http://www.google.com', :method => "POST")
+        check.should_not be_available
+
+        check = IPVSLitmus::Dependency::HTTP.new('http://www.google.com', :method => "GET")
+        check.should be_available
+      end
+    end
+
     it "is true when response is 200" do
       check = IPVSLitmus::Dependency::HTTP.new('http://httpstat.us/200')
       check.should be_available
