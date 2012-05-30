@@ -25,7 +25,11 @@ module IPVSLitmus
 
   def self.configure(filename)
     @config_file = filename
-    @services = IPVSLitmus::Configuration.new(filename).evaluate
+
+    begin
+      @services = IPVSLitmus::Configuration.new(filename).evaluate
+    rescue Exception
+    end
   end
 
   def self.config_dir=(path)

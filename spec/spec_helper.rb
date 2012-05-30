@@ -3,6 +3,7 @@ ENV['RACK_ENV'] = 'test'
 require 'rspec'
 require 'rack/test'
 require 'ipvs_litmus'
+require 'tempfile'
 
 Dir.glob("#{File.expand_path('support', File.dirname(__FILE__))}/**/*.rb").each { |f| require f }
 
@@ -17,6 +18,13 @@ RSpec.configure do |config|
 end
 
 module SpecHelper
+  def self.create_temp_file(contents)
+    file = Tempfile.new 'ipvs_litmus'
+    file.write contents
+    file.close
+    file.path
+  end
+
   def self.wait_for_service(options)
     Timeout::timeout(options[:timeout] || 20) do
       loop do
