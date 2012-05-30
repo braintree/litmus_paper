@@ -17,6 +17,7 @@ module IPVSLitmus
       def _make_request
         uri = URI.parse(@uri)
         request = Net::HTTP.const_get(@method.capitalize).new(uri.normalize.path)
+        request.set_form_data({})
 
         Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(request)
