@@ -16,6 +16,22 @@ RSpec.configure do |config|
   end
 end
 
+module SpecHelper
+  def self.wait_for_service(options)
+    Timeout::timeout(options[:timeout] || 20) do
+      loop do
+        begin
+          socket = TCPSocket.new(options[:host], options[:port])
+          socket.close
+          return
+        rescue Exception
+          sleep 0.5
+        end
+      end
+    end
+  end
+end
+
 IPVSLitmus.config_dir = "/tmp/ipvs"
 
 TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))

@@ -16,7 +16,7 @@ describe IPVSLitmus::Dependency::TCP do
     end
 
     it "is false when the ip is not available" do
-      check = IPVSLitmus::Dependency::TCP.new("127.0.0.254", 3333)
+      check = IPVSLitmus::Dependency::TCP.new("10.254.254.254", 3333)
       check.should_not be_available
     end
 

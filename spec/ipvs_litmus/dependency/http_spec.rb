@@ -3,7 +3,7 @@ require 'spec_helper'
 describe IPVSLitmus::Dependency::HTTP do
   before(:all) do
     server_start = system "bundle exec rackup spec/support/http_test_server_config.ru --port 9294 --pid /tmp/http-test-server.pid --daemonize"
-    sleep 5
+    SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9294
     @url = "http://127.0.0.1:9294"
   end
 
