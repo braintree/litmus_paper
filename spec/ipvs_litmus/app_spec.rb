@@ -228,4 +228,19 @@ describe IPVSLitmus::App do
       last_response.body.should match(/Up for testing/)
     end
   end
+
+  describe "server errors" do
+    it "responds with a text/plain 500 response" do
+      old_environment = :test
+      begin
+        app.environment = :production
+        get "/test/error"
+        last_response.status.should == 500
+        last_response.headers["Content-Type"].should == "text/plain"
+        last_response.body.should == "Server Error"
+      ensure
+        app.environment = old_environment
+      end
+    end
+  end
 end

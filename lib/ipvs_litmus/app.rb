@@ -39,6 +39,14 @@ module IPVSLitmus
       end
     end
 
+    get "/test/error" do
+      raise "an error"
+    end
+
+    error do
+      text 500, "Server Error"
+    end
+
     def text(response_code, body, headers ={})
       [response_code, { "Content-Type" => "text/plain" }.merge(headers), body]
     end
