@@ -44,3 +44,4 @@ LitmusPaper.config_dir = "/tmp/litmus_paper"
 
 TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
 TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))
+TEST_CA_CERT = File.expand_path('ssl/server.crt', File.dirname(__FILE__))

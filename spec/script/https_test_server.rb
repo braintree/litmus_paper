@@ -3,8 +3,8 @@ require 'webrick'
 require 'webrick/https'
 require 'openssl'
 
-private_key_file = File.expand_path(File.join(File.dirname(__FILE__), "..", "ssl", "privateKey.key"))
-cert_file = File.expand_path(File.join(File.dirname(__FILE__), "..", "ssl", "certificate.crt"))
+private_key_file = File.expand_path(File.join(File.dirname(__FILE__), "..", "ssl", "server.key"))
+cert_file = File.expand_path(File.join(File.dirname(__FILE__), "..", "ssl", "server.crt"))
 
 pkey = OpenSSL::PKey::RSA.new(File.read(private_key_file))
 cert = OpenSSL::X509::Certificate.new(File.read(cert_file))
