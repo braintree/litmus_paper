@@ -26,7 +26,10 @@ module LitmusPaper
         request = Net::HTTP.const_get(@method.capitalize).new(uri.normalize.path)
         request.set_form_data({})
 
-        Net::HTTP.start(uri.host, uri.port) do |http|
+        connection = Net::HTTP.new(uri.host, uri.port)
+        connection.use_ssl = uri.scheme == "https"
+
+        connection.start do |http|
           http.request(request)
         end
       end

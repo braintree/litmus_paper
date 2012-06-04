@@ -22,6 +22,20 @@ describe LitmusPaper::Dependency::HTTP do
       end
     end
 
+    context "https" do
+      it "can make https request" do
+        begin
+          puts `env SSL_TEST_PORT=9295 PID_FILE=/tmp/https-test-server.pid bundle exec spec/script/https_test_server.rb`
+          SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9295
+
+          check = LitmusPaper::Dependency::HTTP.new("https://127.0.0.1:9295/")
+          check.should be_available
+        ensure
+          system "kill -9 `cat /tmp/https-test-server.pid`"
+        end
+      end
+    end
+
     it "is true when response is 200" do
       check = LitmusPaper::Dependency::HTTP.new("#{@url}/status/200")
       check.should be_available
