@@ -1,6 +1,8 @@
 require 'pathname'
 require 'net/http'
+require 'net/https'
 require 'uri'
+require 'forwardable'
 
 require 'sinatra/base'
 require 'facter'
@@ -23,7 +25,10 @@ require 'litmus_paper/status_file'
 module LitmusPaper
   class << self
     attr_reader :services, :config_dir
+    attr_accessor :logger
   end
+
+  self.logger = Logger.new
 
   def self.configure(filename)
     @config_file = filename

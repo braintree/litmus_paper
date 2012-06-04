@@ -9,8 +9,15 @@ module LitmusPaper
 
       def available?
         response = _make_request
-        _successful_response?(response) && _body_matches?(response)
-      rescue Exception
+        success = _successful_response?(response)
+        matches = _body_matches?(response)
+
+        LitmusPaper.logger.info("Available check to #{@uri} failed with status #{response.code}") unless success
+        LitmusPaper.logger.info("Available check to #{@uri} did not match #{@expected_content}") unless matches
+
+        success && matches
+      rescue Exception => e
+        LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
         false
       end
 
