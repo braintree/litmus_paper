@@ -43,3 +43,4 @@ end
 IPVSLitmus.config_dir = "/tmp/ipvs"
 
 TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
+TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))
