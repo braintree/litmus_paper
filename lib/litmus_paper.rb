@@ -4,6 +4,7 @@ require 'uri'
 
 require 'sinatra/base'
 require 'facter'
+require 'syslog_logger'
 
 require 'facts/loadaverage'
 
@@ -13,6 +14,7 @@ require 'litmus_paper/dependency/http'
 require 'litmus_paper/dependency/tcp'
 require 'litmus_paper/health'
 require 'litmus_paper/forced_health'
+require 'litmus_paper/logger'
 require 'litmus_paper/metric/available_memory'
 require 'litmus_paper/metric/cpu_load'
 require 'litmus_paper/service'
