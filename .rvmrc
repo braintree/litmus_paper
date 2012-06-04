@@ -1,1 +1,1 @@
-rvm use ruby-1.8.7-p249@ipvs_litmus --create
+rvm use ruby-1.8.7-p249@litmus_paper --create

@@ -2,13 +2,13 @@
 
 Backend health tester for HA Services
 
-[![Build Status](https://secure.travis-ci.org/braintree/ipvs_litmus.png)](http://travis-ci.org/braintree/ipvs_litmus)
+[![Build Status](https://secure.travis-ci.org/braintree/litmus_paper.png)](http://travis-ci.org/braintree/litmus_paper)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'ipvs_litmus'
+    gem 'litmus_paper'
 
 And then execute:
 
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install ipvs_litmus
+    $ gem install litmus_paper
 
 ## Usage
 

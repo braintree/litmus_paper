@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'ipvs_litmus'
-require 'ipvs_litmus/cli/server'
+require 'litmus_paper'
+require 'litmus_paper/cli/server'
 
-IPVSLitmus::CLI::Server.new.start
+LitmusPaper::CLI::Server.new.start

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require 'ipvs_litmus'
-require 'ipvs_litmus/cli/admin'
+require 'litmus_paper'
+require 'litmus_paper/cli/admin'
 
-IPVSLitmus::CLI::Admin.new.run
+LitmusPaper::CLI::Admin.new.run

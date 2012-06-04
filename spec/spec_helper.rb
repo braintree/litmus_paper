@@ -2,7 +2,7 @@ ENV['RACK_ENV'] = 'test'
 
 require 'rspec'
 require 'rack/test'
-require 'ipvs_litmus'
+require 'litmus_paper'
 require 'tempfile'
 
 Dir.glob("#{File.expand_path('support', File.dirname(__FILE__))}/**/*.rb").each { |f| require f }
@@ -12,14 +12,14 @@ RSpec.configure do |config|
   config.include Rack::Test::Methods
 
   config.before :each do
-    FileUtils.rm_rf(IPVSLitmus.config_dir)
-    IPVSLitmus.reset
+    FileUtils.rm_rf(LitmusPaper.config_dir)
+    LitmusPaper.reset
   end
 end
 
 module SpecHelper
   def self.create_temp_file(contents)
-    file = Tempfile.new 'ipvs_litmus'
+    file = Tempfile.new 'litmus_paper'
     file.write contents
     file.close
     file.path
@@ -40,7 +40,7 @@ module SpecHelper
   end
 end
 
-IPVSLitmus.config_dir = "/tmp/ipvs"
+LitmusPaper.config_dir = "/tmp/litmus_paper"
 
 TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
 TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))
