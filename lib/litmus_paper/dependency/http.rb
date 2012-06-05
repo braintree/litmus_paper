@@ -18,6 +18,7 @@ module LitmusPaper
 
         success && matches
       rescue Exception => e
+        p e
         LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
         false
       end
