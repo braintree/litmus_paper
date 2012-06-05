@@ -29,6 +29,10 @@ describe LitmusPaper::Dependency::HTTP do
           unless $?.success?
             raise "failed to start test https server. exit code: #{$?.exitstatus}, output: #{output}"
           end
+          puts "#{Time.now} Connecting to 9297"
+          SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9297
+
+          puts "#{Time.now} Connecting to 9297"
           SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9297
 
           check = LitmusPaper::Dependency::HTTP.new(
