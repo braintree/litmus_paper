@@ -7,7 +7,7 @@ describe 'litmusctl' do
   end
 
   before(:all) do
-    system "bundle exec ruby -I lib bin/litmus -p 9293 -d -D /tmp/litmus_paper -c #{TEST_CONFIG} -P /tmp/litmus.pid"
+   system "bundle exec ruby -I lib bin/litmus -p 9293 -d -D /tmp/litmus_paper -c #{TEST_CONFIG} -P /tmp/litmus.pid"
   end
 
   after(:all) do
