@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe LitmusPaper::Dependency::HTTP do
+  run_in_reactor
+
   before(:all) do
     server_start = system "bundle exec rackup spec/support/http_test_server_config.ru --port 9294 --pid /tmp/http-test-server.pid --daemonize"
     SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9294
@@ -25,7 +27,6 @@ describe LitmusPaper::Dependency::HTTP do
     context "https" do
       it "can make https request" do
         begin
-          LitmusPaper.logger = StdoutLogger.new
           `env SSL_TEST_PORT=9295 PID_FILE=/tmp/https-test-server.pid bundle exec spec/script/https_test_server.rb`
           SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9295
 
