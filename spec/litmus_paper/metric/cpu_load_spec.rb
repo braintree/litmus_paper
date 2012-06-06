@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe LitmusPaper::Metric::CPULoad do
+  run_in_reactor
+
   describe "#current_health" do
     it "is the percent of available cpu capacity" do
       facter = StubFacter.new({"processorcount" => "4", "loadaverage" => "1.00 0.40 0.10"})

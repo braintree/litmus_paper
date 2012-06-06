@@ -1,7 +1,7 @@
 module LitmusPaper
   module Metric
     class CPULoad
-      def initialize(weight, facter = Facter)
+      def initialize(weight, facter = DeferredFacter)
         @weight = weight
         @facter = facter
       end

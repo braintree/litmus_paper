@@ -7,7 +7,7 @@ module LitmusPaper
         "KB" => 1024
       }
 
-      def initialize(weight, facter = Facter)
+      def initialize(weight, facter = DeferredFacter)
         @weight = weight
         @facter = facter
       end

@@ -1,5 +1,7 @@
 module LitmusPaper
   class App < Sinatra::Base
+    register Sinatra::Synchrony
+
     get "/" do
       output = "Services monitored:\n"
       output +=  LitmusPaper.services.keys.join("\n")

@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe LitmusPaper::Metric::AvailableMemory do
+  run_in_reactor
+
   describe "#current_health" do
     it "multiplies weight by memory available" do
       facter = StubFacter.new({"memorytotal" => "10 GB", "memoryfree" => "5 GB"})

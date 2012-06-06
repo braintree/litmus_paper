@@ -17,6 +17,15 @@ RSpec.configure do |config|
   end
 end
 
+def run_in_reactor
+  around(:each) do |spec|
+    EM.synchrony do
+      spec.run
+      EM.stop
+    end
+  end
+end
+
 module SpecHelper
   def self.create_temp_file(contents)
     file = Tempfile.new 'litmus_paper'
