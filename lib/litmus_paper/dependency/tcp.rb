@@ -1,18 +1,35 @@
 module LitmusPaper
   module Dependency
     class TCP
-      def initialize(ip, port)
+      class EndpointAvailable < EM::Connection
+        def initialize(fiber, timeout)
+          @fiber = fiber
+          EM.add_timer(timeout, method(:connection_timeout))
+        end
+
+        def connection_completed
+          close_connection
+          @fiber.resume(true)
+        end
+
+        def connection_timeout
+          @fiber.resume(false)
+        end
+      end
+
+      def initialize(ip, port, options = {})
         @ip, @port = ip, port
+        @timeout = options.fetch(:timeout, 2)
       end
 
       def available?
-        Timeout.timeout(5) do
-          socket = TCPSocket.new(@ip, @port)
-          socket.close
+        fiber = Fiber.current
+
+        EM.connect(@ip, @port, EndpointAvailable, fiber, @timeout) do |connection|
+          connection.set_pending_connect_timeout @timeout
         end
-        true
-      rescue Exception
-        false
+
+        return Fiber.yield
       end
 
       def to_s

@@ -17,10 +17,12 @@ RSpec.configure do |config|
   end
 end
 
-def run_in_reactor
+def run_in_reactor(timeout = 5)
   around(:each) do |spec|
     EM.synchrony do
+      sig = EM.add_timer(timeout) { fail "timeout!"; EM.stop }
       spec.run
+      EM.cancel_timer(sig)
       EM.stop
     end
   end
