@@ -31,7 +31,7 @@ module LitmusPaper
           opt_parser.parse! args
 
           options[:config] = File.expand_path("../../../config.ru", File.dirname(__FILE__))
-          options[:server] = args.shift
+          options[:server] = 'thin-with-callbacks'
           options
         end
       end
@@ -46,8 +46,10 @@ module LitmusPaper
           exit 1
         end
 
-        LitmusPaper.configure(options[:litmus_config])
+        LitmusPaper.config_file = options[:litmus_config]
         LitmusPaper.config_dir = options[:config_dir]
+
+        LitmusPaper.configure!
         super
       end
 

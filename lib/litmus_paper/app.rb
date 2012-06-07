@@ -1,6 +1,8 @@
 module LitmusPaper
   class App < Sinatra::Base
     register Sinatra::Synchrony
+    set :dump_errors, true
+    set :raise_errors, false
 
     get "/" do
       output = "Services monitored:\n"

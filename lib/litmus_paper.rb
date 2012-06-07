@@ -10,7 +10,6 @@ require 'em-synchrony/em-http'
 require 'em/syslog'
 require 'thin'
 require 'facter'
-require 'syslog_logger'
 
 require 'facts/loadaverage'
 
@@ -36,17 +35,17 @@ require 'thin/callback_rack_handler'
 module LitmusPaper
   class << self
     attr_reader :services, :config_dir
-    attr_accessor :logger
+    attr_accessor :logger, :config_file
   end
 
   self.logger = Logger.new
 
-  def self.configure(filename)
-    @config_file = filename
-
+  def self.configure!
+    LitmusPaper.logger.setup!
     begin
-      @services = LitmusPaper::Configuration.new(filename).evaluate
-    rescue Exception
+      @services = LitmusPaper::Configuration.new(@config_file).evaluate
+    rescue Exception => e
+      logger.info("Error in configuration #{e.message}")
     end
   end
 
@@ -55,7 +54,11 @@ module LitmusPaper
   end
 
   def self.reload
-    configure(@config_file)
+    begin
+      @services = LitmusPaper::Configuration.new(@config_file).evaluate
+    rescue Exception => e
+      logger.info("Error in configuration #{e.message}")
+    end
   end
 
   def self.reset
@@ -64,3 +67,4 @@ module LitmusPaper
 end
 
 Signal.trap("HUP") { LitmusPaper.reload }
+
