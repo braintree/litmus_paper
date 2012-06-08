@@ -5,8 +5,8 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Braintreeps"]
   gem.email         = ["code@getbraintree.com"]
   gem.description   = %q{Backend health tester for HA Services}
-  gem.summary       = %q{Backend health tester for HA Services}
-  gem.homepage      = ""
+  gem.summary       = %q{Backend health tester for HA Services, partner project of big_brother}
+  gem.homepage      = "https://github.com/braintree/litmus_paper"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -14,6 +14,8 @@ Gem::Specification.new do |gem|
   gem.name          = "litmus_paper"
   gem.require_paths = ["lib"]
   gem.version       = LitmusPaper::VERSION
+
+  gem.required_ruby_version = '>= 1.9.1'
 
   gem.add_dependency "thin", "~> 1.3.1"
   gem.add_dependency "async-rack", "~> 0.5.1"
