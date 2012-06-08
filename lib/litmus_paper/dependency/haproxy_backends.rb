@@ -31,10 +31,18 @@ module LitmusPaper
 
       def available?
         stats = _parse_stats(_fetch_stats)
-
         servers = _servers_in(stats, @cluster)
-        available = servers.select { |s| s['status'] == "UP" }
 
+        if not _any_up?(servers)
+          LitmusPaper.logger.info("None of the servers (#{servers.map{ |s| s['svname'] }.join(',')}) are up")
+          false
+        else
+          true
+        end
+      end
+
+      def _any_up?(servers)
+        available = servers.select { |s| s['status'] == "UP" }
         available.size > 0
       end
 
