@@ -48,7 +48,7 @@ module LitmusPaper
     end
 
     error do
-      text 500, "Server Error"
+      text 500, "Server Error: " + env['sinatra.error'].message
     end
 
     def text(response_code, body, headers ={})

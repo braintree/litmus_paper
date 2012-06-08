@@ -6,7 +6,7 @@ module LitmusPaper
           args, options = args.dup, {}
 
           opt_parser = OptionParser.new do |opts|
-            opts.banner = "Usage: litmus [mongrel, thin, etc] [options]"
+            opts.banner = "Usage: litmus [options]"
             opts.on("-c", "--config=file", String,
                     "Litmus configuration file", "Default: /etc/litmus.conf") { |v| options[:litmus_config] = v }
             opts.on("-D", "--data-dir=path", String,
@@ -32,6 +32,7 @@ module LitmusPaper
 
           options[:config] = File.expand_path("../../../config.ru", File.dirname(__FILE__))
           options[:server] = 'thin-with-callbacks'
+          options[:backend] = Thin::Backends::TcpServerWithCallbacks
           options
         end
       end
@@ -49,7 +50,10 @@ module LitmusPaper
         LitmusPaper.config_file = options[:litmus_config]
         LitmusPaper.config_dir = options[:config_dir]
 
-        LitmusPaper.configure!
+        Thin::Callbacks.after_connect do
+          LitmusPaper.configure!
+        end
+
         super
       end
 

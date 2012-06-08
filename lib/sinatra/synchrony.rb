@@ -25,6 +25,7 @@ module Sinatra
           s, h, b = printer.call(env)
           [s, h, b]
         else
+          LitmusPaper.logger.info(e)
           [500, {}, ""]
         end
       end
