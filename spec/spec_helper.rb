@@ -37,6 +37,15 @@ module SpecHelper
     file.path
   end
 
+  def self.ensure_no_outstanding_timers(&block)
+    timer_keys = EM.instance_variable_get("@timers").keys
+    yield
+    new_timer_keys = EM.instance_variable_get("@timers").keys - timer_keys
+    new_timer_keys.each do |timer_key|
+      EM.instance_variable_get("@timers")[timer_key].should == false
+    end
+  end
+
   def self.wait_for_service(options)
     Timeout::timeout(options[:timeout] || 20) do
       loop do

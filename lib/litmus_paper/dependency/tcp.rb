@@ -6,11 +6,12 @@ module LitmusPaper
           @fiber = fiber
           @ip = ip
           @port = port
-          EM.add_timer(timeout, method(:connection_timeout))
+          @timer = EM::Timer.new(timeout, method(:connection_timeout))
         end
 
         def connection_completed
           close_connection
+          @timer.cancel
           @fiber.resume(true)
         end
 

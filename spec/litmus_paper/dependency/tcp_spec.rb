@@ -12,9 +12,17 @@ describe LitmusPaper::Dependency::TCP do
         EM.stop_server @server if @server
       end
     end
+
     it "is true when it's able to reach the ip and port" do
       check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 3333)
       check.should be_available
+    end
+
+    it "cancels the timer when successful" do
+      SpecHelper.ensure_no_outstanding_timers do
+        check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 3333)
+        check.should be_available
+      end
     end
 
     it "is false when the ip is not available" do
