@@ -20,12 +20,12 @@ module LitmusPaper
         return @memory_total unless @memory_total.nil?
 
         size, scale = @facter.value('memorytotal').split(' ')
-        @memory_total = size.to_i * MULTIPLIER[scale]
+        @memory_total = (size.to_f * MULTIPLIER[scale]).to_i
       end
 
       def memory_free
         size, scale = @facter.value('memoryfree').split(' ')
-        size.to_i * MULTIPLIER[scale]
+        (size.to_f * MULTIPLIER[scale]).to_i
       end
 
       def to_s
