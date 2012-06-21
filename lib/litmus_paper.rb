@@ -12,6 +12,7 @@ require 'facts/loadaverage'
 
 require 'litmus_paper/app'
 require 'litmus_paper/configuration'
+require 'litmus_paper/dependency/haproxy_backends'
 require 'litmus_paper/dependency/http'
 require 'litmus_paper/dependency/tcp'
 require 'litmus_paper/health'
