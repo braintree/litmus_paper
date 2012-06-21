@@ -29,7 +29,7 @@ describe LitmusPaper::Dependency::HTTP do
           SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9295
 
           check = LitmusPaper::Dependency::HTTP.new(
-            "https://localhost:9295/",
+            "https://127.0.0.1:9295",
             :ca_file => TEST_CA_CERT
           )
           check.should be_available
