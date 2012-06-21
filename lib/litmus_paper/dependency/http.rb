@@ -1,12 +1,10 @@
 module LitmusPaper
   module Dependency
     class HTTP
-      VALID_RESPONSE_CODES = (200..399).freeze
-
       def initialize(uri, options = {})
         @uri = uri
         @expected_content = Regexp.new(options.fetch(:content, '.*'))
-        @method = options.fetch(:method, 'get')
+        @method = options.fetch(:method, 'GET')
         @ca_file = options[:ca_file]
       end
 
@@ -15,7 +13,7 @@ module LitmusPaper
         success = _successful_response?(response)
         matches = _body_matches?(response)
 
-        LitmusPaper.logger.info("Available check to #{@uri} failed with status #{response.response_header.status}") unless success
+        LitmusPaper.logger.info("Available check to #{@uri} failed with status #{response.code}") unless success
         LitmusPaper.logger.info("Available check to #{@uri} did not match #{@expected_content}") unless matches
 
         success && matches
@@ -26,18 +24,28 @@ module LitmusPaper
 
       def _make_request
         uri = URI.parse(@uri)
-        request_options = {}
-        request_options[:ssl] = {:verify_peer => true, :cert_chain_file => @ca_file} if uri.scheme == "https"
+        request = Net::HTTP.const_get(@method.capitalize).new(uri.normalize.path)
+        request.set_form_data({})
 
-        EM::HttpRequest.new(@uri).send(@method.downcase, request_options)
+        connection = Net::HTTP.new(uri.host, uri.port)
+        if uri.scheme == "https"
+          connection.use_ssl = true
+          connection.verify_mode = OpenSSL::SSL::VERIFY_PEER
+          connection.ca_file = @ca_file unless @ca_file.nil?
+          connection.verify_callback = proc { |preverify_ok, ssl_context| _verify_ssl_certificate(preverify_ok, ssl_context) }
+        end
+
+        connection.start do |http|
+          http.request(request)
+        end
       end
 
       def _successful_response?(response)
-        VALID_RESPONSE_CODES.include? response.response_header.status
+        response.is_a? Net::HTTPSuccess
       end
 
       def _body_matches?(response)
-        (response.response =~ @expected_content) ? true : false
+        (response.body =~ @expected_content) ? true : false
       end
 
       def _verify_ssl_certificate(preverify_ok, ssl_context)

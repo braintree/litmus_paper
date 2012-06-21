@@ -7,7 +7,7 @@ module LitmusPaper
         "KB" => 1024
       }
 
-      def initialize(weight, facter = DeferredFacter)
+      def initialize(weight, facter = Facter)
         @weight = weight
         @facter = facter
       end
@@ -20,12 +20,12 @@ module LitmusPaper
         return @memory_total unless @memory_total.nil?
 
         size, scale = @facter.value('memorytotal').split(' ')
-        @memory_total = (size.to_f * MULTIPLIER[scale]).to_i
+        @memory_total = size.to_i * MULTIPLIER[scale]
       end
 
       def memory_free
         size, scale = @facter.value('memoryfree').split(' ')
-        (size.to_f * MULTIPLIER[scale]).to_i
+        size.to_i * MULTIPLIER[scale]
       end
 
       def to_s

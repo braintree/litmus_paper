@@ -7,8 +7,7 @@ describe 'litmusctl' do
   end
 
   before(:all) do
-    `env RACK_ENV=production bundle exec ruby -I lib bin/litmus -p 9293 -d -D #{LitmusPaper.config_dir} -c #{TEST_CONFIG} -P /tmp/litmus.pid`
-    SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9293
+    system "bundle exec ruby -I lib bin/litmus -p 9293 -d -D /tmp/litmus_paper -c #{TEST_CONFIG} -P /tmp/litmus.pid"
   end
 
   after(:all) do

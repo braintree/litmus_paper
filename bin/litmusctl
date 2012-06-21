@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require 'net/http'
+require 'litmus_paper'
 require 'litmus_paper/cli/admin'
 
 LitmusPaper::CLI::Admin.new.run

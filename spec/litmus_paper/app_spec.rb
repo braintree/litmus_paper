@@ -237,7 +237,7 @@ describe LitmusPaper::App do
         get "/test/error"
         last_response.status.should == 500
         last_response.headers["Content-Type"].should == "text/plain"
-        last_response.body.should == "Server Error: an error"
+        last_response.body.should == "Server Error"
       ensure
         app.environment = old_environment
       end

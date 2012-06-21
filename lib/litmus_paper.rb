@@ -4,24 +4,14 @@ require 'net/https'
 require 'uri'
 require 'forwardable'
 
-require 'async-rack'
 require 'sinatra/base'
-require 'sinatra/synchrony'
-require 'em-synchrony/em-http'
-require 'em/syslog'
-
-require 'thin'
-require 'thin/callbacks'
-require 'thin/backends/tcp_server_with_callbacks'
-require 'thin/callback_rack_handler'
-
 require 'facter'
+require 'syslog_logger'
+
 require 'facts/loadaverage'
 
 require 'litmus_paper/app'
 require 'litmus_paper/configuration'
-require 'litmus_paper/deferred_facter'
-require 'litmus_paper/dependency/haproxy_backends'
 require 'litmus_paper/dependency/http'
 require 'litmus_paper/dependency/tcp'
 require 'litmus_paper/health'
@@ -35,17 +25,17 @@ require 'litmus_paper/status_file'
 module LitmusPaper
   class << self
     attr_reader :services, :config_dir
-    attr_accessor :logger, :config_file
+    attr_accessor :logger
   end
 
   self.logger = Logger.new
 
-  def self.configure!
-    LitmusPaper.logger.setup!
+  def self.configure(filename)
+    @config_file = filename
+
     begin
-      @services = LitmusPaper::Configuration.new(@config_file).evaluate
-    rescue Exception => e
-      logger.info("Error in configuration #{e.message}")
+      @services = LitmusPaper::Configuration.new(filename).evaluate
+    rescue Exception
     end
   end
 
@@ -54,11 +44,7 @@ module LitmusPaper
   end
 
   def self.reload
-    begin
-      @services = LitmusPaper::Configuration.new(@config_file).evaluate
-    rescue Exception => e
-      logger.info("Error in configuration #{e.message}")
-    end
+    configure(@config_file)
   end
 
   def self.reset
@@ -67,4 +53,3 @@ module LitmusPaper
 end
 
 Signal.trap("HUP") { LitmusPaper.reload }
-

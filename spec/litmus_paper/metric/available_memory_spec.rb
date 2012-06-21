@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe LitmusPaper::Metric::AvailableMemory do
-  run_in_reactor
-
   describe "#current_health" do
     it "multiplies weight by memory available" do
       facter = StubFacter.new({"memorytotal" => "10 GB", "memoryfree" => "5 GB"})
@@ -10,22 +8,10 @@ describe LitmusPaper::Metric::AvailableMemory do
       memory.current_health.should == 25
     end
 
-    it "multiplies weight by memory available when handling floating point values" do
-      facter = StubFacter.new({"memorytotal" => "2.0 GB", "memoryfree" => "1.8 GB"})
-      memory = LitmusPaper::Metric::AvailableMemory.new(50, facter)
-      memory.current_health.should == 44
-    end
-
     describe "#memory_total" do
       it "is a positive integer" do
         metric = LitmusPaper::Metric::AvailableMemory.new(50)
         metric.memory_total.should > 1_000
-      end
-
-      it "handles floating point values properly" do
-        facter = StubFacter.new("memorytotal" => "1.80 GB")
-        memory = LitmusPaper::Metric::AvailableMemory.new(50, facter)
-        memory.memory_total.should == 1932735283
       end
 
       it "is cached" do
@@ -41,12 +27,6 @@ describe LitmusPaper::Metric::AvailableMemory do
       it "is a positive integer" do
         metric = LitmusPaper::Metric::AvailableMemory.new(50)
         metric.memory_free.should > 100
-      end
-
-      it "handles floating point values properly" do
-        facter = StubFacter.new("memoryfree" => "1.80 GB")
-        memory = LitmusPaper::Metric::AvailableMemory.new(50, facter)
-        memory.memory_free.should == 1932735283
       end
     end
 

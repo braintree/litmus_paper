@@ -1,9 +1,5 @@
 module LitmusPaper
   class App < Sinatra::Base
-    register Sinatra::Synchrony
-    set :dump_errors, true
-    set :raise_errors, false
-
     get "/" do
       output = "Services monitored:\n"
       output +=  LitmusPaper.services.keys.join("\n")
@@ -48,7 +44,7 @@ module LitmusPaper
     end
 
     error do
-      text 500, "Server Error: " + env['sinatra.error'].message
+      text 500, "Server Error"
     end
 
     def text(response_code, body, headers ={})

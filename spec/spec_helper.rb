@@ -14,18 +14,6 @@ RSpec.configure do |config|
   config.before :each do
     FileUtils.rm_rf(LitmusPaper.config_dir)
     LitmusPaper.reset
-    LitmusPaper.logger = NullLogger.new
-  end
-end
-
-def run_in_reactor(timeout = 5)
-  around(:each) do |spec|
-    EM.synchrony do
-      sig = EM.add_timer(timeout) { fail "timeout!"; EM.stop }
-      spec.run
-      EM.cancel_timer(sig)
-      EM.stop
-    end
   end
 end
 
@@ -35,15 +23,6 @@ module SpecHelper
     file.write contents
     file.close
     file.path
-  end
-
-  def self.ensure_no_outstanding_timers(&block)
-    timer_keys = EM.instance_variable_get("@timers").keys
-    yield
-    new_timer_keys = EM.instance_variable_get("@timers").keys - timer_keys
-    new_timer_keys.each do |timer_key|
-      EM.instance_variable_get("@timers")[timer_key].should == false
-    end
   end
 
   def self.wait_for_service(options)
