@@ -31,7 +31,7 @@ module LitmusPaper
 
       def _fetch_stats
         UNIXSocket.open(@domain_socket) do |socket|
-          socket.send "show stat", 0
+          socket.send "show stat\n", 0
           socket.read
         end
       end
