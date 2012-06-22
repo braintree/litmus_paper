@@ -17,6 +17,10 @@ module LitmusPaper
         available.size > 0
       end
 
+      def to_s
+        "Dependency::HaproxyBackends(#{@domain_socket}, #{@cluster})"
+      end
+
       def _servers_in(stats, cluster)
         stats.select do |line|
           line['# pxname'] == cluster && !["FRONTEND", "BACKEND"].include?(line["svname"])

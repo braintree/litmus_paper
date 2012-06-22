@@ -20,5 +20,12 @@ describe LitmusPaper::Dependency::HaproxyBackends do
       haproxy.should_not be_available
     end
   end
+
+  describe "to_s" do
+    it "includes the socket file and the cluster" do
+      haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "orange_cluster")
+      haproxy.to_s.should == 'Dependency::HaproxyBackends(/tmp/stub-haproxy-stats, orange_cluster)'
+    end
+  end
 end
 
