@@ -16,6 +16,13 @@ describe LitmusPaper::App do
       last_response.body.should include('test')
       last_response.body.should include('another')
     end
+
+    it "includes the litmus version" do
+      get "/"
+
+      last_response.status.should == 200
+      last_response.body.should include("Litmus Paper #{LitmusPaper::VERSION}")
+    end
   end
 
   describe "POST /force/*" do

@@ -1,7 +1,8 @@
 module LitmusPaper
   class App < Sinatra::Base
     get "/" do
-      output = "Services monitored:\n"
+      output = "Litmus Paper #{LitmusPaper::VERSION}\n"
+      output += "Services monitored:\n"
       output +=  LitmusPaper.services.keys.join("\n")
 
       text 200, output

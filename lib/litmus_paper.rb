@@ -22,6 +22,7 @@ require 'litmus_paper/metric/available_memory'
 require 'litmus_paper/metric/cpu_load'
 require 'litmus_paper/service'
 require 'litmus_paper/status_file'
+require 'litmus_paper/version'
 
 module LitmusPaper
   class << self
