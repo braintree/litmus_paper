@@ -6,10 +6,6 @@ module LitmusPaper
       @checks = checks
     end
 
-    def success?
-      health > 0
-    end
-
     def current_health
       forced_health = _determine_forced_health
       return forced_health unless forced_health.nil?

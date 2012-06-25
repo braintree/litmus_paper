@@ -28,11 +28,10 @@ module LitmusPaper
     end
 
     get "/:service/status" do
-      service = LitmusPaper.services[params[:service]]
-      if service.nil?
+      health = LitmusPaper.check_service(params[:service])
+      if health.nil?
         text 404, "NOT FOUND", { "X-Health" => "0" }
       else
-        health = service.current_health
         response_code = health.ok? ? 200 : 503
         body = "Health: #{health.value}\n"
         body << health.summary

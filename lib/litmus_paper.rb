@@ -32,6 +32,16 @@ module LitmusPaper
 
   self.logger = Logger.new
 
+  def self.check_service(service_name)
+    Facter.flush
+
+    if service = @services[service_name]
+      service.current_health
+    else
+      nil
+    end
+  end
+
   def self.configure(filename)
     @config_file = filename
 
