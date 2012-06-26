@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/litmus_paper/version', __FILE__)
+$LOAD_PATH.unshift(File.expand_path('../lib', __FILE__))
+require "litmus_paper/version"
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Braintreeps"]
