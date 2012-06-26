@@ -75,6 +75,11 @@ describe LitmusPaper::Dependency::HTTP do
       check = LitmusPaper::Dependency::HTTP.new('http://127.0.0.1:7777')
       check.should_not be_available
     end
+
+    it "is false when the request times out" do
+      check = LitmusPaper::Dependency::HTTP.new("#{@url}/sleep/2", :timeout_seconds => 1)
+      check.should_not be_available
+    end
   end
 
   describe "to_s" do

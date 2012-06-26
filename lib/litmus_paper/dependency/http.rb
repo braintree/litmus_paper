@@ -6,6 +6,7 @@ module LitmusPaper
         @expected_content = Regexp.new(options.fetch(:content, '.*'))
         @method = options.fetch(:method, 'GET')
         @ca_file = options[:ca_file]
+        @timeout = options.fetch(:timeout_seconds, 5)
       end
 
       def available?
@@ -28,6 +29,8 @@ module LitmusPaper
         request.set_form_data({})
 
         connection = Net::HTTP.new(uri.host, uri.port)
+        connection.open_timeout = @timeout
+        connection.read_timeout = @timeout
         if uri.scheme == "https"
           connection.use_ssl = true
           connection.verify_mode = OpenSSL::SSL::VERIFY_PEER

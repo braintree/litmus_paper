@@ -19,6 +19,12 @@ class HttpTestServer < Sinatra::Base
     end
   end
 
+  get "/sleep/:seconds" do
+    sleep params[:seconds].to_f
+    $stderr.puts "sleeping #{params[:seconds]}"
+    text 200, "Woke up after #{params.inspect} seconds"
+  end
+
   def text(response_code, body, headers ={})
     [response_code, { "Content-Type" => "text/plain" }.merge(headers), body]
   end
