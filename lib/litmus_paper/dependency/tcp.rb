@@ -1,12 +1,13 @@
 module LitmusPaper
   module Dependency
     class TCP
-      def initialize(ip, port)
+      def initialize(ip, port, options = {})
         @ip, @port = ip, port
+        @timeout = options.fetch(:timeout_seconds, 5)
       end
 
       def available?
-        Timeout.timeout(5) do
+        Timeout.timeout(@timeout) do
           socket = TCPSocket.new(@ip, @port)
           socket.close
         end
