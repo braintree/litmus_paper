@@ -14,9 +14,23 @@ describe LitmusPaper::Dependency::HaproxyBackends do
       haproxy.should be_available
     end
 
-    it "returns 0 if no nodes are available" do
+    it "returns false if no nodes are available" do
       pending "Broken on TravisCI 1.9.x; works locally" if ENV["TRAVIS_RUBY_VERSION"] =~ /\A1.9/
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "orange_cluster")
+      haproxy.should_not be_available
+    end
+  end
+
+  describe "timeouts" do
+    before(:each) do
+      FileUtils.rm_rf("/tmp/stub-haproxy-stats")
+      system "spec/support/haproxy_test_socket /tmp/stub-haproxy-stats 3 &"
+      sleep 1
+    end
+
+    it "returns false after a configurable number of seconds" do
+      pending "Broken on TravisCI 1.9.x; works locally" if ENV["TRAVIS_RUBY_VERSION"] =~ /\A1.9/
+      haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "yellow_cluster", :timeout_seconds => 1)
       haproxy.should_not be_available
     end
   end

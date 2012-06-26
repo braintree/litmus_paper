@@ -3,9 +3,10 @@ require 'csv'
 module LitmusPaper
   module Dependency
     class HaproxyBackends
-      def initialize(domain_socket, cluster)
+      def initialize(domain_socket, cluster, options = {})
         @domain_socket = domain_socket
         @cluster = cluster
+        @timeout = options.fetch(:timeout_seconds, 2)
       end
 
       def available?
@@ -15,6 +16,8 @@ module LitmusPaper
         available = servers.select { |s| s['status'] == "UP" }
 
         available.size > 0
+      rescue Timeout::Error
+        false
       end
 
       def to_s
@@ -34,9 +37,11 @@ module LitmusPaper
       end
 
       def _fetch_stats
-        UNIXSocket.open(@domain_socket) do |socket|
-          socket.send "show stat\n", 0
-          socket.read
+        Timeout.timeout(@timeout) do
+          UNIXSocket.open(@domain_socket) do |socket|
+            socket.send "show stat\n", 0
+            socket.read
+          end
         end
       end
     end
