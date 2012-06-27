@@ -26,6 +26,8 @@ describe LitmusPaper do
       current_pid = $$
       Process.kill("USR1", current_pid)
 
+      sleep 0.5 # wait for reload
+
       LitmusPaper.services.has_key?('bar').should == false
       LitmusPaper.services.has_key?('test').should == true
     end
