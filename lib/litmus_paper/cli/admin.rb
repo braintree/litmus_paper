@@ -1,80 +1,33 @@
 module LitmusPaper
   module CLI
     class Admin
+      def self.commands
+        {
+          "list" => LitmusPaper::CLI::Admin::List,
+          "force" => LitmusPaper::CLI::Admin::Force,
+          "status" => LitmusPaper::CLI::Admin::Status
+        }
+      end
+
       def run(argv = ARGV)
-        command = argv.shift
-        send(command, argv)
-      end
+        command_name = argv.shift
 
-      def list(args)
-        options = _default_options
-        opt_parser = _extend_default_parser(options) do |opts|
-          opts.banner = "Usage: litmusctl list [options]"
-        end
-        opt_parser.parse! args
-
-        request = Net::HTTP::Get.new("/")
-        _litmus_request(options[:host], options[:port], request)
-      end
-
-      def force(args)
-        options = _default_options
-        opt_parser = _extend_default_parser(options) do |opts|
-          opts.banner = "Usage: litmusctl force <up|down> [service] [options]"
-          opts.on("-d", "--delete", "Remove status file") do
-            options[:delete] = true
-          end
-          opts.on("-r", "--reason=reason", String, "Reason for status file") do |reason|
-            options[:reason] = reason
-          end
-        end
-
-        opt_parser.parse! args
-        direction, service = args
-        path = service ? "/#{service}/#{direction}" : "/#{direction}"
-
-        if options[:delete]
-          request = Net::HTTP::Delete.new(path)
+        if command = Admin.commands[command_name]
+          options = {}
+          request = command.build_request(options, argv)
+          _litmus_request(options[:host], options[:port], request)
         else
-          if !options.has_key?(:reason)
-            print "Reason? "
-            options[:reason] = gets.chomp
-          end
-          request = Net::HTTP::Post.new(path)
-          request.set_form_data('reason' => options[:reason])
+          _display_help
         end
-
-        _litmus_request(options[:host], options[:port], request)
       end
 
-      def status(args)
-        options = _default_options
-        opt_parser = _extend_default_parser(options) do |opts|
-          opts.banner = "Usage: litmusctl status <service> [options]"
+      def _display_help
+        puts "Litmus Paper CLI v#{LitmusPaper::VERSION}\n\n"
+        puts "Commands:\n"
+        Admin.commands.keys.sort.each do |name|
+          puts "  %-8s %s" % [name, Admin.commands[name].description]
         end
-
-        opt_parser.parse! args
-        service = args.shift
-
-        _litmus_request(options[:host], options[:port], Net::HTTP::Get.new("/#{service}/status"))
-      end
-
-      def _default_options
-        options = { :port => 9292, :host => 'localhost' }
-      end
-
-      def _extend_default_parser(options, &block)
-        OptionParser.new do |opts|
-          block.call(opts)
-
-          opts.on("-p", "--port=port", Integer, "Port litmus is running on", "Default: 9292") do |port|
-            options[:port] = port
-          end
-          opts.on("-h", "--host=ip", String, ":Host litmus is running on", "Default: localhost") do |host|
-            options[:host] = host
-          end
-          opts.on("--help", "Show this help message.") { puts opts; exit }
-        end
+        puts "\nSee 'litmusctl <command> --help' for more information on a specific command"
       end
 
       def _litmus_request(host, port, request)

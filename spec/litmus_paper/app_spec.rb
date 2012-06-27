@@ -23,6 +23,16 @@ describe LitmusPaper::App do
       last_response.status.should == 200
       last_response.body.should include("Litmus Paper #{LitmusPaper::VERSION}")
     end
+
+    it "includes the health of the service" do
+      LitmusPaper.services['test'] = LitmusPaper::Service.new('test')
+      LitmusPaper.services['another'] = LitmusPaper::Service.new('another')
+
+      get "/"
+
+      last_response.status.should == 200
+      last_response.body.should include("* test (0)\n")
+    end
   end
 
   describe "POST /up" do

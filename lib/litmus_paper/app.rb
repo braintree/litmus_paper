@@ -4,7 +4,7 @@ module LitmusPaper
       output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
       output += "Services monitored:\n"
       LitmusPaper.services.each do |service_name, service|
-        output += "* #{service_name} (#{service.current_health})"
+        output += "* #{service_name} (#{service.current_health.value})\n"
       end
 
       _text 200, output

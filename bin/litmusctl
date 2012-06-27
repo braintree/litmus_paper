@@ -3,5 +3,9 @@
 require 'optparse'
 require 'litmus_paper'
 require 'litmus_paper/cli/admin'
+require 'litmus_paper/cli/admin/command'
+require 'litmus_paper/cli/admin/list'
+require 'litmus_paper/cli/admin/force'
+require 'litmus_paper/cli/admin/status'
 
 LitmusPaper::CLI::Admin.new.run

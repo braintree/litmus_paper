@@ -14,6 +14,12 @@ describe 'litmusctl' do
     system "kill -9 `cat /tmp/litmus.pid`"
   end
 
+  describe 'help' do
+    it "is displayed if no command is given" do
+      _litmusctl('').should match("Commands:")
+    end
+  end
+
   describe 'list' do
     it "returns the list of services running" do
       _litmusctl('list').should match("test")
