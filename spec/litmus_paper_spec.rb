@@ -19,6 +19,17 @@ describe LitmusPaper do
       LitmusPaper.services.has_key?('test').should == true
     end
 
+    it "reloads on a USR1 signal" do
+      LitmusPaper.configure(TEST_CONFIG)
+      LitmusPaper.services["bar"] = :service
+
+      current_pid = $$
+      Process.kill("USR1", current_pid)
+
+      LitmusPaper.services.has_key?('bar').should == false
+      LitmusPaper.services.has_key?('test').should == true
+    end
+
     it "keeps the old config if there are errors in the new config" do
       old_config_file = SpecHelper.create_temp_file(<<-END)
         service :old_service do |s|

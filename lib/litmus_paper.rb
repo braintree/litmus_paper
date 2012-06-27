@@ -56,6 +56,7 @@ module LitmusPaper
   end
 
   def self.reload
+    LitmusPaper.logger.info "Reloading configuration"
     configure(@config_file)
   end
 
@@ -64,4 +65,4 @@ module LitmusPaper
   end
 end
 
-Signal.trap("HUP") { LitmusPaper.reload }
+Signal.trap("USR1") { LitmusPaper.reload }
