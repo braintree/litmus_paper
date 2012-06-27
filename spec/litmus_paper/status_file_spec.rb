@@ -2,22 +2,15 @@ require 'spec_helper'
 
 describe LitmusPaper::StatusFile do
   describe "create" do
-    it "creates a nested file" do
-      status_file = LitmusPaper::StatusFile.new("foo", "bar")
-      status_file.create("for testing")
-
-      status_file.exists?.should == true
-    end
-
     it "creates a file" do
-      status_file = LitmusPaper::StatusFile.new("foo")
+      status_file = LitmusPaper::StatusFile.new("foo", 100)
       status_file.create("for testing")
 
       status_file.exists?.should == true
     end
 
     it "writes the content" do
-      status_file = LitmusPaper::StatusFile.new("foo")
+      status_file = LitmusPaper::StatusFile.new("foo", 100)
       status_file.create("for testing")
 
       status_file.content.should == "for testing"
@@ -26,7 +19,7 @@ describe LitmusPaper::StatusFile do
 
   describe "delete" do
     it "removes the file" do
-      status_file = LitmusPaper::StatusFile.new("foo")
+      status_file = LitmusPaper::StatusFile.new("foo", 100)
       status_file.create("for testing")
 
       status_file.exists?.should be_true

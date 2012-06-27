@@ -25,36 +25,12 @@ describe LitmusPaper::App do
     end
   end
 
-  describe "POST /force/*" do
+  describe "POST /up" do
     it "creates a global upfile" do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      post "/force/up", :reason => "up for testing"
-      last_response.status.should == 201
-
-      get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/up for testing/)
-    end
-
-    it "creates a global downfile" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
-      LitmusPaper.services['test'] = test_service
-
-      post "/force/down", :reason => "down for testing"
-      last_response.status.should == 201
-
-      get "/test/status"
-      last_response.status.should == 503
-      last_response.body.should match(/down for testing/)
-    end
-
-    it "creates a service specific upfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
-      LitmusPaper.services['test'] = test_service
-
-      post "/force/up/test", :reason => "up for testing"
+      post "/up", :reason => "up for testing"
       last_response.status.should == 201
 
       get "/test/status"
@@ -63,59 +39,51 @@ describe LitmusPaper::App do
     end
   end
 
-  describe "DELETE /force/*" do
-    it "removes the global upfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
-      LitmusPaper.services['test'] = test_service
-
-      post "/force/up", :reason => "up for testing"
-      last_response.status.should == 201
-
-      get "/test/status"
-      last_response.status.should == 200
-
-      delete "/force/up"
-      last_response.status.should == 200
-
-      get "/test/status"
-      last_response.status.should == 503
-      last_response.body.should_not match(/up for testing/)
-    end
-
-    it "removes the global downfile" do
+  describe "POST /down" do
+    it "creates a global downfile" do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      post "/force/down", :reason => "down for testing"
+      post "/down", :reason => "down for testing"
       last_response.status.should == 201
 
       get "/test/status"
       last_response.status.should == 503
-
-      delete "/force/down"
-      last_response.status.should == 200
-
-      get "/test/status"
-      last_response.should be_ok
-      last_response.body.should_not match(/down for testing/)
+      last_response.body.should match(/down for testing/)
     end
+  end
 
-    it "removes a service specific upfile" do
+  describe "POST /:service/up" do
+    it "creates a service specific upfile" do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      post "/force/up/test", :reason => "up for testing"
+      post "/test/up", :reason => "up for testing"
       last_response.status.should == 201
 
       get "/test/status"
       last_response.status.should == 200
       last_response.body.should match(/up for testing/)
+    end
+  end
 
-      delete "/force/up/test"
+  describe "DELETE /up" do
+    it "removes the global upfile" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      post "/up", :reason => "up for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+
+      delete "/up"
       last_response.status.should == 200
 
       get "/test/status"
       last_response.status.should == 503
+      last_response.body.should_not match(/up for testing/)
     end
 
     it "404s if there is no upfile" do
@@ -124,6 +92,46 @@ describe LitmusPaper::App do
       delete "/up"
 
       last_response.status.should == 404
+    end
+  end
+
+  describe "DELETE /down" do
+    it "removes the global downfile" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      post "/down", :reason => "down for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 503
+
+      delete "/down"
+      last_response.status.should == 200
+
+      get "/test/status"
+      last_response.should be_ok
+      last_response.body.should_not match(/down for testing/)
+    end
+  end
+
+  describe "DELETE /:service/up" do
+    it "removes a service specific upfile" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      post "/test/up", :reason => "up for testing"
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+      last_response.body.should match(/up for testing/)
+
+      delete "/test/up"
+      last_response.status.should == 200
+
+      get "/test/status"
+      last_response.status.should == 503
     end
   end
 
@@ -165,8 +173,8 @@ describe LitmusPaper::App do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      LitmusPaper::StatusFile.new("up", "test").create("Up for testing")
-      LitmusPaper::StatusFile.new("down", "test").create("Down for testing")
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
+      LitmusPaper::StatusFile.service_down_file("test").create("Down for testing")
 
       get "/test/status"
 
@@ -178,7 +186,7 @@ describe LitmusPaper::App do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      LitmusPaper::StatusFile.new("up", "test").create("Up for testing")
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
 
       get "/test/status"
 
@@ -190,7 +198,7 @@ describe LitmusPaper::App do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      LitmusPaper::StatusFile.new("up", "test").create("Up for testing")
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
 
       get "/test/status"
 
@@ -202,8 +210,8 @@ describe LitmusPaper::App do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      LitmusPaper::StatusFile.new("global_down").create("Down for testing")
-      LitmusPaper::StatusFile.new("global_up").create("Up for testing")
+      LitmusPaper::StatusFile.global_down_file.create("Down for testing")
+      LitmusPaper::StatusFile.global_up_file.create("Up for testing")
 
       get "/test/status"
 
@@ -215,7 +223,7 @@ describe LitmusPaper::App do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      LitmusPaper::StatusFile.new("global_down").create("Down for testing")
+      LitmusPaper::StatusFile.global_down_file.create("Down for testing")
 
       get "/test/status"
 
@@ -227,7 +235,7 @@ describe LitmusPaper::App do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
-      LitmusPaper::StatusFile.new("global_up").create("Up for testing")
+      LitmusPaper::StatusFile.global_up_file.create("Up for testing")
 
       get "/test/status"
 

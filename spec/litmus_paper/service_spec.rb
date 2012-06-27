@@ -23,7 +23,7 @@ describe LitmusPaper::Service do
       service.depends AlwaysAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      LitmusPaper::StatusFile.new("down", "test").create("Down for testing")
+      LitmusPaper::StatusFile.service_down_file("test").create("Down for testing")
 
       service.current_health.value.should == 0
       service.current_health.summary.should == "Down for testing"
@@ -34,7 +34,7 @@ describe LitmusPaper::Service do
       service.depends AlwaysAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      LitmusPaper::StatusFile.new("down", "test").create("Down for testing")
+      LitmusPaper::StatusFile.global_down_file.create("Down for testing")
 
       service.current_health.value.should == 0
       service.current_health.summary.should == "Down for testing"
@@ -45,7 +45,7 @@ describe LitmusPaper::Service do
       service.depends NeverAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      LitmusPaper::StatusFile.new("up", "test").create("Up for testing")
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
 
       service.current_health.value.should == 100
       service.current_health.summary.should == "Up for testing"
@@ -56,7 +56,7 @@ describe LitmusPaper::Service do
       service.depends NeverAvailableDependency
       service.measure_health ConstantMetric, :weight => 50
 
-      LitmusPaper::StatusFile.new("global_up").create("Up for testing")
+      LitmusPaper::StatusFile.global_up_file.create("Up for testing")
 
       service.current_health.value.should == 100
       service.current_health.summary.should == "Up for testing"

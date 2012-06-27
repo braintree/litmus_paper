@@ -1,42 +1,57 @@
 module LitmusPaper
   class App < Sinatra::Base
     get "/" do
-      output = "Litmus Paper #{LitmusPaper::VERSION}\n"
+      output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
       output += "Services monitored:\n"
-      output +=  LitmusPaper.services.keys.join("\n")
-
-      text 200, output
-    end
-
-    post "/force/*" do
-      path = *status_file_path(params[:splat])
-      statusfile = StatusFile.new(*path)
-      statusfile.create(params[:reason])
-
-      text 201, "File created"
-    end
-
-    delete "/force/*" do
-      path = *status_file_path(params[:splat])
-      statusfile = StatusFile.new(*path)
-      if statusfile.exists?
-        statusfile.delete
-        text 200, "File deleted"
-      else
-        text 404, "NOT FOUND"
+      LitmusPaper.services.each do |service_name, service|
+        output += "* #{service_name} (#{service.current_health})"
       end
+
+      _text 200, output
+    end
+
+    delete "/down" do
+      _delete_status_file(StatusFile.global_down_file)
+    end
+
+    post "/down" do
+      _create_status_file(StatusFile.global_down_file)
+    end
+
+    delete "/up" do
+      _delete_status_file(StatusFile.global_up_file)
+    end
+
+    post "/up" do
+      _create_status_file(StatusFile.global_up_file)
     end
 
     get "/:service/status" do
       health = LitmusPaper.check_service(params[:service])
       if health.nil?
-        text 404, "NOT FOUND", { "X-Health" => "0" }
+        _text 404, "NOT FOUND", { "X-Health" => "0" }
       else
         response_code = health.ok? ? 200 : 503
         body = "Health: #{health.value}\n"
         body << health.summary
-        text response_code, body, { "X-Health" => health.value.to_s }
+        _text response_code, body, { "X-Health" => health.value.to_s }
       end
+    end
+
+    delete "/:service/down" do
+      _delete_status_file(StatusFile.service_down_file(params[:service]))
+    end
+
+    post "/:service/down" do
+      _create_status_file(StatusFile.service_down_file(params[:service]))
+    end
+
+    delete "/:service/up" do
+      _delete_status_file(StatusFile.service_up_file(params[:service]))
+    end
+
+    post "/:service/up" do
+      _create_status_file(StatusFile.service_up_file(params[:service]))
     end
 
     get "/test/error" do
@@ -44,20 +59,25 @@ module LitmusPaper
     end
 
     error do
-      text 500, "Server Error"
+      _text 500, "Server Error"
     end
 
-    def text(response_code, body, headers ={})
-      [response_code, { "Content-Type" => "text/plain" }.merge(headers), body]
+    def _create_status_file(status_file)
+      status_file.create(params[:reason])
+      _text 201, "File created"
     end
 
-    def status_file_path(splat)
-      path = splat.first.split("/")
-      if path.size == 1
-        ["global_#{path.first}"]
+    def _delete_status_file(status_file)
+      if status_file.exists?
+        status_file.delete
+        _text 200, "File deleted"
       else
-        path
+        _text 404, "NOT FOUND"
       end
+    end
+
+    def _text(response_code, body, headers ={})
+      [response_code, { "Content-Type" => "text/plain" }.merge(headers), body]
     end
   end
 end

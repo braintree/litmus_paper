@@ -30,17 +30,12 @@ module LitmusPaper
     end
 
     def _health_files
-      @health_files ||= [
-        [0, LitmusPaper::StatusFile.new('down', @name)],
-        [100, LitmusPaper::StatusFile.new('up', @name)],
-        [0, LitmusPaper::StatusFile.new('global_down')],
-        [100, LitmusPaper::StatusFile.new('global_up')]
-      ]
+      StatusFile.priority_check_order_for_service(@name)
     end
 
     def _determine_forced_health
-      _health_files.map do |health, status_file|
-        ForcedHealth.new(health, status_file.content) if status_file.exists?
+      _health_files.map do |status_file|
+        ForcedHealth.new(status_file.health, status_file.content) if status_file.exists?
       end.compact.first
     end
   end

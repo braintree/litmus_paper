@@ -31,15 +31,16 @@ module LitmusPaper
 
         opt_parser.parse! args
         direction, service = args
+        path = service ? "/#{service}/#{direction}" : "/#{direction}"
 
         if options[:delete]
-          request = Net::HTTP::Delete.new("/force/#{direction}/#{service}")
+          request = Net::HTTP::Delete.new(path)
         else
           if !options.has_key?(:reason)
             print "Reason? "
             options[:reason] = gets.chomp
           end
-          request = Net::HTTP::Post.new("/force/#{direction}/#{service}")
+          request = Net::HTTP::Post.new(path)
           request.set_form_data('reason' => options[:reason])
         end
 
