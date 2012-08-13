@@ -6,7 +6,7 @@ module LitmusPaper
         @expected_content = Regexp.new(options.fetch(:content, '.*'))
         @method = options.fetch(:method, 'GET')
         @ca_file = options[:ca_file]
-        @timeout = options.fetch(:timeout_seconds, 5)
+        @timeout = options.fetch(:timeout_seconds, 2)
       end
 
       def available?
