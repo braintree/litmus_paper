@@ -3,7 +3,7 @@ module LitmusPaper
     class Admin
       class Command
         def self._default_options
-          options = { :port => 9292, :host => 'localhost' }
+          options = { :port => 9292, :host => '127.0.0.1' }
         end
 
         def self._extend_default_parser(options, &block)

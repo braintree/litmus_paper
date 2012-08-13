@@ -4,6 +4,16 @@ require 'net/https'
 require 'uri'
 require 'forwardable'
 
+# Ruby’s stock DNS resolution, by default, blocks the entire Ruby VM from
+# processing while the lookup is happening, because it calls out to the native
+# libc resolver code. A slow DNS server can cause your entire Ruby process to
+# grind to a halt. Ruby comes with a pure Ruby replacement that is not loaded
+# by default called 'resolv'.
+#
+# 'resolv-replace' monkeypatches the various Ruby Socket objects to use resolv
+#
+require 'resolv-replace'
+
 require 'sinatra/base'
 require 'facter'
 require 'syslog_logger'
