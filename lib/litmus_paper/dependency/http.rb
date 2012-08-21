@@ -27,6 +27,7 @@ module LitmusPaper
         uri = URI.parse(@uri)
         request = Net::HTTP.const_get(@method.capitalize).new(uri.normalize.path)
         request.set_form_data({})
+        request.basic_auth(uri.user, uri.password) if uri.user || uri.password
 
         connection = Net::HTTP.new(uri.host, uri.port)
         connection.open_timeout = @timeout

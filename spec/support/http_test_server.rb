@@ -25,7 +25,40 @@ class HttpTestServer < Sinatra::Base
     text 200, "Woke up after #{params.inspect} seconds"
   end
 
+  get '/basic_auth' do
+    requires_basic_auth!('admin', 'admin')
+    "Welcome, authenticated client"
+  end
+
+  get '/basic_auth_without_password' do
+    requires_basic_auth!('justadmin', '')
+    "Welcome, authenticated client"
+  end
+
+  get '/basic_auth_without_user' do
+    requires_basic_auth!('', 'justpassword')
+    "Welcome, authenticated client"
+  end
+
+  get '/return_next_path_segment/:something' do
+    params[:something]
+  end
+
   def text(response_code, body, headers ={})
     [response_code, { "Content-Type" => "text/plain" }.merge(headers), body]
+  end
+
+  helpers do
+    def requires_basic_auth!(user, pass)
+      unless authorized?(user, pass)
+        response['WWW-Authenticate'] = %(Basic realm="Restricted Area")
+        throw(:halt, [401, "Not authorized\n"])
+      end
+    end
+
+    def authorized?(user, pass)
+      @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+      @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == [user, pass]
+    end
   end
 end

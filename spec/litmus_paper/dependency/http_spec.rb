@@ -39,6 +39,30 @@ describe LitmusPaper::Dependency::HTTP do
       end
     end
 
+    context "basic auth" do
+      it "uses the basic auth credentials provided in the URL" do
+        check = LitmusPaper::Dependency::HTTP.new("http://admin:admin@127.0.0.1:9294/basic_auth")
+        check.should be_available
+      end
+
+      it "works with blank password" do
+        check = LitmusPaper::Dependency::HTTP.new("http://justadmin:@127.0.0.1:9294/basic_auth_without_password")
+        check.should be_available
+      end
+
+      it "works with blank user" do
+        check = LitmusPaper::Dependency::HTTP.new("http://:justpassword@127.0.0.1:9294/basic_auth_without_user")
+        check.should be_available
+      end
+    end
+
+    context "special characters in path" do
+      it "works with a URI encoded slash" do
+        check = LitmusPaper::Dependency::HTTP.new("http://admin:admin@127.0.0.1:9294/return_next_path_segment/%2F", :content => '/')
+        check.should be_available
+      end
+    end
+
     it "is true when response is 200" do
       check = LitmusPaper::Dependency::HTTP.new("#{@url}/status/200")
       check.should be_available
