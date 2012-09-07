@@ -23,19 +23,29 @@ describe LitmusPaper::Dependency::HTTP do
     end
 
     context "https" do
-      it "can make https request" do
-        begin
-          `env SSL_TEST_PORT=9295 PID_FILE=/tmp/https-test-server.pid bundle exec spec/script/https_test_server.rb`
-          SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9295
+      before do
+        `env SSL_TEST_PORT=9295 PID_FILE=/tmp/https-test-server.pid bundle exec spec/script/https_test_server.rb`
+        SpecHelper.wait_for_service :host => '127.0.0.1', :port => 9295
+      end
 
-          check = LitmusPaper::Dependency::HTTP.new(
-            "https://127.0.0.1:9295",
-            :ca_file => TEST_CA_CERT
-          )
-          check.should be_available
-        ensure
-          system "kill -9 `cat /tmp/https-test-server.pid`"
-        end
+      after do
+        system "kill -9 `cat /tmp/https-test-server.pid`"
+      end
+
+      it "can make https request" do
+        check = LitmusPaper::Dependency::HTTP.new(
+          "https://127.0.0.1:9295",
+          :ca_file => TEST_CA_CERT
+        )
+        check.should be_available
+      end
+
+      it "is not available when SSL verification fails" do
+        check = LitmusPaper::Dependency::HTTP.new(
+          "https://127.0.0.1:9295",
+          :ca_file => nil
+        )
+        check.should_not be_available
       end
     end
 

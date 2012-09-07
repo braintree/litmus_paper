@@ -56,7 +56,7 @@ module LitmusPaper
         if preverify_ok != true || ssl_context.error != 0
           err_msg = "SSL Verification failed -- Preverify: #{preverify_ok}, Error: #{ssl_context.error_string} (#{ssl_context.error})"
           LitmusPaper.logger.info err_msg
-          false
+          return false
         end
         true
       end
