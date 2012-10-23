@@ -14,5 +14,9 @@ module LitmusPaper
     def ok?
       @health > 0
     end
+
+    def forced?
+      true
+    end
   end
 end

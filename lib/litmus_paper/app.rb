@@ -4,7 +4,11 @@ module LitmusPaper
       output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
       output += "Services monitored:\n"
       LitmusPaper.services.each do |service_name, service|
-        output += "* #{service_name} (#{service.current_health.value})\n"
+        output += "* #{service_name} (#{service.current_health.value})"
+        if service.current_health.forced?
+          output += " - forced: #{service.current_health.summary}"
+        end
+        output += "\n"
       end
 
       _text 200, output
@@ -31,10 +35,23 @@ module LitmusPaper
       if health.nil?
         _text 404, "NOT FOUND", { "X-Health" => "0" }
       else
-        response_code = health.ok? ? 200 : 503
+        if health.ok?
+          response_code = 200
+          status = "up"
+        else
+          response_code = 503
+          status = "down"
+        end
+
+        headers = {"X-Health" => health.value.to_s}
         body = "Health: #{health.value}\n"
         body << health.summary
-        _text response_code, body, { "X-Health" => health.value.to_s }
+
+        if health.forced?
+          headers["X-Health-Forced"] = status
+        end
+
+        _text response_code, body, headers
       end
     end
 

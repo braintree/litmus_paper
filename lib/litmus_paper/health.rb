@@ -13,6 +13,10 @@ module LitmusPaper
       value > 0
     end
 
+    def forced?
+      false
+    end
+
     def value
       return 0 unless @dependencies_available
       @value

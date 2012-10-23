@@ -25,6 +25,8 @@ orange_cluster,orange2,0,0,0,0,,0,0,0,,0,,0,0,0,0,DOWN,1,1,0,0,0,35,0,,1,6,1,,0,
 orange_cluster,BACKEND,0,0,0,0,0,0,0,0,0,0,,0,0,0,0,DOWN,1,1,0,,0,35,0,,1,6,0,,0,,1,0,,0,,,,,,,,,,,,,,0,0,
 DATA
     socket.close
+  rescue Errno::EPIPE
+    # client closed the connection before we got to write
   rescue Errno::EINVAL
     # client closed connection because of timeout
   end
