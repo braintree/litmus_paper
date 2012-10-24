@@ -9,13 +9,8 @@ module LitmusPaper
             opts.banner = "Usage: litmus [mongrel, thin, etc] [options]"
             opts.on("-c", "--config=file", String,
                     "Litmus configuration file", "Default: /etc/litmus.conf") { |v| options[:litmus_config] = v }
-            opts.on("-D", "--data-dir=path", String,
-                    "Litmus data directory", "Default: /etc/litmus") { |v| options[:config_dir] = v }
-
             opts.separator ""
 
-            opts.on("-p", "--port=port", Integer,
-                    "Runs Litmus on the specified port.", "Default: 9292") { |v| options[:Port] = v }
             opts.on("-b", "--binding=ip", String,
                     "Binds Litmus to the specified ip.", "Default: 0.0.0.0") { |v| options[:Host] = v }
             opts.on("-d", "--daemon", "Make server run as a Daemon.") { options[:daemonize] = true }
@@ -47,14 +42,14 @@ module LitmusPaper
         end
 
         LitmusPaper.configure(options[:litmus_config])
-        LitmusPaper.config_dir = options[:config_dir]
+        options[:Port] = LitmusPaper.port
+
         super
       end
 
       def default_options
         super.merge(
-          :litmus_config => '/etc/litmus.conf',
-          :config_dir => '/etc/litmus'
+          :litmus_config => '/etc/litmus.conf'
         )
       end
     end

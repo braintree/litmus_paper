@@ -7,10 +7,5 @@ describe LitmusPaper::CLI::Server do
       options = LitmusPaper::CLI::Server::Options.new.parse!(['-c', 'foo.conf'])
       options[:litmus_config].should == 'foo.conf'
     end
-
-    it 'parses the config dir options' do
-      options = LitmusPaper::CLI::Server::Options.new.parse!(['-D', '/tmp/foo'])
-      options[:config_dir].should == '/tmp/foo'
-    end
   end
 end

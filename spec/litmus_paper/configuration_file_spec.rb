@@ -11,7 +11,7 @@ describe LitmusPaper::ConfigurationFile do
     it "configures the port to listen on" do
       config_file = LitmusPaper::ConfigurationFile.new(TEST_CONFIG)
       config = config_file.evaluate
-      config.port.should == 80
+      config.port.should == 9293
     end
 
     it "configures the data directory" do

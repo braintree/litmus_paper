@@ -39,7 +39,7 @@ require 'litmus_paper/version'
 module LitmusPaper
   class << self
     extend Forwardable
-    def_delegators :@config, :services, :data_directory
+    def_delegators :@config, :services, :data_directory, :port
     attr_accessor :logger
   end
 
@@ -62,14 +62,6 @@ module LitmusPaper
       @config = LitmusPaper::ConfigurationFile.new(filename).evaluate
     rescue Exception
     end
-  end
-
-  def self.config_dir=(path)
-    @config_dir = Pathname.new(path)
-  end
-
-  def self.config_dir
-    @config.data_directory
   end
 
   def self.reload
