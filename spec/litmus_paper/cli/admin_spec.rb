@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe 'litmusctl' do
   def _litmusctl(args)
-    `bundle exec ruby -I lib bin/litmusctl #{args} -p 9293`
+    `bundle exec ruby -I lib bin/litmusctl #{args} -c #{TEST_CONFIG}`
   end
 
   before(:all) do

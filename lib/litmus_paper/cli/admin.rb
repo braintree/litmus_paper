@@ -15,7 +15,8 @@ module LitmusPaper
         if command = Admin.commands[command_name]
           options = {}
           request = command.build_request(options, argv)
-          _litmus_request(options[:host], options[:port], request)
+          LitmusPaper.configure(options[:litmus_config])
+          _litmus_request('127.0.0.1', LitmusPaper.port, request)
         else
           _display_help
         end
