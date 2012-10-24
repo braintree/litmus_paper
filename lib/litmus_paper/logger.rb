@@ -1,7 +1,7 @@
 module LitmusPaper
   class Logger
     extend Forwardable
-    def_delegators :@syslog, :debug, :info
+    def_delegators :@syslog, :debug, :info, :error
 
     def initialize
       @syslog = SyslogLogger.new("litmus_paper")

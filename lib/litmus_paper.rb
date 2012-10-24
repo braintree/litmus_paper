@@ -57,16 +57,17 @@ module LitmusPaper
 
   def self.configure(filename)
     @config_file = filename
-
-    begin
-      @config = LitmusPaper::ConfigurationFile.new(filename).evaluate
-    rescue Exception
-    end
+    @config = LitmusPaper::ConfigurationFile.new(filename).evaluate
   end
 
   def self.reload
     LitmusPaper.logger.info "Reloading configuration"
-    configure(@config_file)
+    begin
+      configure(@config_file)
+    rescue Exception => e
+      LitmusPaper.logger.error "Problem reloading config: #{e.message}"
+      LitmusPaper.logger.error e.backtrace.join("\n")
+    end
   end
 end
 

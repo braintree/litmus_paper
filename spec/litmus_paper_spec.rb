@@ -32,20 +32,36 @@ describe LitmusPaper do
       LitmusPaper.services.has_key?('test').should == true
     end
 
-    it "keeps the old config if there are errors in the new config" do
-      old_config_file = SpecHelper.create_temp_file(<<-END)
-        service :old_service do |s|
-          s.measure_health Metric::CPULoad, :weight => 100
-        end
-      END
-      new_bad_config_file = SpecHelper.create_temp_file(<<-END)
+    it "blows up when initial configuration is invalid" do
+      bad_config_file = SpecHelper.create_temp_file(<<-END)
         service :old_service do |s|
           syntax error here
         end
       END
-      LitmusPaper.configure(old_config_file)
+      expect do
+        LitmusPaper.configure(bad_config_file)
+      end.should raise_error
+    end
+
+    it "keeps the old config if there are errors in the new config" do
+      config_file = SpecHelper.create_temp_file(<<-END)
+        service :old_service do |s|
+          s.measure_health Metric::CPULoad, :weight => 100
+        end
+      END
+
+      LitmusPaper.configure(config_file)
       LitmusPaper.services.keys.should == ["old_service"]
-      LitmusPaper.configure(new_bad_config_file)
+
+      File.open(config_file, "w") do |file|
+        file.write(<<-END)
+          service :old_service do |s|
+            syntax error here
+          end
+        END
+      end
+
+      LitmusPaper.reload
       LitmusPaper.services.keys.should == ["old_service"]
     end
   end
