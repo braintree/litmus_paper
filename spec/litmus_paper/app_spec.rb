@@ -5,6 +5,10 @@ describe LitmusPaper::App do
     LitmusPaper::App
   end
 
+  before :each do
+    LitmusPaper.configure(TEST_CONFIG)
+  end
+
   describe "GET /" do
     it "returns the list of services litmus monitors" do
       LitmusPaper.services['test'] = LitmusPaper::Service.new('test')

@@ -22,6 +22,7 @@ require 'facts/loadaverage'
 
 require 'litmus_paper/app'
 require 'litmus_paper/configuration'
+require 'litmus_paper/configuration_file'
 require 'litmus_paper/dependency/haproxy_backends'
 require 'litmus_paper/dependency/http'
 require 'litmus_paper/dependency/tcp'
@@ -37,7 +38,8 @@ require 'litmus_paper/version'
 
 module LitmusPaper
   class << self
-    attr_reader :services, :config_dir
+    extend Forwardable
+    def_delegators :@config, :services, :data_directory
     attr_accessor :logger
   end
 
@@ -46,7 +48,7 @@ module LitmusPaper
   def self.check_service(service_name)
     Facter.flush
 
-    if service = @services[service_name]
+    if service = services[service_name]
       service.current_health
     else
       nil
@@ -57,7 +59,7 @@ module LitmusPaper
     @config_file = filename
 
     begin
-      @services = LitmusPaper::Configuration.new(filename).evaluate
+      @config = LitmusPaper::ConfigurationFile.new(filename).evaluate
     rescue Exception
     end
   end
@@ -66,13 +68,13 @@ module LitmusPaper
     @config_dir = Pathname.new(path)
   end
 
+  def self.config_dir
+    @config.data_directory
+  end
+
   def self.reload
     LitmusPaper.logger.info "Reloading configuration"
     configure(@config_file)
-  end
-
-  def self.reset
-    @services = {}
   end
 end
 

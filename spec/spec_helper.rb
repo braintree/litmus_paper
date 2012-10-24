@@ -5,6 +5,11 @@ require 'rack/test'
 require 'litmus_paper'
 require 'tempfile'
 
+TEST_CONFIG_DIR = "/tmp/litmus_paper"
+TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
+TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))
+TEST_CA_CERT = File.expand_path('ssl/server.crt', File.dirname(__FILE__))
+
 Dir.glob("#{File.expand_path('support', File.dirname(__FILE__))}/**/*.rb").each { |f| require f }
 
 RSpec.configure do |config|
@@ -12,8 +17,8 @@ RSpec.configure do |config|
   config.include Rack::Test::Methods
 
   config.before :each do
-    FileUtils.rm_rf(LitmusPaper.config_dir)
-    LitmusPaper.reset
+    FileUtils.rm_rf TEST_CONFIG_DIR
+    LitmusPaper.stub(:data_directory).and_return(TEST_CONFIG_DIR)
   end
 end
 
@@ -39,9 +44,3 @@ module SpecHelper
     end
   end
 end
-
-LitmusPaper.config_dir = "/tmp/litmus_paper"
-
-TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
-TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))
-TEST_CA_CERT = File.expand_path('ssl/server.crt', File.dirname(__FILE__))

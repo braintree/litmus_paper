@@ -28,7 +28,7 @@ module LitmusPaper
     end
 
     def initialize(filename, health)
-      @path = File.join(LitmusPaper.config_dir, filename)
+      @path = File.join(LitmusPaper.data_directory, filename)
       @health = health
     end
 
