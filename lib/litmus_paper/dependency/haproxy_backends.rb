@@ -11,15 +11,13 @@ module LitmusPaper
 
       def available?
         stats = _parse_stats(_fetch_stats)
+        backend = _find_backend(stats, @cluster)
 
-        servers = _servers_in(stats, @cluster)
-        available = servers.select { |s| s['status'] == "UP" }
-
-        if available.size != servers.size
-          LitmusPaper.logger.debug("#{available.size} out of #{servers.size} #{@cluster} nodes are UP")
+        if backend['status'] != 'UP'
+          LitmusPaper.logger.info("HAproxy available check failed, #{@cluster} backend is #{backend['status']}")
+          return false
         end
-
-        available.size > 0
+        return true
       rescue Timeout::Error
         LitmusPaper.logger.info("HAproxy available check timed out for #{@cluster}")
         false
@@ -29,9 +27,9 @@ module LitmusPaper
         "Dependency::HaproxyBackends(#{@domain_socket}, #{@cluster})"
       end
 
-      def _servers_in(stats, cluster)
-        stats.select do |line|
-          line['# pxname'] == cluster && !["FRONTEND", "BACKEND"].include?(line["svname"])
+      def _find_backend(stats, cluster)
+        stats.detect do |line|
+          line['# pxname'] == cluster && line['svname'] == 'BACKEND'
         end
       end
 
