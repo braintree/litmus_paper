@@ -15,8 +15,13 @@ module LitmusPaper
         servers = _servers_in(stats, @cluster)
         available = servers.select { |s| s['status'] == "UP" }
 
+        if available.size != servers.size
+          LitmusPaper.logger.debug("#{available.size} out of #{servers.size} #{@cluster} nodes are UP")
+        end
+
         available.size > 0
       rescue Timeout::Error
+        LitmusPaper.logger.info("HAproxy available check timed out for #{@cluster}")
         false
       end
 
