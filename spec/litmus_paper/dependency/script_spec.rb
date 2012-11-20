@@ -16,6 +16,14 @@ describe LitmusPaper::Dependency::Script do
       check = LitmusPaper::Dependency::Script.new("sleep 10", :timeout => 1)
       check.should_not be_available
     end
+
+    it "can handle pipes" do
+      check = LitmusPaper::Dependency::Script.new("ls | grep lib")
+      check.should be_available
+
+      check = LitmusPaper::Dependency::Script.new("ls | grep missing")
+      check.should_not be_available
+    end
   end
 
   describe "to_s" do
