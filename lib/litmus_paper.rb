@@ -3,6 +3,7 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 require 'forwardable'
+require 'English'
 
 # Ruby’s stock DNS resolution, by default, blocks the entire Ruby VM from
 # processing while the lookup is happening, because it calls out to the native

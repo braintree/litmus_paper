@@ -8,7 +8,8 @@ module LitmusPaper
 
       def available?
         Timeout.timeout(@timeout) do
-          system @command
+          %x[#{@command}]
+          $CHILD_STATUS.success?
         end
       rescue Timeout::Error
         false
