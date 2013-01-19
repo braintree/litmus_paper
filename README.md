@@ -1,4 +1,4 @@
-# IpvsLitmus
+# LitmusPaper
 
 Backend health tester for HA Services
 
