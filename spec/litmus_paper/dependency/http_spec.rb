@@ -12,12 +12,17 @@ describe LitmusPaper::Dependency::HTTP do
   end
 
   describe "#available?" do
-    context "http method" do
+    context "http" do
       it "uses the given http method when making the request" do
         check = LitmusPaper::Dependency::HTTP.new("#{@url}/method", :method => "GET", :content => "POST")
         check.should_not be_available
 
         check = LitmusPaper::Dependency::HTTP.new("#{@url}/method", :method => "POST", :content => "POST")
+        check.should be_available
+      end
+
+      it "sends a user agent including the version number" do
+        check = LitmusPaper::Dependency::HTTP.new("#{@url}/fail_if_no_agent", :method => "GET", :content => "OK")
         check.should be_available
       end
     end

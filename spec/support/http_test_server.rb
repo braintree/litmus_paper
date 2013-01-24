@@ -9,6 +9,14 @@ class HttpTestServer < Sinatra::Base
     text 200, "POST"
   end
 
+  get "/fail_if_no_agent" do
+    if request.user_agent.nil?
+      text 400, "No user agent"
+    else
+      text 200, "OK"
+    end
+  end
+
   get "/status/:response_status" do
     if params[:response_status] =~ /\A\d+\z/
       status = params[:response_status]
