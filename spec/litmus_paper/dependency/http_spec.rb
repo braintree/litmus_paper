@@ -21,8 +21,13 @@ describe LitmusPaper::Dependency::HTTP do
         check.should be_available
       end
 
-      it "sends a user agent including the version number" do
-        check = LitmusPaper::Dependency::HTTP.new("#{@url}/fail_if_no_agent", :method => "GET", :content => "OK")
+      it "sends an accept header" do
+        check = LitmusPaper::Dependency::HTTP.new("#{@url}/echo_accept", :method => "GET", :content => Regexp.escape("*/*"))
+        check.should be_available
+      end
+
+      it "sends a user agent" do
+        check = LitmusPaper::Dependency::HTTP.new("#{@url}/echo_agent", :method => "GET", :content => "Litmus Paper")
         check.should be_available
       end
     end

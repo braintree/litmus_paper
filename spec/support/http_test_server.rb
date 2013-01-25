@@ -9,12 +9,12 @@ class HttpTestServer < Sinatra::Base
     text 200, "POST"
   end
 
-  get "/fail_if_no_agent" do
-    if request.user_agent.nil?
-      text 400, "No user agent"
-    else
-      text 200, "OK"
-    end
+  get "/echo_accept" do
+    text 200, request.accept.first
+  end
+
+  get "/echo_agent" do
+    text 200, request.user_agent
   end
 
   get "/status/:response_status" do

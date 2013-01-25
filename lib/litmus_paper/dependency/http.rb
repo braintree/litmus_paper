@@ -26,7 +26,7 @@ module LitmusPaper
       def _make_request
         uri = URI.parse(@uri)
         request = Net::HTTP.const_get(@method.capitalize).new(uri.normalize.path)
-        request.initialize_http_header({"User-Agent" => "Litmus Paper/#{LitmusPaper::VERSION}"})
+        request["User-Agent"] = "Litmus Paper/#{LitmusPaper::VERSION}"
         request.set_form_data({})
         request.basic_auth(uri.user, uri.password) if uri.user || uri.password
 
