@@ -17,6 +17,12 @@ describe LitmusPaper::Dependency::Script do
       check.should_not be_available
     end
 
+    it "kills the child process when script check exceeds timeout" do
+      check = LitmusPaper::Dependency::Script.new("sleep 50", :timeout => 1)
+      check.should_not be_available
+      expect { Process.kill(0, check.script_pid) }.to raise_error(Errno::ESRCH)
+    end
+
     it "can handle pipes" do
       check = LitmusPaper::Dependency::Script.new("ls | grep lib")
       check.should be_available

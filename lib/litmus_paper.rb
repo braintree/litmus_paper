@@ -15,6 +15,7 @@ require 'English'
 #
 require 'resolv-replace'
 
+require 'popen4'
 require 'sinatra/base'
 require 'facter'
 require 'syslog_logger'

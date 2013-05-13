@@ -1,6 +1,8 @@
 module LitmusPaper
   module Dependency
     class Script
+      attr_reader :script_pid
+
       def initialize(command, options = {})
         @command = command
         @timeout = options.fetch(:timeout, 5)
@@ -8,15 +10,23 @@ module LitmusPaper
 
       def available?
         Timeout.timeout(@timeout) do
-          output = %x[#{@command}]
-          unless $CHILD_STATUS.success?
-            LitmusPaper.logger.info("Available check to #{@command} failed with status #{$CHILD_STATUS.exitstatus}")
-            LitmusPaper.logger.info("Failed output #{output}")
+          script_stdout = script_stderr = nil
+          script_status = POpen4.popen4(@command) do |stdout, stderr, stdin, pid|
+            @script_pid = pid
+            script_stdout = stdout.read.strip
+            script_stderr = stderr.read.strip
           end
-          $CHILD_STATUS.success?
+          unless script_status.success?
+            LitmusPaper.logger.info("Available check to #{@command} failed with status #{$CHILD_STATUS.exitstatus}")
+            LitmusPaper.logger.info("Failed stdout #{script_stdout}")
+            LitmusPaper.logger.info("Failed stderr #{script_stderr}")
+          end
+          script_status.success?
         end
       rescue Timeout::Error
         LitmusPaper.logger.info("Available check to '#{@command}' timed out")
+        Process.kill(9, @script_pid) rescue nil
+        Process.waitpid(@script_pid)
         false
       end
 
