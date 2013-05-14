@@ -25,9 +25,15 @@ module LitmusPaper
         end
       rescue Timeout::Error
         LitmusPaper.logger.info("Available check to '#{@command}' timed out")
-        Process.kill(9, @script_pid) rescue nil
-        Process.waitpid(@script_pid)
+        Process.kill(9, @script_pid) rescue Errno::ESRCH
+        reap_zombies
         false
+      end
+
+      def reap_zombies
+        stop_time = Time.now + 2
+        nil while Time.now < stop_time && !Process.waitpid(@script_pid, Process::WNOHANG)
+      rescue Errno::ECHILD
       end
 
       def to_s
