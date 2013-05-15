@@ -32,7 +32,15 @@ module LitmusPaper
 
       def reap_zombies
         stop_time = Time.now + 2
-        nil while Time.now < stop_time && !Process.waitpid(@script_pid, Process::WNOHANG)
+        while Time.now < stop_time
+          if Process.waitpid(@script_pid, Process::WNOHANG)
+            LitmusPaper.logger.info("Reaped PID #{@script_pid}")
+            return
+          else
+            sleep 0.1
+          end
+        end
+        LitmusPaper.logger.error("Unable to reap PID #{@script_pid}")
       rescue Errno::ECHILD
       end
 
