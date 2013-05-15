@@ -40,7 +40,7 @@ describe LitmusPaper do
       END
       expect do
         LitmusPaper.configure(bad_config_file)
-      end.should raise_error
+      end.to raise_error
     end
 
     it "keeps the old config if there are errors in the new config" do
