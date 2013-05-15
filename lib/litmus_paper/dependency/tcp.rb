@@ -7,7 +7,7 @@ module LitmusPaper
       end
 
       def available?
-        SystemTimer.timeout_after(@timeout) do
+        Timeout.timeout(@timeout) do
           socket = TCPSocket.new(@ip, @port)
           socket.close
         end

@@ -20,7 +20,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency "facter", "~> 1.6.7"
   gem.add_dependency "SyslogLogger", "~> 1.4.1"
   gem.add_dependency "popen4", "~> 0.1.2"
-  gem.add_dependency "SystemTimer", "~> 1.2.3"
 
   gem.add_development_dependency "rspec", "~> 2.9.0"
   gem.add_development_dependency "rack-test", "~> 0.6.1"

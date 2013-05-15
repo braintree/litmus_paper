@@ -40,7 +40,7 @@ module LitmusPaper
       end
 
       def _fetch_stats
-        SystemTimer.timeout_after(@timeout) do
+        Timeout.timeout(@timeout) do
           UNIXSocket.open(@domain_socket) do |socket|
             socket.send "show stat\n", 0
             socket.read
