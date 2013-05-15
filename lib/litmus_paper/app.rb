@@ -4,8 +4,9 @@ module LitmusPaper
       output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
       output += "Services monitored:\n"
       LitmusPaper.services.each do |service_name, service|
-        output += "* #{service_name} (#{service.current_health.value})"
-        if service.current_health.forced?
+        health = service.current_health
+        output += "* #{service_name} (#{health.value})"
+        if health.forced?
           output += " - forced: #{service.current_health.summary}"
         end
         output += "\n"
