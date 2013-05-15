@@ -18,30 +18,33 @@ module LitmusPaper
           end
           unless script_status.success?
             LitmusPaper.logger.info("Available check to #{@command} failed with status #{$CHILD_STATUS.exitstatus}")
-            LitmusPaper.logger.info("Failed stdout #{script_stdout}")
-            LitmusPaper.logger.info("Failed stderr #{script_stderr}")
+            LitmusPaper.logger.info("Failed stdout: #{script_stdout}")
+            LitmusPaper.logger.info("Failed stderr: #{script_stderr}")
           end
           script_status.success?
         end
       rescue Timeout::Error
         LitmusPaper.logger.info("Available check to '#{@command}' timed out")
-        Process.kill(9, @script_pid) rescue Errno::ESRCH
-        reap_zombies
+        kill_and_reap_script(@script_pid)
         false
       end
 
-      def reap_zombies
+      def kill_and_reap_script(pid)
+        Process.kill(9, pid)
         stop_time = Time.now + 2
         while Time.now < stop_time
-          if Process.waitpid(@script_pid, Process::WNOHANG)
-            LitmusPaper.logger.info("Reaped PID #{@script_pid}")
+          if Process.waitpid(pid, Process::WNOHANG)
+            LitmusPaper.logger.info("Reaped PID #{pid}")
             return
           else
             sleep 0.1
           end
         end
-        LitmusPaper.logger.error("Unable to reap PID #{@script_pid}")
+        LitmusPaper.logger.error("Unable to reap PID #{pid}")
+      rescue Errno::ESRCH
+        LitmusPaper.logger.info("Attempted to kill non-existent PID #{pid} (ESRCH)")
       rescue Errno::ECHILD
+        LitmusPaper.logger.info("Attempted to reap PID #{pid} but it has already been reaped (ECHILD)")
       end
 
       def to_s
