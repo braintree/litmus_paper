@@ -9,7 +9,7 @@ module LitmusPaper
       end
 
       def available?
-        Timeout.timeout(@timeout) do
+        SystemTimer.timeout_after(@timeout) do
           script_stdout = script_stderr = nil
           script_status = POpen4.popen4(@command) do |stdout, stderr, stdin, pid|
             @script_pid = pid

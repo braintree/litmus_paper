@@ -8,7 +8,7 @@ module LitmusPaper
       end
 
       def available?
-        Timeout.timeout(@timeout) do
+        SystemTimer.timeout_after(@timeout) do
           if File.read(@path).match(@regex)
             true
           else

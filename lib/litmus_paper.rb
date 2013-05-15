@@ -19,6 +19,7 @@ require 'popen4'
 require 'sinatra/base'
 require 'facter'
 require 'syslog_logger'
+require 'system_timer'
 
 require 'facts/loadaverage'
 
