@@ -1,5 +1,7 @@
 module LitmusPaper
   class App < Sinatra::Base
+    disable :show_exceptions
+
     get "/" do
       output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
       output += "Services monitored:\n"
