@@ -11,25 +11,19 @@ describe LitmusPaper do
   describe "reload" do
     it "will reconfigure the services" do
       LitmusPaper.configure(TEST_CONFIG)
+      replace_config_file(TEST_CONFIG, :with => TEST_RELOAD_CONFIG)
       LitmusPaper.services["bar"] = :service
+
+      LitmusPaper.services.has_key?('bar').should == true
+      LitmusPaper.services.has_key?('test').should == true
 
       LitmusPaper.reload
 
       LitmusPaper.services.has_key?('bar').should == false
-      LitmusPaper.services.has_key?('test').should == true
-    end
+      LitmusPaper.services.has_key?('test').should == false
+      LitmusPaper.services.has_key?('foo').should == true
 
-    it "reloads on a USR1 signal" do
-      LitmusPaper.configure(TEST_CONFIG)
-      LitmusPaper.services["bar"] = :service
-
-      current_pid = $$
-      Process.kill("USR1", current_pid)
-
-      sleep 0.5 # wait for reload
-
-      LitmusPaper.services.has_key?('bar').should == false
-      LitmusPaper.services.has_key?('test').should == true
+      restore_config_file(TEST_CONFIG)
     end
 
     it "blows up when initial configuration is invalid" do

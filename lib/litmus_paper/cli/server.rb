@@ -1,22 +1,23 @@
 module LitmusPaper
   module CLI
-    class Server < Rack::Server
+    class Server
       class Options
         def parse!(args)
           args, options = args.dup, {}
+          options[:unicorn_config] = "/etc/litmus_unicorn.rb"
+          options[:daemonize] = false
+          options[:Host] = "0.0.0.0"
+          options[:Port] = 9293
 
           opt_parser = OptionParser.new do |opts|
-            opts.banner = "Usage: litmus [mongrel, thin, etc] [options]"
-            opts.on("-c", "--config=file", String,
-                    "Litmus configuration file", "Default: /etc/litmus.conf") { |v| options[:litmus_config] = v }
+            opts.banner = "Usage: litmus [options]"
             opts.separator ""
 
             opts.on("-b", "--binding=ip", String,
                     "Binds Litmus to the specified ip.", "Default: 0.0.0.0") { |v| options[:Host] = v }
-            opts.on("-d", "--daemon", "Make server run as a Daemon.") { options[:daemonize] = true }
-            opts.on("-P","--pid=pid",String,
-                    "Specifies the PID file.",
-                    "Default: rack.pid") { |v| options[:pid] = v }
+            opts.on("-d", "--daemon", "Make server run as a Daemon.") { |d| options[:daemonize] = true }
+            opts.on("-p", "--port=port", "Listen Port") { |p| options[:Port] = p }
+            opts.on("-c", "--unicorn-config=config", "Unicorn Config") { |c| options[:unicorn_config] = c }
 
             opts.separator ""
 
@@ -25,8 +26,6 @@ module LitmusPaper
 
           opt_parser.parse! args
 
-          options[:config] = File.expand_path("../../../config.ru", File.dirname(__FILE__))
-          options[:server] = args.shift
           options
         end
       end
@@ -36,22 +35,12 @@ module LitmusPaper
       end
 
       def start
-        if !File.exists?(options[:litmus_config])
-          puts "Could not find #{options[:litmus_config]}. Specify correct location with -c file"
-          exit 1
-        end
-
-        LitmusPaper.configure(options[:litmus_config])
-        options[:Port] = LitmusPaper.port
-
-        super
+        options = opt_parser.parse!(ARGV)
+        unicorn_args = ['-c', options[:unicorn_config], '-l', "#{options[:Host]}:#{options[:Port]}"]
+        unicorn_args << '-D' if options[:daemonize]
+        Kernel.exec('unicorn', *unicorn_args)
       end
 
-      def default_options
-        super.merge(
-          :litmus_config => '/etc/litmus.conf'
-        )
-      end
     end
   end
 end

@@ -7,6 +7,8 @@ require 'tempfile'
 
 TEST_CONFIG_DIR = "/tmp/litmus_paper"
 TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
+TEST_RELOAD_CONFIG = File.expand_path('support/test.reload.config', File.dirname(__FILE__))
+TEST_UNICORN_CONFIG = File.expand_path('support/test.unicorn.config', File.dirname(__FILE__))
 TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))
 TEST_CA_CERT = File.expand_path('ssl/server.crt', File.dirname(__FILE__))
 
@@ -43,4 +45,16 @@ module SpecHelper
       end
     end
   end
+end
+
+def replace_config_file(old_config_file, replacement_hash)
+  replacement_config_file = replacement_hash[:with]
+
+  system("cp #{old_config_file} #{old_config_file}.bak")
+  system("cp #{replacement_config_file} #{old_config_file}")
+end
+
+
+def restore_config_file(config_file)
+  system("mv #{config_file}.bak #{config_file}")
 end

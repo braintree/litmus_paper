@@ -7,11 +7,15 @@ describe 'litmusctl' do
   end
 
   before(:all) do
-    system "bundle exec ruby -I lib bin/litmus -d -c #{TEST_CONFIG} -P /tmp/litmus.pid"
+    CONFIG_FILE = 'tmp/test.config'
+    system("cp #{TEST_CONFIG} #{CONFIG_FILE}")
+    ENV['LITMUS_CONFIG'] = CONFIG_FILE
+    system "bundle exec ruby -I lib bin/litmus -d -u #{TEST_UNICORN_CONFIG}"
+    @litmus_pid = File.read("tmp/unicorn.pid").chomp.to_i
   end
 
   after(:all) do
-    system "kill -9 `cat /tmp/litmus.pid`"
+    Process.kill("TERM", @litmus_pid)
   end
 
   describe 'help' do
@@ -65,6 +69,23 @@ describe 'litmusctl' do
 
     it "returns not found if downfile doesn't exist" do
       _litmusctl('force down test -d').should match("NOT FOUND")
+    end
+  end
+
+  describe "reload" do
+    after(:each) do
+      restore_config_file(CONFIG_FILE)
+      Process.kill("HUP", @litmus_pid)
+    end
+
+    it "reloads on a USR1 signal" do
+      _litmusctl('status test').should match("Health: 0")
+
+      replace_config_file(CONFIG_FILE, :with => TEST_RELOAD_CONFIG)
+
+      Process.kill("HUP", @litmus_pid)
+
+      _litmusctl('status foo').should match("Health: 0")
     end
   end
 end

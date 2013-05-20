@@ -59,9 +59,17 @@ module LitmusPaper
     end
   end
 
-  def self.configure(filename)
-    @config_file = filename
-    @config = LitmusPaper::ConfigurationFile.new(filename).evaluate
+  def self.configure(filename = nil)
+    @config_file = if filename
+      filename
+    elsif ENV['LITMUS_CONFIG'] && File.exists?(ENV['LITMUS_CONFIG'])
+      ENV['LITMUS_CONFIG']
+    elsif File.exists?('/etc/litmus.conf')
+      '/etc/litmus.conf'
+    else
+      raise "No litmus configuration file"
+    end
+    @config = LitmusPaper::ConfigurationFile.new(@config_file).evaluate
   end
 
   def self.reload
@@ -75,4 +83,4 @@ module LitmusPaper
   end
 end
 
-Signal.trap("USR1") { LitmusPaper.reload }
+Signal.trap("HUP") { LitmusPaper.reload }
