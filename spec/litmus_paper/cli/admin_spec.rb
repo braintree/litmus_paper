@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-
 describe 'litmusctl' do
   def _litmusctl(args)
     `bundle exec ruby -I lib bin/litmusctl #{args} -c #{TEST_CONFIG}`
   end
 
   before(:all) do
+    FileUtils.mkdir_p('tmp')
     CONFIG_FILE = 'tmp/test.config'
     system("cp #{TEST_CONFIG} #{CONFIG_FILE}")
     ENV['LITMUS_CONFIG'] = CONFIG_FILE
