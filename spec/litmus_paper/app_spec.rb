@@ -55,7 +55,7 @@ describe LitmusPaper::App do
 
   describe "POST /up" do
     it "creates a global upfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       post "/up", :reason => "up for testing"
@@ -69,7 +69,7 @@ describe LitmusPaper::App do
 
   describe "POST /down" do
     it "creates a global downfile" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       post "/down", :reason => "down for testing"
@@ -83,7 +83,7 @@ describe LitmusPaper::App do
 
   describe "POST /:service/up" do
     it "creates a service specific upfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       post "/test/up", :reason => "up for testing"
@@ -97,7 +97,7 @@ describe LitmusPaper::App do
 
   describe "DELETE /up" do
     it "removes the global upfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       post "/up", :reason => "up for testing"
@@ -115,7 +115,7 @@ describe LitmusPaper::App do
     end
 
     it "404s if there is no upfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
 
       delete "/up"
 
@@ -125,7 +125,7 @@ describe LitmusPaper::App do
 
   describe "DELETE /down" do
     it "removes the global downfile" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       post "/down", :reason => "down for testing"
@@ -145,7 +145,7 @@ describe LitmusPaper::App do
 
   describe "DELETE /:service/up" do
     it "removes a service specific upfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       post "/test/up", :reason => "up for testing"
@@ -165,7 +165,7 @@ describe LitmusPaper::App do
 
   describe "GET /:service/status" do
     it "is successful when the service is passing" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       get "/test/status"
@@ -176,11 +176,11 @@ describe LitmusPaper::App do
       last_response.header.should_not have_key("X-Health-Forced")
       last_response.body.should match(/Health: 100/)
       last_response.body.should match(/AlwaysAvailableDependency: OK/)
-      last_response.body.should include("ConstantMetric(100): 100")
+      last_response.body.should include("Metric::ConstantMetric(100): 100")
     end
 
     it "is 'service unavailable' when the check fails" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       get "/test/status"
@@ -199,7 +199,7 @@ describe LitmusPaper::App do
     end
 
     it "is 'service unavailable' when an up file and down file exists" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
@@ -213,7 +213,7 @@ describe LitmusPaper::App do
     end
 
     it "is 'service available' when an up file exists" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
@@ -226,7 +226,7 @@ describe LitmusPaper::App do
     end
 
     it "is 'service available' when an up file exists" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
@@ -239,7 +239,7 @@ describe LitmusPaper::App do
     end
 
     it "is 'service unavailable' when a global down file and up file exists" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       LitmusPaper::StatusFile.global_down_file.create("Down for testing")
@@ -253,7 +253,7 @@ describe LitmusPaper::App do
     end
 
     it "is 'service unavailable' when a global down file exists" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       LitmusPaper::StatusFile.global_down_file.create("Down for testing")
@@ -266,7 +266,7 @@ describe LitmusPaper::App do
     end
 
     it "is successful when a global up file exists" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       LitmusPaper::StatusFile.global_up_file.create("Up for testing")
@@ -279,7 +279,7 @@ describe LitmusPaper::App do
     end
 
     it "resets the Facter cache" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       get "/test/status"
