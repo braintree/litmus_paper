@@ -1,6 +1,8 @@
 require 'sinatra/base'
 
 class HttpTestServer < Sinatra::Base
+  set :protection, :except => :path_traversal
+
   get "/method" do
     text 200, "GET"
   end
