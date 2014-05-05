@@ -225,19 +225,6 @@ describe LitmusPaper::App do
       last_response.body.should match(/Up for testing/)
     end
 
-    it "is 'service available' when an up file exists" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
-      LitmusPaper.services['test'] = test_service
-
-      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
-
-      get "/test/status"
-
-      last_response.status.should == 200
-      last_response.headers["X-Health-Forced"].should == "up"
-      last_response.body.should match(/Up for testing/)
-    end
-
     it "is 'service unavailable' when a global down file and up file exists" do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
