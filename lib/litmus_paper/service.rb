@@ -8,9 +8,8 @@ module LitmusPaper
 
     def current_health
       forced_health = _determine_forced_health
-      return forced_health unless forced_health.nil?
 
-      health = LitmusPaper::Health.new
+      health = forced_health ? forced_health : LitmusPaper::Health.new
       @dependencies.each do |dependency|
         health.ensure(dependency)
       end
@@ -35,7 +34,7 @@ module LitmusPaper
 
     def _determine_forced_health
       _health_files.map do |status_file|
-        ForcedHealth.new(status_file.health, status_file.content) if status_file.exists?
+        LitmusPaper::Health.new(status_file.forced, status_file.content) if status_file.exists?
       end.compact.first
     end
   end

@@ -26,7 +26,7 @@ describe LitmusPaper::Service do
       LitmusPaper::StatusFile.service_down_file("test").create("Down for testing")
 
       service.current_health.value.should == 0
-      service.current_health.summary.should == "Down for testing"
+      service.current_health.summary.should match(/Down for testing/)
     end
 
     it "is 0 when a global down file exists" do
@@ -37,7 +37,7 @@ describe LitmusPaper::Service do
       LitmusPaper::StatusFile.global_down_file.create("Down for testing")
 
       service.current_health.value.should == 0
-      service.current_health.summary.should == "Down for testing"
+      service.current_health.summary.should match(/Down for testing/)
     end
 
     it "is 100 when an up file exists" do
@@ -48,7 +48,7 @@ describe LitmusPaper::Service do
       LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
 
       service.current_health.value.should == 100
-      service.current_health.summary.should == "Up for testing"
+      service.current_health.summary.should match(/Up for testing/)
     end
 
     it "is 100 when a global up file exists" do
@@ -59,7 +59,7 @@ describe LitmusPaper::Service do
       LitmusPaper::StatusFile.global_up_file.create("Up for testing")
 
       service.current_health.value.should == 100
-      service.current_health.summary.should == "Up for testing"
+      service.current_health.summary.should match(/Up for testing/)
     end
   end
 end

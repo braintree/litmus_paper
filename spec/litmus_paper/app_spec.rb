@@ -35,7 +35,7 @@ describe LitmusPaper::App do
       get "/"
 
       last_response.status.should == 200
-      last_response.body.should include("* test (0)\n")
+      last_response.body.should include("* test ( 0 / 0 )\n")
     end
 
     it "includes the status if forced" do
@@ -48,8 +48,8 @@ describe LitmusPaper::App do
       get "/"
 
       last_response.status.should == 200
-      last_response.body.should include("* another (0) - forced: Down for testing\n")
-      last_response.body.should include("* test (100) - forced: Up for testing\n")
+      last_response.body.should include("* another ( 0 / 0 ) - forced: Down for testing\n")
+      last_response.body.should include("* test ( 100 / 0 ) - forced: Up for testing\n")
     end
   end
 
@@ -210,6 +210,36 @@ describe LitmusPaper::App do
       last_response.status.should == 503
       last_response.headers["X-Health-Forced"].should == "down"
       last_response.body.should match(/Down for testing/)
+    end
+
+    it "still reports the health, dependencies, and metrics when forced down" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.service_down_file("test").create("Down for testing")
+
+      get "/test/status"
+
+      last_response.status.should == 503
+      last_response.headers["X-Health-Forced"].should == "down"
+      last_response.body.should match(/Measured Health: 100\n/)
+      last_response.body.should match(/AlwaysAvailableDependency: OK\n/)
+      last_response.body.should match(/Metric::ConstantMetric\(100\): 100\n/)
+    end
+
+    it "still reports the health, dependencies, and metrics when forced up" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
+
+      get "/test/status"
+
+      last_response.status.should == 200
+      last_response.headers["X-Health-Forced"].should == "up"
+      last_response.body.should match(/Measured Health: 100\n/)
+      last_response.body.should match(/AlwaysAvailableDependency: OK\n/)
+      last_response.body.should match(/Metric::ConstantMetric\(100\): 100\n/)
     end
 
     it "is 'service available' when an up file exists" do

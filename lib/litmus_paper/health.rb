@@ -3,10 +3,11 @@ module LitmusPaper
 
     attr_reader :summary
 
-    def initialize
+    def initialize(forced = :none, summary = "")
       @value = 0
       @dependencies_available = true
-      @summary = ""
+      @summary = summary
+      @forced = forced
     end
 
     def ok?
@@ -14,10 +15,18 @@ module LitmusPaper
     end
 
     def forced?
-      false
+      @forced != :none
     end
 
     def value
+      if forced?
+        return @forced == :up ? 100 : 0
+      end
+
+      measured_health
+    end
+
+    def measured_health
       return 0 unless @dependencies_available
       @value
     end

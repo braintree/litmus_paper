@@ -5,9 +5,10 @@ module LitmusPaper
     get "/" do
       output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
       output += "Services monitored:\n"
+      output += " Service ( Health / Measured Health )\n"
       LitmusPaper.services.each do |service_name, service|
         health = service.current_health
-        output += "* #{service_name} (#{health.value})"
+        output += "* #{service_name} ( #{health.value} / #{health.measured_health} )"
         if health.forced?
           output += " - forced: #{service.current_health.summary}"
         end
@@ -48,6 +49,9 @@ module LitmusPaper
 
         headers = {"X-Health" => health.value.to_s}
         body = "Health: #{health.value}\n"
+        if health.forced?
+          body << "Measured Health: #{health.measured_health}\n"
+        end
         body << health.summary
 
         if health.forced?
