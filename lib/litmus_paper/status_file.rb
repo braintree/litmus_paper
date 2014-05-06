@@ -33,7 +33,7 @@ module LitmusPaper
     end
 
     def content
-      File.read(@path).chomp + "\n"
+      File.read(@path).chomp
     end
 
     def create(reason)

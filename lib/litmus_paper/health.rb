@@ -1,13 +1,14 @@
 module LitmusPaper
   class Health
 
-    attr_reader :summary
+    attr_reader :summary, :forced_reason
 
-    def initialize(forced = :none, summary = "")
+    def initialize(forced = :none, forced_reason = "")
       @value = 0
       @dependencies_available = true
-      @summary = summary
+      @summary = ""
       @forced = forced
+      @forced_reason = forced_reason
     end
 
     def ok?

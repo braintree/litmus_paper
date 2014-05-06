@@ -3,14 +3,15 @@ module LitmusPaper
     disable :show_exceptions
 
     get "/" do
-      output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
-      output += "Services monitored:\n"
-      output += " Service ( Health / Measured Health )\n"
+      output = "Litmus Paper #{LitmusPaper::VERSION}\n"
+      max_service_length = (LitmusPaper.services.keys << "Service").max { |a, b| a.length <=> b.length }.length
+      output += sprintf "  %-#{max_service_length}s %6s [%s] [%s]\n", "", "", "Measured", "Forced"
+      output += sprintf "  %-#{max_service_length}s %6s [%s] [%s]\n", "Service", "Health", "Health".center(8), "Reason"
       LitmusPaper.services.each do |service_name, service|
         health = service.current_health
-        output += "* #{service_name} ( #{health.value} / #{health.measured_health} )"
+        output += sprintf "* %-#{max_service_length}s %6s", service_name, health.value
         if health.forced?
-          output += " - forced: #{service.current_health.summary}"
+          output += sprintf " %10s %s", health.measured_health, service.current_health.forced_reason
         end
         output += "\n"
       end
@@ -51,6 +52,7 @@ module LitmusPaper
         body = "Health: #{health.value}\n"
         if health.forced?
           body << "Measured Health: #{health.measured_health}\n"
+          body << "Forced Reason: #{health.forced_reason}\n"
         end
         body << health.summary
 

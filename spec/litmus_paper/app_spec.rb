@@ -35,7 +35,7 @@ describe LitmusPaper::App do
       get "/"
 
       last_response.status.should == 200
-      last_response.body.should include("* test ( 0 / 0 )\n")
+      last_response.body.should match(/\* test +0\n/)
     end
 
     it "includes the status if forced" do
@@ -48,8 +48,8 @@ describe LitmusPaper::App do
       get "/"
 
       last_response.status.should == 200
-      last_response.body.should include("* another ( 0 / 0 ) - forced: Down for testing\n")
-      last_response.body.should include("* test ( 100 / 0 ) - forced: Up for testing\n")
+      last_response.body.should match(/\* another +0 +0 +Down for testing\n/)
+      last_response.body.should match(/\* test +100 +0 +Up for testing\n/)
     end
   end
 
