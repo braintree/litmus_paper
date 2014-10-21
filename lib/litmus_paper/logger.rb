@@ -4,7 +4,7 @@ module LitmusPaper
     def_delegators :@syslog, :debug, :info, :error
 
     def initialize
-      @syslog = SyslogLogger.new("litmus_paper")
+      @syslog = RemoteSyslogLogger.new('127.0.0.1', 514, :program => 'litmus_paper', :facility => 'daemon')
     end
 
     def write(message)

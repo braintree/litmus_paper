@@ -18,7 +18,7 @@ require 'resolv-replace'
 require 'popen4'
 require 'sinatra/base'
 require 'facter'
-require 'syslog_logger'
+require 'remote_syslog_logger'
 
 require 'facts/loadaverage'
 
