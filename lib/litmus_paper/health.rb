@@ -19,9 +19,20 @@ module LitmusPaper
       @forced != :none
     end
 
+    def direction
+      @forced
+    end
+
     def value
       if forced?
-        return @forced == :up ? 100 : 0
+        return case @forced
+        when :up
+          100
+        when :down
+          0
+        when :health
+          @forced_reason.split("\n").last.to_i
+        end
       end
 
       measured_health

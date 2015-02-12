@@ -22,6 +22,14 @@ module LitmusPaper
       _create_status_file(StatusFile.global_up_file)
     end
 
+    delete "/health" do
+      _delete_status_file(StatusFile.global_health_file)
+    end
+
+    post "/health" do
+      _create_status_file(StatusFile.global_health_file)
+    end
+
     get "/:service/status" do
       health = LitmusPaper.check_service(params[:service])
       if health.nil?
@@ -38,8 +46,13 @@ module LitmusPaper
         headers = {"X-Health" => health.value.to_s}
         body = "Health: #{health.value}\n"
         if health.forced?
+          if health.direction == :health
+            reason = health.forced_reason.split("\n").join(" ")
+          else
+            reason = health.forced_reason
+          end
           body << "Measured Health: #{health.measured_health}\n"
-          body << "Forced Reason: #{health.forced_reason}\n"
+          body << "Forced Reason: #{reason}\n"
         end
         body << health.summary
 
@@ -59,6 +72,14 @@ module LitmusPaper
       _create_status_file(StatusFile.service_down_file(params[:service]))
     end
 
+    delete "/:service/health" do
+      _delete_status_file(StatusFile.service_health_file(params[:service]))
+    end
+
+    post "/:service/health" do
+      _create_status_file(StatusFile.service_health_file(params[:service]))
+    end
+
     delete "/:service/up" do
       _delete_status_file(StatusFile.service_up_file(params[:service]))
     end
@@ -76,7 +97,7 @@ module LitmusPaper
     end
 
     def _create_status_file(status_file)
-      status_file.create(params[:reason])
+      status_file.create(params[:reason], params[:health])
       _text 201, "File created"
     end
 

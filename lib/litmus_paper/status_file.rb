@@ -10,6 +10,10 @@ module LitmusPaper
       new("global_up", :up)
     end
 
+    def self.global_health_file
+      new("global_health", :health)
+    end
+
     def self.service_down_file(service_name)
       new("#{service_name}_down", :down)
     end
@@ -18,12 +22,18 @@ module LitmusPaper
       new("#{service_name}_up", :up)
     end
 
+    def self.service_health_file(service_name)
+      new("#{service_name}_health", :health)
+    end
+
     def self.priority_check_order_for_service(service_name)
       [
         global_down_file,
         global_up_file,
+        global_health_file,
         service_down_file(service_name),
-        service_up_file(service_name)
+        service_up_file(service_name),
+        service_health_file(service_name),
       ]
     end
 
@@ -36,10 +46,11 @@ module LitmusPaper
       File.read(@path).chomp
     end
 
-    def create(reason)
+    def create(reason, health = nil)
       FileUtils.mkdir_p(File.dirname(@path))
       File.open(@path, 'w') do |file|
         file.puts(reason)
+        file.puts(health) if health
       end
     end
 

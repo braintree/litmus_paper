@@ -52,6 +52,13 @@ describe LitmusPaper::App do
       last_response.body.should include('Down for testing')
       last_response.body.should include('Up for testing')
     end
+
+    it "includes the health value if health is forced" do
+      LitmusPaper.services['test'] = LitmusPaper::Service.new('test')
+      LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
+      get "/"
+      last_response.body.should match(/Forcing health 88\n/)
+    end
   end
 
   describe "POST /up" do
@@ -82,6 +89,20 @@ describe LitmusPaper::App do
     end
   end
 
+  describe "POST /health" do
+    it "creates a global healthfile" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      post "/health", :reason => "health for testing", :health => 88
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+      last_response.body.should match(/health for testing 88/)
+    end
+  end
+
   describe "POST /:service/up" do
     it "creates a service specific upfile" do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
@@ -93,6 +114,20 @@ describe LitmusPaper::App do
       get "/test/status"
       last_response.status.should == 200
       last_response.body.should match(/up for testing/)
+    end
+  end
+
+  describe "POST /:service/health" do
+    it "creates a service specific healthfile" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      post "/test/health", :reason => "health for testing", :health => 88
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+      last_response.body.should match(/health for testing 88/)
     end
   end
 
@@ -144,6 +179,35 @@ describe LitmusPaper::App do
     end
   end
 
+  describe "DELETE /health" do
+    it "removes the global healthfile" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      post "/health", :reason => "health for testing", :health => 88
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+      last_response.body.should match(/health for testing 88/)
+
+      delete "/health"
+      last_response.status.should == 200
+
+      get "/test/status"
+      last_response.should be_ok
+      last_response.body.should_not match(/health for testing 88/)
+    end
+
+    it "404s if there is no healthfile" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+
+      delete "/health"
+
+      last_response.status.should == 404
+    end
+  end
+
   describe "DELETE /:service/up" do
     it "removes a service specific upfile" do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
@@ -161,6 +225,35 @@ describe LitmusPaper::App do
 
       get "/test/status"
       last_response.status.should == 503
+    end
+  end
+
+  describe "DELETE /:service/health" do
+    it "removes the service specific healthfile" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      post "/test/health", :reason => "health for testing", :health => 88
+      last_response.status.should == 201
+
+      get "/test/status"
+      last_response.status.should == 200
+      last_response.body.should match(/health for testing 88/)
+
+      delete "/test/health"
+      last_response.status.should == 200
+
+      get "/test/status"
+      last_response.should be_ok
+      last_response.body.should_not match(/health for testing 88/)
+    end
+
+    it "404s if there is no healthfile" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+
+      delete "/test/health"
+
+      last_response.status.should == 404
     end
   end
 

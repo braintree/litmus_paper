@@ -14,7 +14,7 @@ module LitmusPaper
         measured_health = health.measured_health.to_s.rjust(3)
         reported_health = health.value.to_s.rjust(3)
         service_forced = if health.forced?
-          "Yes: #{health.forced_reason}"
+          "Yes: #{health.forced_reason.split("\n").join(" ")}"
         else
           "No"
         end
