@@ -14,7 +14,7 @@ module LitmusPaper
               options[:delete] = true
             end
             opts.on("-r", "--reason=reason", String, "Reason for status file") do |reason|
-              options[:reason] = reason
+              options[:reason] = reason.gsub("\n", " ")
             end
           end
 
@@ -31,7 +31,7 @@ module LitmusPaper
           else
             if !options.has_key?(:reason)
               print "Reason? "
-              options[:reason] = STDIN.gets.chomp
+              options[:reason] = STDIN.gets.chomp.gsub("\n", " ")
             end
             request = Net::HTTP::Post.new(path)
             params = {'reason' => options[:reason]}
