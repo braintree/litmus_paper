@@ -65,6 +65,7 @@ module LitmusPaper
         body = "Health: #{health.value}\n"
         if health.forced?
           if health.direction == :health
+            status = "health"
             reason = health.forced_reason.split("\n").join(" ")
           else
             reason = health.forced_reason

@@ -50,11 +50,11 @@ describe 'litmusctl' do
       status.should match(/for testing/)
     end
 
-    it "can create a global helpfile" do
+    it "can create a global healthfile" do
       _litmusctl('force health 88 -r "for testing"').should match("File created")
 
       status = _litmusctl('status test')
-      status.should match(/Health: 88/)
+      status.should match(/Health: 0/) # This service is actually failing so we'll get 0 back
       status.should match(/for testing 88/)
     end
 
@@ -70,7 +70,7 @@ describe 'litmusctl' do
       _litmusctl('force health 88 test -r "for testing"').should match("File created")
 
       status = _litmusctl('status test')
-      status.should match(/Health: 88/)
+      status.should match(/Health: 0/)
       status.should match(/for testing 88/)
     end
 
