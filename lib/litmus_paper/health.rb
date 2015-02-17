@@ -19,9 +19,25 @@ module LitmusPaper
       @forced != :none
     end
 
+    def direction
+      @forced
+    end
+
     def value
       if forced?
-        return @forced == :up ? 100 : 0
+        return case @forced
+        when :up
+          100
+        when :down
+          0
+        when :health
+          forced_health = @forced_reason.split("\n").last.to_i
+
+          # This could potentially be argued differently, but I feel like forcing
+          # a health value != forcing up - if the measured health is less than the
+          # forced health, we should return the measured health.
+          measured_health < forced_health ? measured_health : forced_health
+        end
       end
 
       measured_health

@@ -50,6 +50,14 @@ describe 'litmusctl' do
       status.should match(/for testing/)
     end
 
+    it "can create a global healthfile" do
+      _litmusctl('force health 88 -r "for testing"').should match("File created")
+
+      status = _litmusctl('status test')
+      status.should match(/Health: 0/) # This service is actually failing so we'll get 0 back
+      status.should match(/for testing 88/)
+    end
+
     it "creates a downfile" do
       _litmusctl('force down test -r "for testing"').should match("File created")
 
@@ -58,10 +66,26 @@ describe 'litmusctl' do
       status.should match(/for testing/)
     end
 
+    it "creates a healthfile" do
+      _litmusctl('force health 88 test -r "for testing"').should match("File created")
+
+      status = _litmusctl('status test')
+      status.should match(/Health: 0/)
+      status.should match(/for testing 88/)
+    end
+
     it 'removes an upfile for the service' do
       _litmusctl('force up test -r "for testing"').should match("File created")
       _litmusctl('force up test -d').should match("File deleted")
 
+      status = _litmusctl('status passing_test')
+      status.should match(/Health: \d\d/)
+      status.should_not match(/for testing/)
+    end
+
+    it "removes a healthfile for the service" do
+      _litmusctl('force health 88 test -r "for testing"').should match("File created")
+      _litmusctl('force health test -d').should match("File deleted")
       status = _litmusctl('status passing_test')
       status.should match(/Health: \d\d/)
       status.should_not match(/for testing/)

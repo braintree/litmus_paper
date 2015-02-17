@@ -9,17 +9,21 @@ module LitmusPaper
         def self.build_request(options, args)
           options.merge! _default_options
           opt_parser = _extend_default_parser(options) do |opts|
-            opts.banner = "Usage: litmusctl force <up|down> [service] [options]"
+            opts.banner = "Usage: litmusctl force <up|down|health N> [service] [options]"
             opts.on("-d", "--delete", "Remove status file") do
               options[:delete] = true
             end
             opts.on("-r", "--reason=reason", String, "Reason for status file") do |reason|
-              options[:reason] = reason
+              options[:reason] = reason.gsub("\n", " ")
             end
           end
 
           opt_parser.parse! args
-          direction, service = args
+          if args[0] == "health" && !options[:delete]
+            direction, value, service = args
+          else
+            direction, service = args
+          end
           path = service ? "/#{service}/#{direction}" : "/#{direction}"
 
           if options[:delete]
@@ -27,10 +31,12 @@ module LitmusPaper
           else
             if !options.has_key?(:reason)
               print "Reason? "
-              options[:reason] = STDIN.gets.chomp
+              options[:reason] = STDIN.gets.chomp.gsub("\n", " ")
             end
             request = Net::HTTP::Post.new(path)
-            request.set_form_data('reason' => options[:reason])
+            params = {'reason' => options[:reason]}
+            params.merge!({'health' => value}) if direction == 'health'
+            request.set_form_data(params)
           end
 
           request
