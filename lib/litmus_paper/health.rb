@@ -31,7 +31,12 @@ module LitmusPaper
         when :down
           0
         when :health
-          @forced_reason.split("\n").last.to_i
+          forced_health = @forced_reason.split("\n").last.to_i
+
+          # This could potentially be argued differently, but I feel like forcing
+          # a health value != forcing up - if the measured health is less than the
+          # forced health, we should return the measured health.
+          measured_health < forced_health ? measured_health : forced_health
         end
       end
 

@@ -119,7 +119,7 @@ describe LitmusPaper::App do
 
   describe "POST /:service/health" do
     it "creates a service specific healthfile" do
-      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
 
       post "/test/health", :reason => "health for testing", :health => 88
@@ -258,6 +258,33 @@ describe LitmusPaper::App do
   end
 
   describe "GET /:service/status" do
+    it "returns the forced health value for a healthy service" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+      LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
+
+      get "/test/status"
+      last_response.should be_ok
+      last_response.header["X-Health"].should == "88"
+      last_response.body.should match(/Health: 88/)
+      last_response.body.should match(/Measured Health: 100/)
+      last_response.header["X-Health-Forced"].should == "health"
+    end
+
+    it "returns the actualy health value for an unhealthy service when the measured health is less than the forced value" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+      LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
+
+      get "/test/status"
+      last_response.should_not be_ok
+      last_response.header["X-Health"].should == "0"
+      last_response.header["X-Health-Forced"].should == "health"
+      last_response.body.should match(/Health: 0/)
+      last_response.body.should match(/Measured Health: 0/)
+      last_response.body.should match(/Forcing health 88\n/)
+    end
+
     it "is successful when the service is passing" do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service

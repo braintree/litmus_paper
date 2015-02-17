@@ -14,10 +14,10 @@ module LitmusPaper
         measured_health = health.measured_health.to_s.rjust(3)
         reported_health = health.value.to_s.rjust(3)
         service_forced = if health.forced?
-          "Yes: #{health.forced_reason.split("\n").join(" ")}"
-        else
-          "No"
-        end
+                           "Yes: #{health.forced_reason.split("\n").first}"
+                         else
+                           "No"
+                         end
         output += sprintf("* %-#{max_service_length}s   %s   %s   %s\n",
                           service_name,
                           reported_health.center(8).colorize(_health_color(health.value)),
