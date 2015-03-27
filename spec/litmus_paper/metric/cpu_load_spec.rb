@@ -22,7 +22,7 @@ describe LitmusPaper::Metric::CPULoad do
     end
 
     it "is cached" do
-      Facter.should_receive(:value).once.and_return("10")
+      Facter.should_receive(:value).once.and_return("15")
       cpu_load = LitmusPaper::Metric::CPULoad.new(50)
       cpu_load.processor_count
       cpu_load.processor_count
