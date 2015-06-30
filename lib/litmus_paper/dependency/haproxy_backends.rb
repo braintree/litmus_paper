@@ -21,6 +21,9 @@ module LitmusPaper
       rescue Timeout::Error
         LitmusPaper.logger.info("HAproxy available check timed out for #{@cluster}")
         false
+      rescue => e
+        LitmusPaper.logger.info("HAproxy available check failed for #{@cluster} with #{e.message}")
+        false
       end
 
       def to_s

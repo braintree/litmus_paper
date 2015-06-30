@@ -32,6 +32,14 @@ describe LitmusPaper::Dependency::HaproxyBackends do
     end
   end
 
+  describe "exceptions" do
+    it "logs exceptions and returns false" do
+      haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/dev/null", "yellow_cluster")
+      LitmusPaper.logger.should_receive(:info)
+      haproxy.should_not be_available
+    end
+  end
+
   describe "to_s" do
     it "includes the socket file and the cluster" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "orange_cluster")
