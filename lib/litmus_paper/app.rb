@@ -3,20 +3,7 @@ module LitmusPaper
     disable :show_exceptions
 
     get "/" do
-      output = "Litmus Paper #{LitmusPaper::VERSION}\n"
-      max_service_length = (LitmusPaper.services.keys << "Service").max { |a, b| a.length <=> b.length }.length
-      output += sprintf "  %-#{max_service_length}s %6s [%s] [%s]\n", "", "", "Measured", "Forced"
-      output += sprintf "  %-#{max_service_length}s %6s [%s] [%s]\n", "Service", "Health", "Health".center(8), "Reason"
-      LitmusPaper.services.each do |service_name, service|
-        health = service.current_health
-        output += sprintf "* %-#{max_service_length}s %6s", service_name, health.value
-        if health.forced?
-          output += sprintf " %10s %s", health.measured_health, service.current_health.forced_reason
-        end
-        output += "\n"
-      end
-
-      _text 200, output
+      _text 200, LitmusPaper::TerminalOutput.service_status
     end
 
     delete "/down" do

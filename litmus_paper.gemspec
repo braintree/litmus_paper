@@ -21,6 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "remote_syslog_logger", "~> 1.0.3"
   gem.add_dependency "popen4", "~> 0.1.2"
   gem.add_dependency "unicorn", "~> 4.6.2"
+  gem.add_dependency "colorize"
 
   gem.add_development_dependency "rspec", "~> 2.9.0"
   gem.add_development_dependency "rack-test", "~> 0.6.1"

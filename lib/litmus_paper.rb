@@ -4,6 +4,7 @@ require 'net/https'
 require 'uri'
 require 'forwardable'
 require 'English'
+require 'colorize'
 
 # Ruby's stock DNS resolution, by default, blocks the entire Ruby VM from
 # processing while the lookup is happening, because it calls out to the native
@@ -38,6 +39,7 @@ require 'litmus_paper/metric/constant_metric'
 require 'litmus_paper/metric/cpu_load'
 require 'litmus_paper/service'
 require 'litmus_paper/status_file'
+require 'litmus_paper/terminal_output'
 require 'litmus_paper/version'
 
 module LitmusPaper
