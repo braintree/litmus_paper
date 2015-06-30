@@ -21,6 +21,12 @@ describe LitmusPaper::Dependency::FileContents do
       check = LitmusPaper::Dependency::FileContents.new("/dev/zero", /^timeout$/, :timeout => 1)
       check.should_not be_available
     end
+
+    it "logs exceptions and returns false" do
+      check = LitmusPaper::Dependency::FileContents.new("/tmp/this_file_does_not_exist", /^foo$/)
+      LitmusPaper.logger.should_receive(:info)
+      check.should_not be_available
+    end
   end
 
   describe "to_s" do

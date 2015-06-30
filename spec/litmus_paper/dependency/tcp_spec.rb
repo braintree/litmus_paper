@@ -24,6 +24,12 @@ describe LitmusPaper::Dependency::TCP do
       check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 3334)
       check.should_not be_available
     end
+
+    it "logs exceptions and returns false" do
+      check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 3334)
+      LitmusPaper.logger.should_receive(:info)
+      check.should_not be_available
+    end
   end
 
   describe "to_s" do

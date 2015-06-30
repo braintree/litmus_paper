@@ -30,6 +30,12 @@ describe LitmusPaper::Dependency::Script do
       check = LitmusPaper::Dependency::Script.new("ls | grep missing")
       check.should_not be_available
     end
+
+    it "logs exceptions and returns false" do
+      check = LitmusPaper::Dependency::Script.new("command_not_found")
+      LitmusPaper.logger.should_receive(:info)
+      check.should_not be_available
+    end
   end
 
   describe "to_s" do

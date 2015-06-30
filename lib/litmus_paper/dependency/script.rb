@@ -27,6 +27,9 @@ module LitmusPaper
         LitmusPaper.logger.info("Available check to '#{@command}' timed out")
         kill_and_reap_script(@script_pid)
         false
+      rescue => e
+        LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
+        false
       end
 
       def kill_and_reap_script(pid)

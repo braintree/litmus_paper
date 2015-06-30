@@ -19,7 +19,7 @@ module LitmusPaper
       rescue Timeout::Error
         LitmusPaper.logger.info("Timeout reading #{@path}")
         false
-      rescue Exception => e
+      rescue => e
         LitmusPaper.logger.info("Error reading #{@path}: '#{e.message}'")
         false
       end

@@ -12,7 +12,7 @@ module LitmusPaper
           socket.close
         end
         true
-      rescue Exception => e
+      rescue => e
         LitmusPaper.logger.info("TCP available check to #{@ip}:#{@port} failed with #{e.message}")
         false
       end

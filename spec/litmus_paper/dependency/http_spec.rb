@@ -124,6 +124,12 @@ describe LitmusPaper::Dependency::HTTP do
       check = LitmusPaper::Dependency::HTTP.new("#{@url}/sleep/2", :timeout_seconds => 1)
       check.should_not be_available
     end
+
+    it "logs exceptions and returns false" do
+      check = LitmusPaper::Dependency::HTTP.new('http://127.0.0.1:7777')
+      LitmusPaper.logger.should_receive(:info)
+      check.should_not be_available
+    end
   end
 
   describe "to_s" do

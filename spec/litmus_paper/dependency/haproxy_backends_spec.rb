@@ -17,6 +17,12 @@ describe LitmusPaper::Dependency::HaproxyBackends do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "orange_cluster")
       haproxy.should_not be_available
     end
+
+    it "logs exceptions and returns false" do
+      haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/dev/null", "yellow_cluster")
+      LitmusPaper.logger.should_receive(:info)
+      haproxy.should_not be_available
+    end
   end
 
   describe "timeouts" do
@@ -28,14 +34,6 @@ describe LitmusPaper::Dependency::HaproxyBackends do
 
     it "returns false after a configurable number of seconds" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "yellow_cluster", :timeout_seconds => 1)
-      haproxy.should_not be_available
-    end
-  end
-
-  describe "exceptions" do
-    it "logs exceptions and returns false" do
-      haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/dev/null", "yellow_cluster")
-      LitmusPaper.logger.should_receive(:info)
       haproxy.should_not be_available
     end
   end
