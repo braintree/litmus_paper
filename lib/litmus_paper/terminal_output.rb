@@ -5,9 +5,9 @@ module LitmusPaper
       max_service_length = (LitmusPaper.services.keys << "Service").max { |a, b| a.length <=> b.length }.length
 
       output = "Litmus Paper #{LitmusPaper::VERSION}\n"
-      output += sprintf(" %s │ %s │ %s │ %s\n", "Service".ljust(max_service_length), "Reported", "Measured", "Forced")
-      output += sprintf(" %s │ %s │ %s │ %s\n", "Name".ljust(max_service_length), "Health".ljust(8), "Health".ljust(8), "Down".ljust(6))
-      output += "─" * (max_service_length + 2) + "┴" + "─" * 10 + "┴" + "─" * 10 + "┴" + "─" * 8 + "\n"
+      output += sprintf(" %s │ %s │ %s │ %s\n", "Service".ljust(max_service_length), "Reported", "Measured", "Health")
+      output += sprintf(" %s │ %s │ %s │ %s\n", "Name".ljust(max_service_length), "Health".ljust(8), "Health".ljust(8), "Forced?")
+      output += "─" * (max_service_length + 2) + "┴" + "─" * 10 + "┴" + "─" * 10 + "┴" + "─" * 9 + "\n"
 
       LitmusPaper.services.each do |service_name, service|
         health = service.current_health
