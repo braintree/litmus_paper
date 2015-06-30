@@ -24,7 +24,7 @@ module LitmusPaper
           script_status.success?
         end
       rescue Timeout::Error
-        LitmusPaper.logger.info("Available check to '#{@command}' timed out")
+        LitmusPaper.logger.info("Timeout running command: '#{@command}'")
         kill_and_reap_script(@script_pid)
         false
       rescue => e

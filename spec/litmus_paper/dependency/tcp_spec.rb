@@ -25,6 +25,14 @@ describe LitmusPaper::Dependency::TCP do
       check.should_not be_available
     end
 
+    it "is false when the request times out" do
+      TCPSocket.stub(:new) do
+        sleep(5)
+      end
+      check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 3334, :timeout_seconds => 1)
+      check.should_not be_available
+    end
+
     it "logs exceptions and returns false" do
       check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 3334)
       LitmusPaper.logger.should_receive(:info)

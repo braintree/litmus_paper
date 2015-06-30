@@ -12,6 +12,9 @@ module LitmusPaper
           socket.close
         end
         true
+      rescue Timeout::Error
+        LitmusPaper.logger.info("Timeout connecting #{@ip}:#{@port}")
+        false
       rescue => e
         LitmusPaper.logger.info("TCP available check to #{@ip}:#{@port} failed with #{e.message}")
         false

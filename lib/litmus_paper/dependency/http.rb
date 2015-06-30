@@ -18,6 +18,9 @@ module LitmusPaper
         LitmusPaper.logger.info("Available check to #{@uri} did not match #{@expected_content}") unless matches
 
         success && matches
+      rescue Timeout::Error
+        LitmusPaper.logger.info("Timeout fetching #{@uri}")
+        false
       rescue => e
         LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
         false
