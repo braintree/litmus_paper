@@ -14,15 +14,15 @@ module LitmusPaper
         backend = _find_backend(stats, @cluster)
 
         if backend['status'] != 'UP'
-          LitmusPaper.logger.info("HAproxy available check failed, #{@cluster} backend is #{backend['status']}")
+          LitmusPaper.logger.info("HAProxy available check failed, #{@cluster} backend is #{backend['status']}")
           return false
         end
         return true
       rescue Timeout::Error
-        LitmusPaper.logger.info("HAproxy available check timed out for #{@cluster}")
+        LitmusPaper.logger.info("HAProxy available check timed out for #{@cluster}")
         false
       rescue => e
-        LitmusPaper.logger.info("HAproxy available check failed for #{@cluster} with #{e.message}")
+        LitmusPaper.logger.info("HAProxy available check failed for #{@cluster} with #{e.message}")
         false
       end
 
