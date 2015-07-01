@@ -9,8 +9,8 @@ module LitmusPaper
       output += sprintf(" %s │ %s │ %s │ %s\n", "Name".ljust(max_service_length), "Health".ljust(8), "Health".ljust(8), "Forced?")
       output += "─" * (max_service_length + 2) + "┴" + "─" * 10 + "┴" + "─" * 10 + "┴" + "─" * 9 + "\n"
 
-      LitmusPaper.services.each do |service_name, service|
-        health = service.current_health
+      LitmusPaper.services.keys.sort.each do |service_name|
+        health = LitmusPaper.services[service_name].current_health
         measured_health = health.measured_health.to_s.rjust(3)
         reported_health = health.value.to_s.rjust(3)
         service_forced = if health.forced?
