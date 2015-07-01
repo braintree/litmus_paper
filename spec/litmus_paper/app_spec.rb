@@ -57,7 +57,8 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = LitmusPaper::Service.new('test')
       LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
       get "/"
-      last_response.body.should match(/Forcing health 88\n/)
+      last_response.body.should include('Forcing health')
+      last_response.body.should include('88')
     end
   end
 
