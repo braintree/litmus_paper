@@ -4,7 +4,7 @@ module LitmusPaper
     def self.service_status
       max_service_length = (LitmusPaper.services.keys << "Service").max { |a, b| a.length <=> b.length }.length
 
-      output = "Litmus Paper #{LitmusPaper::VERSION}\n"
+      output = "Litmus Paper #{LitmusPaper::VERSION}\n\n"
       output += sprintf(" %s │ %s │ %s │ %s\n", "Service".ljust(max_service_length), "Reported", "Measured", "Health")
       output += sprintf(" %s │ %s │ %s │ %s\n", "Name".ljust(max_service_length), "Health".ljust(8), "Health".ljust(8), "Forced?")
       output += "─" * (max_service_length + 2) + "┴" + "─" * 10 + "┴" + "─" * 10 + "┴" + "─" * 9 + "\n"
@@ -23,7 +23,7 @@ module LitmusPaper
                          else
                            "No"
                          end
-        output += sprintf("* %-#{max_service_length}s   %s   %s   %s\n",
+        output += sprintf("- %-#{max_service_length}s   %s   %s   %s\n",
                           service_name,
                           reported_health.center(8).colorize(_health_color(health.value)),
                           measured_health.center(8),
