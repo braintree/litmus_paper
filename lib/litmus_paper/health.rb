@@ -49,7 +49,7 @@ module LitmusPaper
     end
 
     def perform(metric)
-      health = metric.current_health
+      health = metric.current_health.ceil
 
       @value += health
       @summary << "#{metric}: #{health}\n"
