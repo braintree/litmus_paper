@@ -23,7 +23,7 @@ module LitmusPaper
                          else
                            "No"
                          end
-        output += sprintf("- %-#{max_service_length}s   %s   %s   %s\n",
+        output += sprintf(" %-#{max_service_length}s   %s   %s   %s\n",
                           service_name,
                           reported_health.center(8).colorize(_health_color(health.value)),
                           measured_health.center(8),
