@@ -4,14 +4,25 @@ module LitmusPaper
       def initialize(ip, port, options = {})
         @ip, @port = ip, port
         @timeout = options.fetch(:timeout_seconds, 5)
+        @input_data = options[:input_data]
+        @expected_output = options[:expected_output]
       end
 
       def available?
+        response = true
+
         Timeout.timeout(@timeout) do
           socket = TCPSocket.new(@ip, @port)
+          if @input_data || @expected_output
+            socket.puts(@input_data.to_s)
+            data = socket.gets
+            response = data.chomp == @expected_output
+            LitmusPaper.logger.info("Response (#{response}) does not match expected output (#{@expected_output})")
+          end
           socket.close
         end
-        true
+
+        response
       rescue Timeout::Error
         LitmusPaper.logger.info("Timeout connecting #{@ip}:#{@port}")
         false

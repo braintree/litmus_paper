@@ -1,15 +1,47 @@
 require 'spec_helper'
 
 describe LitmusPaper::Dependency::TCP do
-  before(:all) do
-    @server = TCPServer.new 3333
-  end
+  describe "accepts input data and compares result against an expected output " do
+    before(:each) do
+      @server = TCPServer.new 7333
+      @thread = Thread.start do
+        s = @server.accept
+        s.puts "+PONG"
+      end
+    end
 
-  after(:all) do
-    @server.close
+    after(:each) do
+      @server.close
+      @thread.join
+    end
+
+    describe "#available?" do
+      it "is true when expected_output equals response from socket" do
+        check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 7333, :expected_output => "+PONG", :input_data => "PING")
+        check.should be_available
+      end
+
+      it "is true when expected_output equals response from socket when no input is supplied" do
+        check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 7333, :expected_output => "+PONG")
+        check.should be_available
+      end
+
+      it "is false when expected_output does not equal response from socket" do
+        check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 7333, :expected_output => "+PANG", :input_data => "PING")
+        check.should_not be_available
+      end
+    end
   end
 
   describe "#available?" do
+    before(:all) do
+      @server = TCPServer.new 3333
+    end
+
+    after(:all) do
+      @server.close
+    end
+
     it "is true when it's able to reach the ip and port" do
       check = LitmusPaper::Dependency::TCP.new("127.0.0.1", 3333)
       check.should be_available
