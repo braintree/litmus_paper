@@ -8,10 +8,10 @@ describe LitmusPaper::Metric::CPULoad do
       cpu_load.current_health.should == 30
     end
 
-    it "is zero when the load is above one per core" do
+    it "is one when the load is above one per core" do
       facter = StubFacter.new({"processorcount" => "4", "loadaverage" => "20.00 11.40 10.00"})
       cpu_load = LitmusPaper::Metric::CPULoad.new(50, facter)
-      cpu_load.current_health.should == 0
+      cpu_load.current_health.should == 1
     end
   end
 
