@@ -7,7 +7,7 @@ module LitmusPaper
       end
 
       def current_health
-        [@weight - (@weight * load_average / processor_count), 0].max
+        [@weight - (@weight * load_average / processor_count), 1].max
       end
 
       def processor_count
