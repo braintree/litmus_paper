@@ -5,4 +5,4 @@ rvm:
 - 2.0.0
 notifications:
   email:
-    - blue@getbraintree.com
+    - blue-ci-notifications@getbraintree.com
