@@ -19,7 +19,7 @@ module LitmusPaper
       def memory_total
         return @memory_total unless @memory_total.nil?
 
-        size, scale = @facter.value('memorytotal').split(' ')
+        size, scale = @facter.value('memorysize').split(' ')
         @memory_total = (size.to_f * MULTIPLIER[scale]).to_i
       end
 
