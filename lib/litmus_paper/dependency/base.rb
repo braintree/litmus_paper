@@ -4,7 +4,6 @@ module LitmusPaper
       attr_reader :available
 
       def available?
-        return @available unless @available.nil?
         @available = yield
       end
 
