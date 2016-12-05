@@ -4,11 +4,15 @@ module LitmusPaper
       attr_reader :available
 
       def available?
-        @available = yield
+        @available = _available?
       end
 
       def result
         available ? 'OK' : 'FAIL'
+      end
+
+      def _available?
+        raise NotImplementedError
       end
     end
   end

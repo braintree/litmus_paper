@@ -9,25 +9,21 @@ module LitmusPaper
         @timeout = options.fetch(:timeout_seconds, 2)
       end
 
-      def available?
-        super do
-          begin
-            response = _make_request
-            success = _successful_response?(response)
-            matches = _body_matches?(response)
+      def _available?
+        response = _make_request
+        success = _successful_response?(response)
+        matches = _body_matches?(response)
 
-            LitmusPaper.logger.info("Available check to #{@uri} failed with status #{response.code}") unless success
-            LitmusPaper.logger.info("Available check to #{@uri} did not match #{@expected_content}") unless matches
+        LitmusPaper.logger.info("Available check to #{@uri} failed with status #{response.code}") unless success
+        LitmusPaper.logger.info("Available check to #{@uri} did not match #{@expected_content}") unless matches
 
-            success && matches
-          rescue Timeout::Error
-            LitmusPaper.logger.info("Timeout fetching #{@uri}")
-            false
-          rescue => e
-            LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
-            false
-          end
-        end
+        success && matches
+      rescue Timeout::Error
+        LitmusPaper.logger.info("Timeout fetching #{@uri}")
+        false
+      rescue => e
+        LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
+        false
       end
 
       def _make_request

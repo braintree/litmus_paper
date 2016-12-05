@@ -9,34 +9,30 @@ module LitmusPaper
         @report_result = options.fetch(:report_result, false)
       end
 
-      def available?
-        super do
-          begin
-            _clear_state
-            Timeout.timeout(@timeout) do
-              script_stdout = script_stderr = nil
-              script_status = POpen4.popen4(@command) do |stdout, stderr, stdin, pid|
-                @script_pid = pid
-                script_stdout = stdout.read.strip
-                script_stderr = stderr.read.strip
-              end
-              unless script_status.success?
-                LitmusPaper.logger.info("Available check to #{@command} failed with status #{$CHILD_STATUS.exitstatus}")
-                LitmusPaper.logger.info("Failed stdout: #{script_stdout}")
-                LitmusPaper.logger.info("Failed stderr: #{script_stderr}")
-              end
-              @result = script_stdout if @report_result
-              script_status.success?
-            end
-          rescue Timeout::Error
-            LitmusPaper.logger.info("Timeout running command: '#{@command}'")
-            kill_and_reap_script(@script_pid)
-            false
-          rescue => e
-            LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
-            false
+      def _available?
+        _clear_state
+        Timeout.timeout(@timeout) do
+          script_stdout = script_stderr = nil
+          script_status = POpen4.popen4(@command) do |stdout, stderr, stdin, pid|
+            @script_pid = pid
+            script_stdout = stdout.read.strip
+            script_stderr = stderr.read.strip
           end
+          unless script_status.success?
+            LitmusPaper.logger.info("Available check to #{@command} failed with status #{$CHILD_STATUS.exitstatus}")
+            LitmusPaper.logger.info("Failed stdout: #{script_stdout}")
+            LitmusPaper.logger.info("Failed stderr: #{script_stderr}")
+          end
+          @result = script_stdout if @report_result
+          script_status.success?
         end
+      rescue Timeout::Error
+        LitmusPaper.logger.info("Timeout running command: '#{@command}'")
+        kill_and_reap_script(@script_pid)
+        false
+      rescue => e
+        LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
+        false
       end
 
       def _clear_state

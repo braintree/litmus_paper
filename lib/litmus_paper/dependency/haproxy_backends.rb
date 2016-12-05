@@ -9,25 +9,21 @@ module LitmusPaper
         @timeout = options.fetch(:timeout_seconds, 2)
       end
 
-      def available?
-        super do
-          begin
-            stats = _parse_stats(_fetch_stats)
-            backend = _find_backend(stats, @cluster)
+      def _available?
+        stats = _parse_stats(_fetch_stats)
+        backend = _find_backend(stats, @cluster)
 
-            if backend['status'] != 'UP'
-              LitmusPaper.logger.info("HAProxy available check failed, #{@cluster} backend is #{backend['status']}")
-              return false
-            end
-            return true
-          rescue Timeout::Error
-            LitmusPaper.logger.info("HAProxy available check timed out for #{@cluster}")
-            false
-          rescue => e
-            LitmusPaper.logger.info("HAProxy available check failed for #{@cluster} with #{e.message}")
-            false
-          end
+        if backend['status'] != 'UP'
+          LitmusPaper.logger.info("HAProxy available check failed, #{@cluster} backend is #{backend['status']}")
+          return false
         end
+        return true
+      rescue Timeout::Error
+        LitmusPaper.logger.info("HAProxy available check timed out for #{@cluster}")
+        false
+      rescue => e
+        LitmusPaper.logger.info("HAProxy available check failed for #{@cluster} with #{e.message}")
+        false
       end
 
       def to_s

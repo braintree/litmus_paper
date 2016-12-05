@@ -7,25 +7,21 @@ module LitmusPaper
         @timeout = options.fetch(:timeout, 5)
       end
 
-      def available?
-        super do
-          begin
-            Timeout.timeout(@timeout) do
-              if File.read(@path).match(@regex)
-                true
-              else
-                LitmusPaper.logger.info("Available check of #{@path} failed, content did not match #{@regex.inspect}")
-                false
-              end
-            end
-          rescue Timeout::Error
-            LitmusPaper.logger.info("Timeout reading #{@path}")
-            false
-          rescue => e
-            LitmusPaper.logger.info("Error reading #{@path}: '#{e.message}'")
+      def _available?
+        Timeout.timeout(@timeout) do
+          if File.read(@path).match(@regex)
+            true
+          else
+            LitmusPaper.logger.info("Available check of #{@path} failed, content did not match #{@regex.inspect}")
             false
           end
         end
+      rescue Timeout::Error
+        LitmusPaper.logger.info("Timeout reading #{@path}")
+        false
+      rescue => e
+        LitmusPaper.logger.info("Error reading #{@path}: '#{e.message}'")
+        false
       end
 
       def to_s
