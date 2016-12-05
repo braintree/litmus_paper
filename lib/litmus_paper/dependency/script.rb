@@ -6,6 +6,7 @@ module LitmusPaper
       def initialize(command, options = {})
         @command = command
         @timeout = options.fetch(:timeout, 5)
+        @report_result = options.fetch(:report_result, false)
       end
 
       def available?
@@ -23,6 +24,7 @@ module LitmusPaper
                 LitmusPaper.logger.info("Failed stdout: #{script_stdout}")
                 LitmusPaper.logger.info("Failed stderr: #{script_stderr}")
               end
+              @result = script_stdout if @report_result
               script_status.success?
             end
           rescue Timeout::Error
@@ -56,6 +58,11 @@ module LitmusPaper
 
       def to_s
         "Dependency::Script(#{@command})"
+      end
+
+      def result
+        return super unless @report_result
+        @result[0...100] if @result
       end
     end
   end
