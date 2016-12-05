@@ -1,6 +1,6 @@
 module LitmusPaper
   module Dependency
-    class HTTP
+    class HTTP < Base
       def initialize(uri, options = {})
         @uri = uri
         @expected_content = Regexp.new(options.fetch(:content, '.*'))
@@ -10,20 +10,24 @@ module LitmusPaper
       end
 
       def available?
-        response = _make_request
-        success = _successful_response?(response)
-        matches = _body_matches?(response)
+        super do
+          begin
+            response = _make_request
+            success = _successful_response?(response)
+            matches = _body_matches?(response)
 
-        LitmusPaper.logger.info("Available check to #{@uri} failed with status #{response.code}") unless success
-        LitmusPaper.logger.info("Available check to #{@uri} did not match #{@expected_content}") unless matches
+            LitmusPaper.logger.info("Available check to #{@uri} failed with status #{response.code}") unless success
+            LitmusPaper.logger.info("Available check to #{@uri} did not match #{@expected_content}") unless matches
 
-        success && matches
-      rescue Timeout::Error
-        LitmusPaper.logger.info("Timeout fetching #{@uri}")
-        false
-      rescue => e
-        LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
-        false
+            success && matches
+          rescue Timeout::Error
+            LitmusPaper.logger.info("Timeout fetching #{@uri}")
+            false
+          rescue => e
+            LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
+            false
+          end
+        end
       end
 
       def _make_request

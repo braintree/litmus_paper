@@ -1,6 +1,8 @@
-class NeverAvailableDependency
+class NeverAvailableDependency < LitmusPaper::Dependency::Base
   def available?
-    false
+    super do
+      false
+    end
   end
 
   def to_s

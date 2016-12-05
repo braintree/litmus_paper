@@ -59,7 +59,7 @@ module LitmusPaper
       available = dependency.available?
 
       @dependencies_available &&= available
-      @summary << "#{dependency}: #{available ? 'OK' : 'FAIL'}\n"
+      @summary << "#{dependency}: #{dependency.result}\n"
     end
   end
 end

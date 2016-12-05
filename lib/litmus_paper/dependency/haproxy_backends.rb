@@ -2,7 +2,7 @@ require 'csv'
 
 module LitmusPaper
   module Dependency
-    class HaproxyBackends
+    class HaproxyBackends < Base
       def initialize(domain_socket, cluster, options = {})
         @domain_socket = domain_socket
         @cluster = cluster
@@ -10,20 +10,24 @@ module LitmusPaper
       end
 
       def available?
-        stats = _parse_stats(_fetch_stats)
-        backend = _find_backend(stats, @cluster)
+        super do
+          begin
+            stats = _parse_stats(_fetch_stats)
+            backend = _find_backend(stats, @cluster)
 
-        if backend['status'] != 'UP'
-          LitmusPaper.logger.info("HAProxy available check failed, #{@cluster} backend is #{backend['status']}")
-          return false
+            if backend['status'] != 'UP'
+              LitmusPaper.logger.info("HAProxy available check failed, #{@cluster} backend is #{backend['status']}")
+              return false
+            end
+            return true
+          rescue Timeout::Error
+            LitmusPaper.logger.info("HAProxy available check timed out for #{@cluster}")
+            false
+          rescue => e
+            LitmusPaper.logger.info("HAProxy available check failed for #{@cluster} with #{e.message}")
+            false
+          end
         end
-        return true
-      rescue Timeout::Error
-        LitmusPaper.logger.info("HAProxy available check timed out for #{@cluster}")
-        false
-      rescue => e
-        LitmusPaper.logger.info("HAProxy available check failed for #{@cluster} with #{e.message}")
-        false
       end
 
       def to_s

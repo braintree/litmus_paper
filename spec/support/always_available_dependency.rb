@@ -1,6 +1,8 @@
-class AlwaysAvailableDependency
+class AlwaysAvailableDependency < LitmusPaper::Dependency::Base
   def available?
-    true
+    super do
+      true
+    end
   end
 
   def to_s
