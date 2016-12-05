@@ -12,6 +12,7 @@ module LitmusPaper
       def available?
         super do
           begin
+            _clear_state
             Timeout.timeout(@timeout) do
               script_stdout = script_stderr = nil
               script_status = POpen4.popen4(@command) do |stdout, stderr, stdin, pid|
@@ -36,6 +37,10 @@ module LitmusPaper
             false
           end
         end
+      end
+
+      def _clear_state
+        @result = nil
       end
 
       def kill_and_reap_script(pid)

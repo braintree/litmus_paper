@@ -75,5 +75,18 @@ describe LitmusPaper::Dependency::Script do
       check = LitmusPaper::Dependency::Script.new("echo 'result'", :report_result => true)
       check.result.should be_nil
     end
+
+    context "when the dependency succeeds and then fails" do
+      it "reports a failure result" do
+        check = LitmusPaper::Dependency::Script.new("echo 'result'", :report_result => true)
+        available = check.available?
+        available.should be_true
+        check.result.should == "result"
+
+        check.instance_variable_set(:@command, "false")
+        check.should_not be_available
+        check.result.should be_empty
+      end
+    end
   end
 end
