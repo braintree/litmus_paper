@@ -20,12 +20,12 @@ describe LitmusPaper::Dependency::TCP do
     end
 
     it "returns 100 when it's able to reach a single host" do
-      internet_health = LitmusPaper::Metric::InternetHealth.new(["127.0.0.1:3000"])
+      internet_health = LitmusPaper::Metric::InternetHealth.new(100, ["127.0.0.1:3000"])
       internet_health.current_health.should == 100
     end
 
     it "returns 0 when it's unable to reach a single host" do
-      internet_health = LitmusPaper::Metric::InternetHealth.new(["127.0.0.1:6000"])
+      internet_health = LitmusPaper::Metric::InternetHealth.new(100, ["127.0.0.1:6000"])
       internet_health.current_health.should == 0
     end
 
@@ -34,6 +34,7 @@ describe LitmusPaper::Dependency::TCP do
         sleep(5)
       end
       internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
         ["127.0.0.1:6000"],
         { :timeout_seconds => 2 },
       )
@@ -41,23 +42,29 @@ describe LitmusPaper::Dependency::TCP do
     end
 
     it "returns 100 when it's able to reach multiple hosts" do
-      internet_health = LitmusPaper::Metric::InternetHealth.new([
-        "127.0.0.1:3000",
-        "127.0.0.1:3001",
-        "127.0.0.1:3002",
-        "127.0.0.1:3003",
-        "127.0.0.1:3004",
-      ])
+      internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
+        [
+          "127.0.0.1:3000",
+          "127.0.0.1:3001",
+          "127.0.0.1:3002",
+          "127.0.0.1:3003",
+          "127.0.0.1:3004",
+        ],
+      )
       internet_health.current_health.should == 100
     end
 
     it "returns 50 when it's unable to reach half the hosts" do
-      internet_health = LitmusPaper::Metric::InternetHealth.new([
-        "127.0.0.1:3000",
-        "127.0.0.1:3001",
-        "127.0.0.1:6002",
-        "127.0.0.1:6003",
-      ])
+      internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
+        [
+          "127.0.0.1:3000",
+          "127.0.0.1:3001",
+          "127.0.0.1:6002",
+          "127.0.0.1:6003",
+        ],
+      )
       internet_health.current_health.should == 50
     end
 
@@ -67,6 +74,7 @@ describe LitmusPaper::Dependency::TCP do
         sleep(5)
       end
       internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
         ["127.0.0.1:3000", "127.0.0.1:3001"],
         { :timeout_seconds => 2 },
       )
@@ -74,18 +82,21 @@ describe LitmusPaper::Dependency::TCP do
     end
 
     it "returns 0 when it's unable to reach any of the hosts" do
-      internet_health = LitmusPaper::Metric::InternetHealth.new([
-        "127.0.0.1:6000",
-        "127.0.0.1:6001",
-        "127.0.0.1:6002",
-        "127.0.0.1:6003",
-        "127.0.0.1:6004",
-      ])
+      internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
+        [
+          "127.0.0.1:6000",
+          "127.0.0.1:6001",
+          "127.0.0.1:6002",
+          "127.0.0.1:6003",
+          "127.0.0.1:6004",
+        ],
+      )
       internet_health.current_health.should == 0
     end
 
     it "logs exceptions and returns 0" do
-      internet_health = LitmusPaper::Metric::InternetHealth.new(["127.0.0.1:6000"])
+      internet_health = LitmusPaper::Metric::InternetHealth.new(100, ["127.0.0.1:6000"])
       LitmusPaper.logger.should_receive(:info)
       internet_health.current_health.should == 0
     end
@@ -93,14 +104,17 @@ describe LitmusPaper::Dependency::TCP do
 
   describe "to_s" do
     it "is the name of the class and the lists of hosts" do
-      internet_health = LitmusPaper::Metric::InternetHealth.new([
-        "127.0.0.1:6000",
-        "127.0.0.1:6001",
-        "127.0.0.1:6002",
-        "127.0.0.1:6003",
-        "127.0.0.1:6004",
-      ])
-      internet_health.to_s.should == "Metric::InternetHealth([\"127.0.0.1:6000\", \"127.0.0.1:6001\", \"127.0.0.1:6002\", \"127.0.0.1:6003\", \"127.0.0.1:6004\"], {})"
+      internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
+        [
+          "127.0.0.1:6000",
+          "127.0.0.1:6001",
+          "127.0.0.1:6002",
+          "127.0.0.1:6003",
+          "127.0.0.1:6004",
+        ],
+      )
+      internet_health.to_s.should == "Metric::InternetHealth(100, [\"127.0.0.1:6000\", \"127.0.0.1:6001\", \"127.0.0.1:6002\", \"127.0.0.1:6003\", \"127.0.0.1:6004\"], {})"
     end
   end
 

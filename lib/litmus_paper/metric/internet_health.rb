@@ -1,7 +1,8 @@
 module LitmusPaper
   module Metric
     class InternetHealth
-      def initialize(hosts, options = {})
+      def initialize(weight, hosts, options = {})
+        @weight = weight
         @hosts = hosts
         @options = options
         @timeout = options.fetch(:timeout_seconds, 5)
@@ -22,7 +23,7 @@ module LitmusPaper
       end
 
       def current_health
-        health = 100 * @hosts.reduce(Rational(0)) do |memo, host|
+        health = @weight * @hosts.reduce(Rational(0)) do |memo, host|
           if tcp_connect?(*host.split(':'))
             memo += Rational(1) / Rational(@hosts.length)
           end
@@ -32,7 +33,7 @@ module LitmusPaper
       end
 
       def to_s
-        "Metric::InternetHealth(#{@hosts.inspect}, #{@options.inspect})"
+        "Metric::InternetHealth(#{@weight}, #{@hosts.inspect}, #{@options.inspect})"
       end
     end
   end
