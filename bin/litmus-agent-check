@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'litmus_paper'
+require 'litmus_paper/cli/agent_check'
+
+LitmusPaper::CLI::AgentCheck.new.run(ARGV)
