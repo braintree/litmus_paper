@@ -1,6 +1,6 @@
 # LitmusPaper
 
-Backend health tester for HA Services
+Backend health tester for HA Services, or as an agent-check for HAProxy
 
 [![Build Status](https://secure.travis-ci.org/braintree/litmus_paper.png)](http://travis-ci.org/braintree/litmus_paper)
 
@@ -20,7 +20,8 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Use the sample config to run it under unicorn. Or when running it as an
+agent-check for HAProxy use the sample xinetd config.
 
 ## Contributing
 
