@@ -9,7 +9,7 @@ module LitmusPaper
         def self.build_request(options, args)
           options.merge! _default_options
           opt_parser = _extend_default_parser(options) do |opts|
-            opts.banner = "Usage: litmusctl force <up|down|health N> [service] [options]"
+            opts.banner = "Usage: litmusctl force [remove] <up|down|health N> [service] [options]"
             opts.on("-d", "--delete", "Remove status file") do
               options[:delete] = true
             end
@@ -19,6 +19,10 @@ module LitmusPaper
           end
 
           opt_parser.parse! args
+          if args[0] == "remove"
+            options[:delete] = true
+            args.shift
+          end
           if args[0] == "health" && !options[:delete]
             direction, value, service = args
           else
