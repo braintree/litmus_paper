@@ -10,12 +10,12 @@ module LitmusPaper
     def evaluate_yaml(config_contents)
       config = YAML.load(config_contents)
 
+      @data_directory = config.fetch("data_directory", @data_directory)
+      @port = config.fetch("port", @port)
+
       if glob_pattern = config["include_files"]
         include_files(glob_pattern)
       end
-
-      @data_directory = config.fetch("data_directory", @data_directory)
-      @port = config.fetch("port", @port)
 
       (config["services"] || []).each do |service_name, service_configuration|
         s = Service.new(service_name)
