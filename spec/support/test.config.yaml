@@ -1,5 +1,3 @@
-# vim: set ft=yaml
-
 port: 9293
 data_directory: "/tmp/litmus_paper"
 services:
