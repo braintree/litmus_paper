@@ -16,16 +16,16 @@ describe LitmusPaper::App do
 
       get "/"
 
-      last_response.status.should == 200
-      last_response.body.should include('test')
-      last_response.body.should include('another')
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to include('test')
+      expect(last_response.body).to include('another')
     end
 
     it "includes the litmus version" do
       get "/"
 
-      last_response.status.should == 200
-      last_response.body.should include("Litmus Paper #{LitmusPaper::VERSION}")
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to include("Litmus Paper #{LitmusPaper::VERSION}")
     end
 
     it "includes the health of the service" do
@@ -34,9 +34,9 @@ describe LitmusPaper::App do
 
       get "/"
 
-      last_response.status.should == 200
-      last_response.body.should include('test')
-      last_response.body.should include('0')
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to include('test')
+      expect(last_response.body).to include('0')
     end
 
     it "includes the status if forced" do
@@ -48,17 +48,17 @@ describe LitmusPaper::App do
 
       get "/"
 
-      last_response.status.should == 200
-      last_response.body.should include('Down for testing')
-      last_response.body.should include('Up for testing')
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to include('Down for testing')
+      expect(last_response.body).to include('Up for testing')
     end
 
     it "includes the health value if health is forced" do
       LitmusPaper.services['test'] = LitmusPaper::Service.new('test')
       LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
       get "/"
-      last_response.body.should include('Forcing health')
-      last_response.body.should include('88')
+      expect(last_response.body).to include('Forcing health')
+      expect(last_response.body).to include('88')
     end
   end
 
@@ -68,11 +68,11 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/up", :reason => "up for testing"
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/up for testing/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to match(/up for testing/)
     end
   end
 
@@ -82,11 +82,11 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/down", :reason => "down for testing"
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 503
-      last_response.body.should match(/down for testing/)
+      expect(last_response.status).to eq(503)
+      expect(last_response.body).to match(/down for testing/)
     end
   end
 
@@ -96,11 +96,11 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/health", :reason => "health for testing", :health => 88
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/health for testing 88/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to match(/health for testing 88/)
     end
   end
 
@@ -110,11 +110,11 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/test/up", :reason => "up for testing"
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/up for testing/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to match(/up for testing/)
     end
   end
 
@@ -124,11 +124,11 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/test/health", :reason => "health for testing", :health => 88
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/health for testing 88/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to match(/health for testing 88/)
     end
   end
 
@@ -138,17 +138,17 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/up", :reason => "up for testing"
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
+      expect(last_response.status).to eq(200)
 
       delete "/up"
-      last_response.status.should == 200
+      expect(last_response.status).to eq(200)
 
       get "/test/status"
-      last_response.status.should == 503
-      last_response.body.should_not match(/up for testing/)
+      expect(last_response.status).to eq(503)
+      expect(last_response.body).not_to match(/up for testing/)
     end
 
     it "404s if there is no upfile" do
@@ -156,7 +156,7 @@ describe LitmusPaper::App do
 
       delete "/up"
 
-      last_response.status.should == 404
+      expect(last_response.status).to eq(404)
     end
   end
 
@@ -166,17 +166,17 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/down", :reason => "down for testing"
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 503
+      expect(last_response.status).to eq(503)
 
       delete "/down"
-      last_response.status.should == 200
+      expect(last_response.status).to eq(200)
 
       get "/test/status"
-      last_response.should be_ok
-      last_response.body.should_not match(/down for testing/)
+      expect(last_response).to be_ok
+      expect(last_response.body).not_to match(/down for testing/)
     end
   end
 
@@ -186,18 +186,18 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/health", :reason => "health for testing", :health => 88
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/health for testing 88/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to match(/health for testing 88/)
 
       delete "/health"
-      last_response.status.should == 200
+      expect(last_response.status).to eq(200)
 
       get "/test/status"
-      last_response.should be_ok
-      last_response.body.should_not match(/health for testing 88/)
+      expect(last_response).to be_ok
+      expect(last_response.body).not_to match(/health for testing 88/)
     end
 
     it "404s if there is no healthfile" do
@@ -205,7 +205,7 @@ describe LitmusPaper::App do
 
       delete "/health"
 
-      last_response.status.should == 404
+      expect(last_response.status).to eq(404)
     end
   end
 
@@ -215,17 +215,17 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/test/up", :reason => "up for testing"
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/up for testing/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to match(/up for testing/)
 
       delete "/test/up"
-      last_response.status.should == 200
+      expect(last_response.status).to eq(200)
 
       get "/test/status"
-      last_response.status.should == 503
+      expect(last_response.status).to eq(503)
     end
   end
 
@@ -235,18 +235,18 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       post "/test/health", :reason => "health for testing", :health => 88
-      last_response.status.should == 201
+      expect(last_response.status).to eq(201)
 
       get "/test/status"
-      last_response.status.should == 200
-      last_response.body.should match(/health for testing 88/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.body).to match(/health for testing 88/)
 
       delete "/test/health"
-      last_response.status.should == 200
+      expect(last_response.status).to eq(200)
 
       get "/test/status"
-      last_response.should be_ok
-      last_response.body.should_not match(/health for testing 88/)
+      expect(last_response).to be_ok
+      expect(last_response.body).not_to match(/health for testing 88/)
     end
 
     it "404s if there is no healthfile" do
@@ -254,7 +254,7 @@ describe LitmusPaper::App do
 
       delete "/test/health"
 
-      last_response.status.should == 404
+      expect(last_response.status).to eq(404)
     end
   end
 
@@ -265,11 +265,11 @@ describe LitmusPaper::App do
       LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
 
       get "/test/status"
-      last_response.should be_ok
-      last_response.header["X-Health"].should == "88"
-      last_response.body.should match(/Health: 88/)
-      last_response.body.should match(/Measured Health: 100/)
-      last_response.header["X-Health-Forced"].should == "health"
+      expect(last_response).to be_ok
+      expect(last_response.header["X-Health"]).to eq("88")
+      expect(last_response.body).to match(/Health: 88/)
+      expect(last_response.body).to match(/Measured Health: 100/)
+      expect(last_response.header["X-Health-Forced"]).to eq("health")
     end
 
     it "returns the actualy health value for an unhealthy service when the measured health is less than the forced value" do
@@ -278,12 +278,12 @@ describe LitmusPaper::App do
       LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
 
       get "/test/status"
-      last_response.should_not be_ok
-      last_response.header["X-Health"].should == "0"
-      last_response.header["X-Health-Forced"].should == "health"
-      last_response.body.should match(/Health: 0/)
-      last_response.body.should match(/Measured Health: 0/)
-      last_response.body.should match(/Forcing health 88\n/)
+      expect(last_response).not_to be_ok
+      expect(last_response.header["X-Health"]).to eq("0")
+      expect(last_response.header["X-Health-Forced"]).to eq("health")
+      expect(last_response.body).to match(/Health: 0/)
+      expect(last_response.body).to match(/Measured Health: 0/)
+      expect(last_response.body).to match(/Forcing health 88\n/)
     end
 
     it "is successful when the service is passing" do
@@ -292,13 +292,13 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.should be_ok
-      last_response.header["Content-Type"].should == "text/plain"
-      last_response.header["X-Health"].should == "100"
-      last_response.header.should_not have_key("X-Health-Forced")
-      last_response.body.should match(/Health: 100/)
-      last_response.body.should match(/AlwaysAvailableDependency: OK/)
-      last_response.body.should include("Metric::ConstantMetric(100): 100")
+      expect(last_response).to be_ok
+      expect(last_response.header["Content-Type"]).to eq("text/plain")
+      expect(last_response.header["X-Health"]).to eq("100")
+      expect(last_response.header).not_to have_key("X-Health-Forced")
+      expect(last_response.body).to match(/Health: 100/)
+      expect(last_response.body).to match(/AlwaysAvailableDependency: OK/)
+      expect(last_response.body).to include("Metric::ConstantMetric(100): 100")
     end
 
     it "is 'service unavailable' when the check fails" do
@@ -307,17 +307,17 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 503
-      last_response.header["Content-Type"].should == "text/plain"
-      last_response.header["X-Health"].should == "0"
-      last_response.body.should match(/Health: 0/)
+      expect(last_response.status).to eq(503)
+      expect(last_response.header["Content-Type"]).to eq("text/plain")
+      expect(last_response.header["X-Health"]).to eq("0")
+      expect(last_response.body).to match(/Health: 0/)
     end
 
     it "is 'not found' when the service is unknown" do
       get "/unknown/status"
 
-      last_response.status.should == 404
-      last_response.header["Content-Type"].should == "text/plain"
+      expect(last_response.status).to eq(404)
+      expect(last_response.header["Content-Type"]).to eq("text/plain")
     end
 
     it "is 'service unavailable' when an up file and down file exists" do
@@ -329,9 +329,9 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 503
-      last_response.headers["X-Health-Forced"].should == "down"
-      last_response.body.should match(/Down for testing/)
+      expect(last_response.status).to eq(503)
+      expect(last_response.headers["X-Health-Forced"]).to eq("down")
+      expect(last_response.body).to match(/Down for testing/)
     end
 
     it "still reports the health, dependencies, and metrics when forced down" do
@@ -342,11 +342,11 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 503
-      last_response.headers["X-Health-Forced"].should == "down"
-      last_response.body.should match(/Measured Health: 100\n/)
-      last_response.body.should match(/AlwaysAvailableDependency: OK\n/)
-      last_response.body.should match(/Metric::ConstantMetric\(100\): 100\n/)
+      expect(last_response.status).to eq(503)
+      expect(last_response.headers["X-Health-Forced"]).to eq("down")
+      expect(last_response.body).to match(/Measured Health: 100\n/)
+      expect(last_response.body).to match(/AlwaysAvailableDependency: OK\n/)
+      expect(last_response.body).to match(/Metric::ConstantMetric\(100\): 100\n/)
     end
 
     it "still reports the health, dependencies, and metrics when forced up" do
@@ -357,11 +357,11 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 200
-      last_response.headers["X-Health-Forced"].should == "up"
-      last_response.body.should match(/Measured Health: 100\n/)
-      last_response.body.should match(/AlwaysAvailableDependency: OK\n/)
-      last_response.body.should match(/Metric::ConstantMetric\(100\): 100\n/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.headers["X-Health-Forced"]).to eq("up")
+      expect(last_response.body).to match(/Measured Health: 100\n/)
+      expect(last_response.body).to match(/AlwaysAvailableDependency: OK\n/)
+      expect(last_response.body).to match(/Metric::ConstantMetric\(100\): 100\n/)
     end
 
     it "is 'service available' when an up file exists" do
@@ -372,9 +372,9 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 200
-      last_response.headers["X-Health-Forced"].should == "up"
-      last_response.body.should match(/Up for testing/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.headers["X-Health-Forced"]).to eq("up")
+      expect(last_response.body).to match(/Up for testing/)
     end
 
     it "is 'service unavailable' when a global down file and up file exists" do
@@ -386,9 +386,9 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 503
-      last_response.headers["X-Health-Forced"].should == "down"
-      last_response.body.should match(/Down for testing/)
+      expect(last_response.status).to eq(503)
+      expect(last_response.headers["X-Health-Forced"]).to eq("down")
+      expect(last_response.body).to match(/Down for testing/)
     end
 
     it "is 'service unavailable' when a global down file exists" do
@@ -399,9 +399,9 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 503
-      last_response.headers["X-Health-Forced"].should == "down"
-      last_response.body.should match(/Down for testing/)
+      expect(last_response.status).to eq(503)
+      expect(last_response.headers["X-Health-Forced"]).to eq("down")
+      expect(last_response.body).to match(/Down for testing/)
     end
 
     it "is successful when a global up file exists" do
@@ -412,9 +412,9 @@ describe LitmusPaper::App do
 
       get "/test/status"
 
-      last_response.status.should == 200
-      last_response.headers["X-Health-Forced"].should == "up"
-      last_response.body.should match(/Up for testing/)
+      expect(last_response.status).to eq(200)
+      expect(last_response.headers["X-Health-Forced"]).to eq("up")
+      expect(last_response.body).to match(/Up for testing/)
     end
 
     it "resets the Facter cache" do
@@ -422,15 +422,15 @@ describe LitmusPaper::App do
       LitmusPaper.services['test'] = test_service
 
       get "/test/status"
-      last_response.should be_ok
+      expect(last_response).to be_ok
 
       facter_uptime = Facter.value("uptime_seconds")
       sleep 1
 
       get "/test/status"
-      last_response.should be_ok
+      expect(last_response).to be_ok
 
-      Facter.value("uptime_seconds").should > facter_uptime
+      expect(Facter.value("uptime_seconds")).to be > facter_uptime
     end
   end
 
@@ -440,9 +440,9 @@ describe LitmusPaper::App do
       begin
         app.environment = :production
         get "/test/error"
-        last_response.status.should == 500
-        last_response.headers["Content-Type"].should == "text/plain"
-        last_response.body.should == "Server Error"
+        expect(last_response.status).to eq(500)
+        expect(last_response.headers["Content-Type"]).to eq("text/plain")
+        expect(last_response.body).to eq("Server Error")
       ensure
         app.environment = old_environment
       end

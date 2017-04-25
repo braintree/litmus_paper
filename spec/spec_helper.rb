@@ -22,7 +22,7 @@ RSpec.configure do |config|
 
   config.before :each do
     FileUtils.rm_rf TEST_CONFIG_DIR
-    LitmusPaper.stub(:data_directory).and_return(TEST_CONFIG_DIR)
+    allow(LitmusPaper).to receive(:data_directory).and_return(TEST_CONFIG_DIR)
   end
 end
 

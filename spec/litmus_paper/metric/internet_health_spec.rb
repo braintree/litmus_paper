@@ -21,16 +21,16 @@ describe LitmusPaper::Dependency::TCP do
 
     it "returns 100 when it's able to reach a single host" do
       internet_health = LitmusPaper::Metric::InternetHealth.new(100, ["127.0.0.1:3000"])
-      internet_health.current_health.should == 100
+      expect(internet_health.current_health).to eq(100)
     end
 
     it "returns 0 when it's unable to reach a single host" do
       internet_health = LitmusPaper::Metric::InternetHealth.new(100, ["127.0.0.1:6000"])
-      internet_health.current_health.should == 0
+      expect(internet_health.current_health).to eq(0)
     end
 
     it "returns 0 when it's request to a single host times out" do
-      TCPSocket.stub(:new) do
+      allow(TCPSocket).to receive(:new) do
         sleep(5)
       end
       internet_health = LitmusPaper::Metric::InternetHealth.new(
@@ -38,7 +38,7 @@ describe LitmusPaper::Dependency::TCP do
         ["127.0.0.1:6000"],
         { :timeout_seconds => 2 },
       )
-      internet_health.current_health.should == 0
+      expect(internet_health.current_health).to eq(0)
     end
 
     it "returns 100 when it's able to reach multiple hosts" do
@@ -52,7 +52,7 @@ describe LitmusPaper::Dependency::TCP do
           "127.0.0.1:3004",
         ],
       )
-      internet_health.current_health.should == 100
+      expect(internet_health.current_health).to eq(100)
     end
 
     it "returns 50 when it's unable to reach half the hosts" do
@@ -65,12 +65,12 @@ describe LitmusPaper::Dependency::TCP do
           "127.0.0.1:6003",
         ],
       )
-      internet_health.current_health.should == 50
+      expect(internet_health.current_health).to eq(50)
     end
 
     it "returns 50 when it's request to a single host out of two hosts times out" do
-      TCPSocket.stub(:new) do
-        TCPSocket.unstub(:new)
+      allow(TCPSocket).to receive(:new) do
+        allow(TCPSocket).to receive(:new).and_call_original
         sleep(5)
       end
       internet_health = LitmusPaper::Metric::InternetHealth.new(
@@ -78,7 +78,7 @@ describe LitmusPaper::Dependency::TCP do
         ["127.0.0.1:3000", "127.0.0.1:3001"],
         { :timeout_seconds => 2 },
       )
-      internet_health.current_health.should == 50
+      expect(internet_health.current_health).to eq(50)
     end
 
     it "returns 0 when it's unable to reach any of the hosts" do
@@ -92,13 +92,13 @@ describe LitmusPaper::Dependency::TCP do
           "127.0.0.1:6004",
         ],
       )
-      internet_health.current_health.should == 0
+      expect(internet_health.current_health).to eq(0)
     end
 
     it "logs exceptions and returns 0" do
       internet_health = LitmusPaper::Metric::InternetHealth.new(100, ["127.0.0.1:6000"])
-      LitmusPaper.logger.should_receive(:info)
-      internet_health.current_health.should == 0
+      expect(LitmusPaper.logger).to receive(:info)
+      expect(internet_health.current_health).to eq(0)
     end
   end
 
@@ -114,7 +114,7 @@ describe LitmusPaper::Dependency::TCP do
           "127.0.0.1:6004",
         ],
       )
-      internet_health.to_s.should == "Metric::InternetHealth(100, [\"127.0.0.1:6000\", \"127.0.0.1:6001\", \"127.0.0.1:6002\", \"127.0.0.1:6003\", \"127.0.0.1:6004\"], {})"
+      expect(internet_health.to_s).to eq("Metric::InternetHealth(100, [\"127.0.0.1:6000\", \"127.0.0.1:6001\", \"127.0.0.1:6002\", \"127.0.0.1:6003\", \"127.0.0.1:6004\"], {})")
     end
   end
 

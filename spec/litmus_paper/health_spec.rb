@@ -5,13 +5,13 @@ describe LitmusPaper::Health do
     it "is true when health is greater than 0" do
       health = LitmusPaper::Health.new
       health.perform(LitmusPaper::Metric::ConstantMetric.new(50))
-      health.should be_ok
+      expect(health).to be_ok
     end
 
     it "is false when health is 0" do
       health = LitmusPaper::Health.new
       health.perform(LitmusPaper::Metric::ConstantMetric.new(0))
-      health.should_not be_ok
+      expect(health).not_to be_ok
     end
   end
 
@@ -20,7 +20,7 @@ describe LitmusPaper::Health do
       health = LitmusPaper::Health.new
       health.perform(LitmusPaper::Metric::ConstantMetric.new(50))
       health.perform(LitmusPaper::Metric::ConstantMetric.new(25))
-      health.value.should == 75
+      expect(health.value).to eq(75)
     end
   end
 
@@ -29,7 +29,7 @@ describe LitmusPaper::Health do
       health = LitmusPaper::Health.new
       health.ensure(NeverAvailableDependency.new)
       health.perform(LitmusPaper::Metric::ConstantMetric.new(50))
-      health.value.should == 0
+      expect(health.value).to eq(0)
     end
   end
 
@@ -39,8 +39,8 @@ describe LitmusPaper::Health do
       health.ensure(NeverAvailableDependency.new)
       health.ensure(AlwaysAvailableDependency.new)
 
-      health.summary.should match(/NeverAvailableDependency: FAIL/)
-      health.summary.should match(/AlwaysAvailableDependency: OK/)
+      expect(health.summary).to match(/NeverAvailableDependency: FAIL/)
+      expect(health.summary).to match(/AlwaysAvailableDependency: OK/)
     end
 
     it "includes the health of individual metrics" do
@@ -48,14 +48,14 @@ describe LitmusPaper::Health do
       health.perform(LitmusPaper::Metric::ConstantMetric.new(12))
       health.perform(LitmusPaper::Metric::ConstantMetric.new(34))
 
-      health.summary.should include("ConstantMetric(12): 12")
-      health.summary.should include("ConstantMetric(34): 34")
+      expect(health.summary).to include("ConstantMetric(12): 12")
+      expect(health.summary).to include("ConstantMetric(34): 34")
     end
 
     it "only runs each metric once" do
       health = LitmusPaper::Health.new
       metric = LitmusPaper::Metric::ConstantMetric.new(12)
-      metric.should_receive(:current_health).once.and_return(12)
+      expect(metric).to receive(:current_health).once.and_return(12)
 
       health.perform(metric)
     end
@@ -63,7 +63,7 @@ describe LitmusPaper::Health do
     it "only runs each dependency once" do
       health = LitmusPaper::Health.new
       dependency = AlwaysAvailableDependency.new
-      dependency.should_receive(:available?).once.and_return(true)
+      expect(dependency).to receive(:available?).once.and_return(true)
 
       health.ensure(dependency)
     end

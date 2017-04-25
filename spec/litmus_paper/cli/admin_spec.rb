@@ -20,79 +20,79 @@ describe 'litmusctl' do
 
   describe 'help' do
     it "is displayed if no command is given" do
-      _litmusctl('').should match("Commands:")
+      expect(_litmusctl('')).to match("Commands:")
     end
   end
 
   describe 'list' do
     it "returns the list of services running" do
-      _litmusctl('list').should match("test")
+      expect(_litmusctl('list')).to match("test")
     end
   end
 
   describe 'status' do
     it 'returns the status of a service' do
-      _litmusctl('status test').should match("Health: 0")
-      _litmusctl('status passing_test').should match(/Health: \d\d/)
+      expect(_litmusctl('status test')).to match("Health: 0")
+      expect(_litmusctl('status passing_test')).to match(/Health: \d\d/)
     end
 
     it "returns 'NOT FOUND' for a service that doesn't exist" do
-      _litmusctl('status unknown').should match('NOT FOUND')
+      expect(_litmusctl('status unknown')).to match('NOT FOUND')
     end
   end
 
   describe "force" do
     it "can create a global downfile" do
-      _litmusctl('force down -r "for testing"').should match("File created")
+      expect(_litmusctl('force down -r "for testing"')).to match("File created")
 
       status = _litmusctl('status test')
-      status.should match(/Health: 0/)
-      status.should match(/for testing/)
+      expect(status).to match(/Health: 0/)
+      expect(status).to match(/for testing/)
     end
 
     it "can create a global healthfile" do
-      _litmusctl('force health 88 -r "for testing"').should match("File created")
+      expect(_litmusctl('force health 88 -r "for testing"')).to match("File created")
 
       status = _litmusctl('status test')
-      status.should match(/Health: 0/) # This service is actually failing so we'll get 0 back
-      status.should match(/for testing 88/)
+      expect(status).to match(/Health: 0/) # This service is actually failing so we'll get 0 back
+      expect(status).to match(/for testing 88/)
     end
 
     it "creates a downfile" do
-      _litmusctl('force down test -r "for testing"').should match("File created")
+      expect(_litmusctl('force down test -r "for testing"')).to match("File created")
 
       status = _litmusctl('status test')
-      status.should match(/Health: 0/)
-      status.should match(/for testing/)
+      expect(status).to match(/Health: 0/)
+      expect(status).to match(/for testing/)
     end
 
     it "creates a healthfile" do
-      _litmusctl('force health 88 test -r "for testing"').should match("File created")
+      expect(_litmusctl('force health 88 test -r "for testing"')).to match("File created")
 
       status = _litmusctl('status test')
-      status.should match(/Health: 0/)
-      status.should match(/for testing 88/)
+      expect(status).to match(/Health: 0/)
+      expect(status).to match(/for testing 88/)
     end
 
     it 'removes an upfile for the service' do
-      _litmusctl('force up test -r "for testing"').should match("File created")
-      _litmusctl('force up test -d').should match("File deleted")
+      expect(_litmusctl('force up test -r "for testing"')).to match("File created")
+      expect(_litmusctl('force up test -d')).to match("File deleted")
 
       status = _litmusctl('status passing_test')
-      status.should match(/Health: \d\d/)
-      status.should_not match(/for testing/)
+      expect(status).to match(/Health: \d\d/)
+      expect(status).not_to match(/for testing/)
     end
 
     it "removes a healthfile for the service" do
-      _litmusctl('force health 88 test -r "for testing"').should match("File created")
-      _litmusctl('force health test -d').should match("File deleted")
+      expect(_litmusctl('force health 88 test -r "for testing"')).to match("File created")
+      expect(_litmusctl('force health test -d')).to match("File deleted")
       status = _litmusctl('status passing_test')
-      status.should match(/Health: \d\d/)
-      status.should_not match(/for testing/)
+      expect(status).to match(/Health: \d\d/)
+      expect(status).not_to match(/for testing/)
     end
 
     it "returns not found if downfile doesn't exist" do
-      _litmusctl('force down test -d').should match("NOT FOUND")
+      expect(_litmusctl('force down test -d')).to match("NOT FOUND")
     end
   end
 
@@ -103,13 +103,13 @@ describe 'litmusctl' do
     end
 
     it "reloads on a USR1 signal" do
-      _litmusctl('status test').should match("Health: 0")
+      expect(_litmusctl('status test')).to match("Health: 0")
 
       replace_config_file(CONFIG_FILE, :with => TEST_RELOAD_CONFIG)
 
       Process.kill("HUP", @litmus_pid)
 
-      _litmusctl('status foo').should match("Health: 0")
+      expect(_litmusctl('status foo')).to match("Health: 0")
     end
   end
 end

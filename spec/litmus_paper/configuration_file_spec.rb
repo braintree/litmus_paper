@@ -6,20 +6,20 @@ describe LitmusPaper::ConfigurationFile do
       it "configures a service" do
         config_file = LitmusPaper::ConfigurationFile.new(test_config)
         config = config_file.evaluate
-        config.services.has_key?('test').should == true
-        config.services.has_key?('passing_test').should == true
+        expect(config.services.has_key?('test')).to eq(true)
+        expect(config.services.has_key?('passing_test')).to eq(true)
       end
 
       it "configures the port to listen on" do
         config_file = LitmusPaper::ConfigurationFile.new(test_config)
         config = config_file.evaluate
-        config.port.should == 9293
+        expect(config.port).to eq(9293)
       end
 
       it "configures the data directory" do
         config_file = LitmusPaper::ConfigurationFile.new(test_config)
         config = config_file.evaluate
-        config.data_directory.should == "/tmp/litmus_paper"
+        expect(config.data_directory).to eq("/tmp/litmus_paper")
       end
     end
   end
@@ -30,16 +30,16 @@ describe LitmusPaper::ConfigurationFile do
         it "configures a dir glob of services" do
           config_file = LitmusPaper::ConfigurationFile.new(test_config)
           config = config_file.evaluate
-          config.services.has_key?('test').should == true
-          config.services.has_key?('passing_test').should == true
+          expect(config.services.has_key?('test')).to eq(true)
+          expect(config.services.has_key?('passing_test')).to eq(true)
         end
 
         it "defaults configuration options" do
           config_file = LitmusPaper::ConfigurationFile.new(test_config)
           config = config_file.evaluate
-          config.services.has_key?('test').should == true
-          config.port.should == 9292
-          config.data_directory.should == "/etc/litmus"
+          expect(config.services.has_key?('test')).to eq(true)
+          expect(config.port).to eq(9292)
+          expect(config.data_directory).to eq("/etc/litmus")
         end
       end
     end

@@ -6,14 +6,14 @@ describe LitmusPaper::StatusFile do
       status_file = LitmusPaper::StatusFile.new("foo", :up)
       status_file.create("for testing")
 
-      status_file.exists?.should == true
+      expect(status_file.exists?).to eq(true)
     end
 
     it "writes the content" do
       status_file = LitmusPaper::StatusFile.new("foo", :up)
       status_file.create("for testing")
 
-      status_file.content.should match(/for testing/)
+      expect(status_file.content).to match(/for testing/)
     end
   end
 
@@ -22,11 +22,11 @@ describe LitmusPaper::StatusFile do
       status_file = LitmusPaper::StatusFile.new("foo", :up)
       status_file.create("for testing")
 
-      status_file.exists?.should be_true
+      expect(status_file.exists?).to be_truthy
 
       status_file.delete
 
-      status_file.exists?.should be_false
+      expect(status_file.exists?).to be_falsey
     end
   end
 end

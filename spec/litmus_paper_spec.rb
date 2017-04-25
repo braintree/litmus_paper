@@ -4,7 +4,7 @@ describe LitmusPaper do
   describe 'configure' do
     it 'populates services from the config file' do
       LitmusPaper.configure(TEST_CONFIG)
-      LitmusPaper.services.has_key?('test').should == true
+      expect(LitmusPaper.services.has_key?('test')).to eq(true)
     end
   end
 
@@ -14,14 +14,14 @@ describe LitmusPaper do
       replace_config_file(TEST_CONFIG, :with => TEST_RELOAD_CONFIG)
       LitmusPaper.services["bar"] = :service
 
-      LitmusPaper.services.has_key?('bar').should == true
-      LitmusPaper.services.has_key?('test').should == true
+      expect(LitmusPaper.services.has_key?('bar')).to eq(true)
+      expect(LitmusPaper.services.has_key?('test')).to eq(true)
 
       LitmusPaper.reload
 
-      LitmusPaper.services.has_key?('bar').should == false
-      LitmusPaper.services.has_key?('test').should == false
-      LitmusPaper.services.has_key?('foo').should == true
+      expect(LitmusPaper.services.has_key?('bar')).to eq(false)
+      expect(LitmusPaper.services.has_key?('test')).to eq(false)
+      expect(LitmusPaper.services.has_key?('foo')).to eq(true)
 
       restore_config_file(TEST_CONFIG)
     end
@@ -34,7 +34,7 @@ describe LitmusPaper do
       END
       expect do
         LitmusPaper.configure(bad_config_file)
-      end.to raise_error
+      end.to raise_error(NameError)
     end
 
     it "keeps the old config if there are errors in the new config" do
@@ -45,7 +45,7 @@ describe LitmusPaper do
       END
 
       LitmusPaper.configure(config_file)
-      LitmusPaper.services.keys.should == ["old_service"]
+      expect(LitmusPaper.services.keys).to eq(["old_service"])
 
       File.open(config_file, "w") do |file|
         file.write(<<-END)
@@ -56,7 +56,7 @@ describe LitmusPaper do
       end
 
       LitmusPaper.reload
-      LitmusPaper.services.keys.should == ["old_service"]
+      expect(LitmusPaper.services.keys).to eq(["old_service"])
     end
   end
 end

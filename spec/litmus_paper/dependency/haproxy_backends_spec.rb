@@ -10,18 +10,18 @@ describe LitmusPaper::Dependency::HaproxyBackends do
 
     it "is available if at least one backend is up" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "yellow_cluster")
-      haproxy.should be_available
+      expect(haproxy).to be_available
     end
 
     it "returns false if no nodes are available" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "orange_cluster")
-      haproxy.should_not be_available
+      expect(haproxy).not_to be_available
     end
 
     it "logs exceptions and returns false" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/dev/null", "yellow_cluster")
-      LitmusPaper.logger.should_receive(:info)
-      haproxy.should_not be_available
+      expect(LitmusPaper.logger).to receive(:info)
+      expect(haproxy).not_to be_available
     end
   end
 
@@ -34,14 +34,14 @@ describe LitmusPaper::Dependency::HaproxyBackends do
 
     it "returns false after a configurable number of seconds" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "yellow_cluster", :timeout_seconds => 1)
-      haproxy.should_not be_available
+      expect(haproxy).not_to be_available
     end
   end
 
   describe "to_s" do
     it "includes the socket file and the cluster" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "orange_cluster")
-      haproxy.to_s.should == 'Dependency::HaproxyBackends(/tmp/stub-haproxy-stats, orange_cluster)'
+      expect(haproxy.to_s).to eq('Dependency::HaproxyBackends(/tmp/stub-haproxy-stats, orange_cluster)')
     end
   end
 end
