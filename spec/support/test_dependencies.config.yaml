@@ -1,20 +1,24 @@
 services:
   one_arg:
     dependencies:
-      HTTP: "http://localhost/heartbeat"
+      - HTTP: "http://localhost/heartbeat"
   one_arg_with_options:
     dependencies:
-      HTTP:
+      - HTTP:
         - "http://localhost/heartbeat"
         - { method: "POST" }
   two_args:
     dependencies:
-      TCP:
+      - TCP:
         - 127.0.0.1
         - 65534
   two_args_with_options:
     dependencies:
-      TCP:
+      - TCP:
         - 127.0.0.1
         - 65535
         - { timeout_seconds: 1 }
+  two_deps_of_same_type:
+    dependencies:
+      - HTTP: "http://localhost/heartbeat1"
+      - HTTP: "http://localhost/heartbeat2"

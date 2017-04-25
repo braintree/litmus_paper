@@ -20,7 +20,7 @@ module LitmusPaper
       (config["services"] || []).each do |service_name, service_configuration|
         s = Service.new(service_name)
 
-        (service_configuration["dependencies"] || []).each do |dependency_name, dependency_args|
+        (service_configuration["dependencies"] || []).flat_map(&:to_a).each do |(dependency_name, dependency_args)|
           dependency_class = LitmusPaper::Dependency.const_get(dependency_name)
           symbolized_args = [*(dependency_args)].map do |arg|
             if arg.is_a?(Hash)
@@ -32,7 +32,7 @@ module LitmusPaper
           s.depends dependency_class, *symbolized_args
         end
 
-        (service_configuration["metrics"] || []).each do |metric_name, metric_args|
+        (service_configuration["metrics"] || []).flat_map(&:to_a).each do |(metric_name, metric_args)|
           metric_class = LitmusPaper::Metric.const_get(metric_name)
           s.measure_health metric_class, metric_args
         end

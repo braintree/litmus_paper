@@ -78,6 +78,23 @@ describe LitmusPaper::ConfigurationFile do
         dependency = config.services["two_args_with_options"].instance_variable_get(:@dependencies).first
         expect(dependency.instance_variable_get(:@timeout)).to eq(1)
       end
+
+      it "correctly sets a dependency with two args and options" do
+        config_file = LitmusPaper::ConfigurationFile.new(test_config)
+        config = config_file.evaluate
+        expect(config.services).to have_key("two_args_with_options")
+        dependency = config.services["two_args_with_options"].instance_variable_get(:@dependencies).first
+        expect(dependency.instance_variable_get(:@timeout)).to eq(1)
+      end
+
+      it "correctly sets two dependencies of the same type" do
+        config_file = LitmusPaper::ConfigurationFile.new(test_config)
+        config = config_file.evaluate
+        expect(config.services).to have_key("two_deps_of_same_type")
+        dependencies = config.services["two_deps_of_same_type"].instance_variable_get(:@dependencies).map(&:to_s)
+        expect(dependencies.to_s).to include("Dependency::HTTP(GET http://localhost/heartbeat1)")
+        expect(dependencies.to_s).to include("Dependency::HTTP(GET http://localhost/heartbeat2)")
+      end
     end
   end
 end

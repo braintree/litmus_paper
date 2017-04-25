@@ -1,7 +1,5 @@
-# vim: ft=ruby
-
 services:
   passing_test:
     metrics:
-      CPULoad: {weight: 50}
-      AvailableMemory: {weight: 50}
+      - CPULoad: {weight: 50}
+      - AvailableMemory: {weight: 50}
