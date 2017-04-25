@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe LitmusPaper::ConfigurationFile do
-  {"rb" => TEST_CONFIG, "yaml" => TEST_CONFIG_YAML}.each do |filetype, test_config|
-    describe "evaluate #{filetype}" do
+  [TEST_CONFIG, TEST_CONFIG_YAML].each do |test_config|
+    describe "evaluate #{File.extname(test_config)}" do
       it "configures a service" do
         config_file = LitmusPaper::ConfigurationFile.new(test_config)
         config = config_file.evaluate
@@ -24,8 +24,8 @@ describe LitmusPaper::ConfigurationFile do
     end
   end
 
-  {"rb" => TEST_D_CONFIG, "yaml" => TEST_D_CONFIG_YAML}.each do |filetype, test_config|
-    describe "evaluate #{filetype}" do
+  [TEST_D_CONFIG, TEST_D_CONFIG_YAML].each do |test_config|
+    describe "evaluate #{File.extname(test_config)}" do
       describe "include_files" do
         it "configures a dir glob of services" do
           config_file = LitmusPaper::ConfigurationFile.new(test_config)
@@ -45,8 +45,8 @@ describe LitmusPaper::ConfigurationFile do
     end
   end
 
-  {"rb" => TEST_DEPS_CONFIG, "yaml" => TEST_DEPS_CONFIG_YAML}.each do |filetype, test_config|
-    describe "configuring #{filetype} dependencies" do
+  [TEST_DEPS_CONFIG, TEST_DEPS_CONFIG_YAML].each do |test_config|
+    describe "configuring #{File.extname(test_config)} dependencies" do
       it "correctly sets a dependency with one arg" do
         config_file = LitmusPaper::ConfigurationFile.new(test_config)
         config = config_file.evaluate
