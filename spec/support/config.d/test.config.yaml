@@ -1,0 +1,9 @@
+# vim: ft=ruby
+
+services:
+  test:
+    dependencies:
+      HTTP: "http://localhost/heartbeat"
+    metrics:
+      CPULoad: {weight: 50}
+      AvailableMemory: {weight: 50}

@@ -1,0 +1,15 @@
+# vim: set ft=yaml
+
+port: 9293
+data_directory: "/tmp/litmus_paper"
+services:
+  test:
+    dependencies:
+      HTTP: "http://localhost/heartbeat"
+    metrics:
+      CPULoad: {weight: 50}
+      AvailableMemory: {weight: 50}
+  passing_test:
+    metrics:
+      CPULoad: {weight: 50}
+      AvailableMemory: {weight: 50}

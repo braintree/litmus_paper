@@ -7,9 +7,11 @@ require 'tempfile'
 
 TEST_CONFIG_DIR = "/tmp/litmus_paper"
 TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
+TEST_CONFIG_YAML = File.expand_path('support/test.config.yaml', File.dirname(__FILE__))
 TEST_RELOAD_CONFIG = File.expand_path('support/test.reload.config', File.dirname(__FILE__))
 TEST_UNICORN_CONFIG = File.expand_path('support/test.unicorn.config', File.dirname(__FILE__))
 TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))
+TEST_D_CONFIG_YAML = File.expand_path('support/test.d.config.yaml', File.dirname(__FILE__))
 TEST_CA_CERT = File.expand_path('ssl/server.crt', File.dirname(__FILE__))
 
 Dir.glob("#{File.expand_path('support', File.dirname(__FILE__))}/**/*.rb").each { |f| require f }

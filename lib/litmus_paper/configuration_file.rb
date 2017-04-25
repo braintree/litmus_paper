@@ -7,10 +7,41 @@ module LitmusPaper
       @data_directory = "/etc/litmus"
     end
 
+    def evaluate_yaml(config_contents)
+      config = YAML.load(config_contents)
+
+      if glob_pattern = config["include_files"]
+        include_files(glob_pattern)
+      end
+
+      @data_directory = config.fetch("data_directory", @data_directory)
+      @port = config.fetch("port", @port)
+
+      (config["services"] || []).each do |service_name, service_configuration|
+        s = Service.new(service_name)
+
+        (service_configuration["dependencies"] || []).each do |dependency_name, dependency_args|
+          dependency_class = LitmusPaper::Dependency.const_get(dependency_name)
+          s.depends dependency_class, dependency_args
+        end
+
+        service_configuration["metrics"].each do |metric_name, metric_args|
+          metric_class = LitmusPaper::Metric.const_get(metric_name)
+          s.measure_health metric_class, metric_args
+        end
+
+        @services[service_name] = s
+      end
+    end
+
     def evaluate(file = @config_file_path)
       LitmusPaper.logger.info "Loading file #{file}"
       config_contents = File.read(file)
-      instance_eval(config_contents)
+      if File.extname(file) == ".yaml"
+        evaluate_yaml(config_contents)
+      else
+        instance_eval(config_contents)
+      end
       LitmusPaper::Configuration.new(@port, @data_directory, @services)
     end
 
