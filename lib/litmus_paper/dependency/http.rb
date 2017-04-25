@@ -66,7 +66,7 @@ module LitmusPaper
       end
 
       def to_s
-        "Dependency::HTTP(#{@uri})"
+        "Dependency::HTTP(#{@method} #{@uri})"
       end
     end
   end

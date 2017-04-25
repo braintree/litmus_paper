@@ -135,7 +135,7 @@ describe LitmusPaper::Dependency::HTTP do
   describe "to_s" do
     it "is the name of the class and the url" do
       check = LitmusPaper::Dependency::HTTP.new("#{@url}/status/500")
-      expect(check.to_s).to eq("Dependency::HTTP(http://127.0.0.1:9294/status/500)")
+      expect(check.to_s).to eq("Dependency::HTTP(GET http://127.0.0.1:9294/status/500)")
     end
   end
 end
