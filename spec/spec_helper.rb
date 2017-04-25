@@ -8,6 +8,8 @@ require 'tempfile'
 TEST_CONFIG_DIR = "/tmp/litmus_paper"
 TEST_CONFIG = File.expand_path('support/test.config', File.dirname(__FILE__))
 TEST_CONFIG_YAML = File.expand_path('support/test.config.yaml', File.dirname(__FILE__))
+TEST_DEPS_CONFIG = File.expand_path('support/test_dependencies.config', File.dirname(__FILE__))
+TEST_DEPS_CONFIG_YAML = File.expand_path('support/test_dependencies.config.yaml', File.dirname(__FILE__))
 TEST_RELOAD_CONFIG = File.expand_path('support/test.reload.config', File.dirname(__FILE__))
 TEST_UNICORN_CONFIG = File.expand_path('support/test.unicorn.config', File.dirname(__FILE__))
 TEST_D_CONFIG = File.expand_path('support/test.d.config', File.dirname(__FILE__))

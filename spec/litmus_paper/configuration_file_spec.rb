@@ -44,4 +44,40 @@ describe LitmusPaper::ConfigurationFile do
       end
     end
   end
+
+  {"rb" => TEST_DEPS_CONFIG, "yaml" => TEST_DEPS_CONFIG_YAML}.each do |filetype, test_config|
+    describe "configuring #{filetype} dependencies" do
+      it "correctly sets a dependency with one arg" do
+        config_file = LitmusPaper::ConfigurationFile.new(test_config)
+        config = config_file.evaluate
+        expect(config.services).to have_key("one_arg")
+        dependency = config.services["one_arg"].instance_variable_get(:@dependencies).first
+        expect(dependency.to_s).to eq("Dependency::HTTP(GET http://localhost/heartbeat)")
+      end
+
+      it "correctly sets a dependency with one arg and options" do
+        config_file = LitmusPaper::ConfigurationFile.new(test_config)
+        config = config_file.evaluate
+        expect(config.services).to have_key("one_arg_with_options")
+        dependency = config.services["one_arg_with_options"].instance_variable_get(:@dependencies).first
+        expect(dependency.to_s).to eq("Dependency::HTTP(POST http://localhost/heartbeat)")
+      end
+
+      it "correctly sets a dependency with two args" do
+        config_file = LitmusPaper::ConfigurationFile.new(test_config)
+        config = config_file.evaluate
+        expect(config.services).to have_key("two_args")
+        dependency = config.services["two_args"].instance_variable_get(:@dependencies).first
+        expect(dependency.to_s).to eq("Dependency::TCP(tcp://127.0.0.1:65534)")
+      end
+
+      it "correctly sets a dependency with two args and options" do
+        config_file = LitmusPaper::ConfigurationFile.new(test_config)
+        config = config_file.evaluate
+        expect(config.services).to have_key("two_args_with_options")
+        dependency = config.services["two_args_with_options"].instance_variable_get(:@dependencies).first
+        expect(dependency.instance_variable_get(:@timeout)).to eq(1)
+      end
+    end
+  end
 end

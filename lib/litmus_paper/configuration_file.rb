@@ -22,10 +22,17 @@ module LitmusPaper
 
         (service_configuration["dependencies"] || []).each do |dependency_name, dependency_args|
           dependency_class = LitmusPaper::Dependency.const_get(dependency_name)
-          s.depends dependency_class, dependency_args
+          symbolized_args = [*(dependency_args)].map do |arg|
+            if arg.is_a?(Hash)
+              Hash[arg.map { |k, v| [k.to_sym, v] }]
+            else
+              arg
+            end
+          end
+          s.depends dependency_class, *symbolized_args
         end
 
-        service_configuration["metrics"].each do |metric_name, metric_args|
+        (service_configuration["metrics"] || []).each do |metric_name, metric_args|
           metric_class = LitmusPaper::Metric.const_get(metric_name)
           s.measure_health metric_class, metric_args
         end

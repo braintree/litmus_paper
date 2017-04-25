@@ -1,0 +1,20 @@
+services:
+  one_arg:
+    dependencies:
+      HTTP: "http://localhost/heartbeat"
+  one_arg_with_options:
+    dependencies:
+      HTTP:
+        - "http://localhost/heartbeat"
+        - { method: "POST" }
+  two_args:
+    dependencies:
+      TCP:
+        - 127.0.0.1
+        - 65534
+  two_args_with_options:
+    dependencies:
+      TCP:
+        - 127.0.0.1
+        - 65535
+        - { timeout_seconds: 1 }
