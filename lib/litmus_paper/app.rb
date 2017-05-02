@@ -45,6 +45,7 @@ module LitmusPaper
 
         headers = {"X-Health" => health.value.to_s}
         body = "Health: #{health.value}\n"
+        body << "Measured Health: #{health.measured_health}\n"
         if health.forced?
           if health.direction == :health
             status = "health"
@@ -52,7 +53,6 @@ module LitmusPaper
           else
             reason = health.forced_reason
           end
-          body << "Measured Health: #{health.measured_health}\n"
           body << "Forced Reason: #{reason}\n"
         end
         body << health.summary
