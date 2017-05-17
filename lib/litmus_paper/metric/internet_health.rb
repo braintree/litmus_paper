@@ -5,7 +5,7 @@ module LitmusPaper
         @weight = weight
         @hosts = hosts
         @options = options
-        @timeout = options.fetch(:timeout_seconds, 5)
+        @timeout = options.fetch(:timeout_seconds, 5) / @hosts.length.to_f
       end
 
       def tcp_connect?(host, port)

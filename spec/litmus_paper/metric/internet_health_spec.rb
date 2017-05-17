@@ -95,6 +95,61 @@ describe LitmusPaper::Dependency::TCP do
       internet_health.current_health.should == 0
     end
 
+    it "returns shortly after the timeout provided when all hosts timeout" do
+      TCPSocket.stub(:new) do
+        sleep(5)
+      end
+      internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
+        ["127.0.0.1:6000",
+        "127.0.0.1:6000",
+        "127.0.0.1:6000",
+        "127.0.0.1:6000"],
+        { :timeout_seconds => 2 },
+      )
+      health = nil
+      Timeout.timeout(3) do
+        health = internet_health.current_health
+      end
+      health.should == 0
+    end
+
+    it "returns shortly after the timeout provided when one of many hosts timeout" do
+      TCPSocket.stub(:new) do
+        TCPSocket.unstub(:new)
+        sleep(5)
+      end
+      internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
+        ["127.0.0.1:6000",
+        "127.0.0.1:6000",
+        "127.0.0.1:6000",
+        "127.0.0.1:6000"],
+        { :timeout_seconds => 2 },
+      )
+      health = nil
+      Timeout.timeout(3) do
+        health = internet_health.current_health
+      end
+      health.should == 0
+    end
+
+    it "returns shortly after the timeout when one host times out" do
+      TCPSocket.stub(:new) do
+        sleep(5)
+      end
+      internet_health = LitmusPaper::Metric::InternetHealth.new(
+        100,
+        ["127.0.0.1:6000"],
+        { :timeout_seconds => 2 },
+      )
+      health = nil
+      Timeout.timeout(3) do
+        health = internet_health.current_health
+      end
+      health.should == 0
+    end
+
     it "logs exceptions and returns 0" do
       internet_health = LitmusPaper::Metric::InternetHealth.new(100, ["127.0.0.1:6000"])
       LitmusPaper.logger.should_receive(:info)
