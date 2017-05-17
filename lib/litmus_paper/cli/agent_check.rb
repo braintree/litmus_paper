@@ -45,14 +45,16 @@ module LitmusPaper
         else
           case health.direction
           when :up, :health
-            output << "ready"
+            output << "ready" # administrative state
+            output << "up" # operational state
           when :down
-            output << "drain"
+            output << "drain" # administrative state
           when :none
             if health.ok?
-              output << "ready"
+              output << "ready" # administrative state
+              output << "up" # operational state
             else
-              output << "down"
+              output << "down" # operational state
             end
           end
           output << "#{health.value.to_s}%"

@@ -18,20 +18,20 @@ describe LitmusPaper::CLI::AgentCheck do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
       LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
-      agent_check("test").should == "ready\t88%\r\n"
+      agent_check("test").should == "ready\tup\t88%\r\n"
     end
 
     it "returns the actual health value for an unhealthy service when the measured health is less than the forced value" do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
       LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
-      agent_check("test").should == "ready\t0%\r\n"
+      agent_check("test").should == "ready\tup\t0%\r\n"
     end
 
     it "is 'ready' when the service is passing" do
       test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
-      agent_check("test").should == "ready\t100%\r\n"
+      agent_check("test").should == "ready\tup\t100%\r\n"
     end
 
     it "is 'down' when the check fails" do
@@ -64,7 +64,7 @@ describe LitmusPaper::CLI::AgentCheck do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
       LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
-      agent_check("test").should == "ready\t100%\r\n"
+      agent_check("test").should == "ready\tup\t100%\r\n"
     end
 
     it "is 'drain' when a global down file exists" do
@@ -78,7 +78,7 @@ describe LitmusPaper::CLI::AgentCheck do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
       LitmusPaper::StatusFile.global_up_file.create("Up for testing")
-      agent_check("test").should == "ready\t100%\r\n"
+      agent_check("test").should == "ready\tup\t100%\r\n"
     end
   end
 end
