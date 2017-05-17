@@ -15,7 +15,7 @@ module LitmusPaper
         end
         true
       rescue Timeout::Error
-        LitmusPaper.logger.info("Timeout connecting to #{host}:#{port}")
+        LitmusPaper.logger.info("Timed out connecting to #{host}:#{port} after #{@timeout}s")
         false
       rescue => e
         LitmusPaper.logger.info("TCP connect to #{host}:#{port} failed with #{e.message}")
