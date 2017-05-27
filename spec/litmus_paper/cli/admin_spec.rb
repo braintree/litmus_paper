@@ -83,9 +83,33 @@ describe 'litmusctl' do
       status.should_not match(/for testing/)
     end
 
+    it "removes an upfile for the service with 'remove'" do
+      _litmusctl('force up test -r "for testing"').should match("File created")
+      _litmusctl('force remove up test').should match("File deleted")
+      status = _litmusctl('status passing_test')
+      status.should match(/Health: \d\d/)
+      status.should_not match(/for testing/)
+    end
+
     it "removes a healthfile for the service" do
       _litmusctl('force health 88 test -r "for testing"').should match("File created")
       _litmusctl('force health test -d').should match("File deleted")
+      status = _litmusctl('status passing_test')
+      status.should match(/Health: \d\d/)
+      status.should_not match(/for testing/)
+    end
+
+    it "removes a healthfile for the service with 'remove'" do
+      _litmusctl('force health 88 test -r "for testing"').should match("File created")
+      _litmusctl('force remove health test').should match("File deleted")
+      status = _litmusctl('status passing_test')
+      status.should match(/Health: \d\d/)
+      status.should_not match(/for testing/)
+    end
+
+    it "removes a downfile for the service with 'remove'" do
+      _litmusctl('force down test -r "for testing"').should match("File created")
+      _litmusctl('force remove down test').should match("File deleted")
       status = _litmusctl('status passing_test')
       status.should match(/Health: \d\d/)
       status.should_not match(/for testing/)
