@@ -1,13 +1,13 @@
 module LitmusPaper
   module Dependency
-    class FileContents
+    class FileContents < Base
       def initialize(path, regex, options = {})
         @path = path
         @regex = regex
         @timeout = options.fetch(:timeout, 5)
       end
 
-      def available?
+      def _available?
         Timeout.timeout(@timeout) do
           if File.read(@path).match(@regex)
             true

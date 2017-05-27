@@ -1,14 +1,16 @@
 module LitmusPaper
   module Dependency
-    class Script
+    class Script < Base
       attr_reader :script_pid
 
       def initialize(command, options = {})
         @command = command
         @timeout = options.fetch(:timeout, 5)
+        @report_result = options.fetch(:report_result, false)
       end
 
-      def available?
+      def _available?
+        _clear_state
         Timeout.timeout(@timeout) do
           script_stdout = script_stderr = nil
           script_status = POpen4.popen4(@command) do |stdout, stderr, stdin, pid|
@@ -21,6 +23,7 @@ module LitmusPaper
             LitmusPaper.logger.info("Failed stdout: #{script_stdout}")
             LitmusPaper.logger.info("Failed stderr: #{script_stderr}")
           end
+          @result = script_stdout if @report_result
           script_status.success?
         end
       rescue Timeout::Error
@@ -30,6 +33,10 @@ module LitmusPaper
       rescue => e
         LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
         false
+      end
+
+      def _clear_state
+        @result = nil
       end
 
       def kill_and_reap_script(pid)
@@ -52,6 +59,11 @@ module LitmusPaper
 
       def to_s
         "Dependency::Script(#{@command})"
+      end
+
+      def result
+        return super unless @report_result
+        @result[0...100] if @result
       end
     end
   end

@@ -2,14 +2,14 @@ require 'csv'
 
 module LitmusPaper
   module Dependency
-    class HaproxyBackends
+    class HaproxyBackends < Base
       def initialize(domain_socket, cluster, options = {})
         @domain_socket = domain_socket
         @cluster = cluster
         @timeout = options.fetch(:timeout_seconds, 2)
       end
 
-      def available?
+      def _available?
         stats = _parse_stats(_fetch_stats)
         backend = _find_backend(stats, @cluster)
 

@@ -1,5 +1,5 @@
-class NeverAvailableDependency
-  def available?
+class NeverAvailableDependency < LitmusPaper::Dependency::Base
+  def _available?
     false
   end
 

@@ -1,6 +1,6 @@
 module LitmusPaper
   module Dependency
-    class TCP
+    class TCP < Base
       def initialize(ip, port, options = {})
         @ip, @port = ip, port
         @timeout = options.fetch(:timeout_seconds, 5)
@@ -8,7 +8,7 @@ module LitmusPaper
         @expected_output = options[:expected_output]
       end
 
-      def available?
+      def _available?
         response = true
 
         Timeout.timeout(@timeout) do

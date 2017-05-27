@@ -44,4 +44,49 @@ describe LitmusPaper::Dependency::Script do
       check.to_s.should == "Dependency::Script(sleep 10)"
     end
   end
+
+  describe "result" do
+    it "returns OK when report_result is false and the dependency is available" do
+      check = LitmusPaper::Dependency::Script.new("echo 'result'", :report_result => false)
+      check.should be_available
+      check.result.should == "OK"
+    end
+
+    it "returns FAIL when report_result is false and the dependency is not available" do
+      check = LitmusPaper::Dependency::Script.new("echo 'result' && false", :report_result => false)
+      check.should_not be_available
+      check.result.should == "FAIL"
+    end
+
+    it "returns the result when report_result is true" do
+      check = LitmusPaper::Dependency::Script.new("echo 'result'", :report_result => true)
+      check.should be_available
+      check.result.should == "result"
+    end
+
+    it "limits the returned result to 100 characters" do
+      as = "a"*500
+      check = LitmusPaper::Dependency::Script.new("echo '#{as}'", :report_result => true)
+      check.should be_available
+      check.result.size.should == 100
+    end
+
+    it "returns nil when report_result is true, but a result is not set" do
+      check = LitmusPaper::Dependency::Script.new("echo 'result'", :report_result => true)
+      check.result.should be_nil
+    end
+
+    context "when the dependency succeeds and then fails" do
+      it "reports a failure result" do
+        check = LitmusPaper::Dependency::Script.new("echo 'result'", :report_result => true)
+        available = check.available?
+        available.should be_true
+        check.result.should == "result"
+
+        check.instance_variable_set(:@command, "false")
+        check.should_not be_available
+        check.result.should be_empty
+      end
+    end
+  end
 end

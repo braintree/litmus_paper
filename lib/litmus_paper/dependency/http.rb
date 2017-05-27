@@ -1,6 +1,6 @@
 module LitmusPaper
   module Dependency
-    class HTTP
+    class HTTP < Base
       def initialize(uri, options = {})
         @uri = uri
         @expected_content = Regexp.new(options.fetch(:content, '.*'))
@@ -9,7 +9,7 @@ module LitmusPaper
         @timeout = options.fetch(:timeout_seconds, 2)
       end
 
-      def available?
+      def _available?
         response = _make_request
         success = _successful_response?(response)
         matches = _body_matches?(response)

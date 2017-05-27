@@ -1,5 +1,5 @@
-class AlwaysAvailableDependency
-  def available?
+class AlwaysAvailableDependency < LitmusPaper::Dependency::Base
+  def _available?
     true
   end
 
