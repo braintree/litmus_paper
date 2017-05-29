@@ -7,6 +7,26 @@ describe LitmusPaper::Metric::Script do
       check.current_health.should == 1
     end
 
+    it "is true when the script returns a lot of data" do
+      check = LitmusPaper::Metric::Script.new("dd if=/dev/urandom bs=1M count=1|base64 >&2 && echo 1", 1)
+      check.current_health.should == 1
+    end
+
+    it "logs stdout and stderr when it fails" do
+      check = LitmusPaper::Metric::Script.new("echo Hello && echo Goodbye 1>&2 && false", 1)
+      count = 0
+      logs = [
+        "Available check to echo Hello && echo Goodbye 1>&2 && false failed with status 1",
+        "Failed stdout: Hello\n",
+        "Failed stderr: Goodbye\n",
+      ]
+      LitmusPaper.logger.should_receive(:info).exactly(3).times do |log|
+        log.should == logs[count]
+        count += 1
+      end
+      check.current_health.should == 0
+    end
+
     it "is zero when the script exits 1" do
       check = LitmusPaper::Metric::Script.new("false", 1)
       check.current_health.should == 0
