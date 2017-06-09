@@ -17,7 +17,6 @@ Gem::Specification.new do |gem|
   gem.version       = LitmusPaper::VERSION
 
   gem.add_dependency "sinatra", "~> 1.3.2"
-  gem.add_dependency "facter", "~> 1.7.5"
   gem.add_dependency "remote_syslog_logger", "~> 1.0.3"
   gem.add_dependency "unicorn", "~> 4.6.2"
   gem.add_dependency "colorize"
