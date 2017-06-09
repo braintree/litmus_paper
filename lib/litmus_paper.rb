@@ -1,9 +1,3 @@
-require 'net/http'
-require 'net/https'
-require 'uri'
-require 'forwardable'
-require 'colorize'
-
 # Ruby's stock DNS resolution, by default, blocks the entire Ruby VM from
 # processing while the lookup is happening, because it calls out to the native
 # libc resolver code. A slow DNS server can cause your entire Ruby process to
@@ -13,11 +7,13 @@ require 'colorize'
 # 'resolv-replace' monkeypatches the various Ruby Socket objects to use resolv
 #
 require 'resolv-replace'
+require 'net/http'
+require 'net/https'
+require 'uri'
+require 'forwardable'
 
-require 'sinatra/base'
 require 'remote_syslog_logger'
 
-require 'litmus_paper/app'
 require 'litmus_paper/configuration'
 require 'litmus_paper/configuration_file'
 require 'litmus_paper/dependency/file_contents'
@@ -34,7 +30,6 @@ require 'litmus_paper/metric/internet_health'
 require 'litmus_paper/metric/script'
 require 'litmus_paper/service'
 require 'litmus_paper/status_file'
-require 'litmus_paper/terminal_output'
 require 'litmus_paper/version'
 
 module LitmusPaper

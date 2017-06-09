@@ -1,4 +1,6 @@
 # encoding: UTF-8
+require 'colorize'
+
 module LitmusPaper
   class TerminalOutput
     def self.service_status
