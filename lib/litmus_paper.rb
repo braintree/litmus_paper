@@ -1,9 +1,7 @@
-require 'pathname'
 require 'net/http'
 require 'net/https'
 require 'uri'
 require 'forwardable'
-require 'English'
 require 'colorize'
 
 # Ruby's stock DNS resolution, by default, blocks the entire Ruby VM from
