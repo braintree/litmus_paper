@@ -1,3 +1,5 @@
+require 'open3'
+
 module LitmusPaper
   module Dependency
     class Script
@@ -9,23 +11,27 @@ module LitmusPaper
       end
 
       def available?
-        Timeout.timeout(@timeout) do
-          script_stdout = script_stderr = nil
-          script_status = POpen4.popen4(@command) do |stdout, stderr, stdin, pid|
-            @script_pid = pid
-            script_stdout = stdout.read.strip
-            script_stderr = stderr.read.strip
+        script_status = script_stdout = script_stderr = nil
+        Open3.popen3(@command, :pgroup=>true) do |stdin, stdout, stderr, wait_thr|
+          @script_pid = wait_thr.pid
+          thstderr = Thread.new { stderr.read }
+          thstdout = Thread.new { stdout.read }
+          if !wait_thr.join(@timeout) # wait thread does not end within timeout
+            kill_and_reap_script(-@script_pid) # kill the process group
+            raise Timeout::Error
           end
-          unless script_status.success?
-            LitmusPaper.logger.info("Available check to #{@command} failed with status #{$CHILD_STATUS.exitstatus}")
-            LitmusPaper.logger.info("Failed stdout: #{script_stdout}")
-            LitmusPaper.logger.info("Failed stderr: #{script_stderr}")
-          end
-          script_status.success?
+          script_stderr = thstderr.value
+          script_stdout = thstdout.value
+          script_status = wait_thr.value
         end
+        unless script_status.success?
+          LitmusPaper.logger.info("Available check to #{@command} failed with status #{script_status.exitstatus}")
+          LitmusPaper.logger.info("Failed stdout: #{script_stdout}")
+          LitmusPaper.logger.info("Failed stderr: #{script_stderr}")
+        end
+        script_status.success?
       rescue Timeout::Error
         LitmusPaper.logger.info("Timeout running command: '#{@command}'")
-        kill_and_reap_script(@script_pid)
         false
       rescue => e
         LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")

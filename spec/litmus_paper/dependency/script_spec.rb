@@ -8,7 +8,7 @@ describe LitmusPaper::Dependency::Script do
     end
 
     it "is false when the script returns 1" do
-      check = LitmusPaper::Dependency::Script.new("false")
+      check = LitmusPaper::Dependency::Script.new("echo Hello && echo Goodbye 1>&2 && false")
       check.should_not be_available
     end
 
