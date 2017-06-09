@@ -16,7 +16,6 @@ require 'colorize'
 #
 require 'resolv-replace'
 
-require 'popen4'
 require 'sinatra/base'
 require 'facter'
 require 'remote_syslog_logger'
