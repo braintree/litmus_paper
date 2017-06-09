@@ -1,4 +1,5 @@
 require 'optparse'
+require 'litmus_paper/agent_check_server'
 
 module LitmusPaper
   module CLI
@@ -6,12 +7,22 @@ module LitmusPaper
 
       def parse_args(args)
         options = {}
+        options[:pid_file] = '/tmp/litmus-agent-check.pid'
         optparser = OptionParser.new do |opts|
-          opts.on("-s", "--service SERVICE", "Service to check") do |s|
-            options[:service] = s
+          opts.on("-s", "--service SERVICE:PORT,...", Array, "agent-check service to port mappings") do |s|
+            options[:services] = s
           end
-          opts.on("-c", "--config CONFIG", "Path to config file") do |c|
-            options[:config] = c
+          opts.on("-c", "--config CONFIG", "Path to litmus paper config file") do |c|
+            options[:litmus_paper_config] = c
+          end
+          opts.on("-p", "--pid-file PID_FILE", String, "Where to write the pid") do |p|
+            options[:pid_file] = p
+          end
+          opts.on("-w", "--workers WORKERS", Integer, "Number of worker processes") do |w|
+            options[:workers] = w
+          end
+          opts.on("-D", "--daemonize", "Daemonize the process") do |d|
+            options[:daemonize] = d
           end
           opts.on("-h", "--help", "Help text") do |h|
             options[:help] = h
@@ -31,43 +42,43 @@ module LitmusPaper
           exit 0
         end
 
-        if !options.has_key?(:service)
-          puts "Error: `-s SERVICE` required"
+        if !options.has_key?(:services)
+          puts "Error: `-s SERVICE:PORT,...` required"
           puts optparser
           exit 1
         end
-        options
-      end
 
-      def output_service_status(service, stdout)
-        output = []
-        health = LitmusPaper.check_service(service)
-        if health.nil?
-          output << "failed#NOT_FOUND"
-        else
-          case health.direction
-          when :up, :health
-            output << "ready" # administrative state
-            output << "up" # operational state
-          when :down
-            output << "drain" # administrative state
-          when :none
-            if health.ok?
-              output << "ready" # administrative state
-              output << "up" # operational state
-            else
-              output << "down" # operational state
-            end
-          end
-          output << "#{health.value.to_s}%"
+        if !options.has_key?(:workers) || options[:workers] <= 0
+          puts "Error: `-w WORKERS` required, and must be greater than 0"
+          puts optparser
+          exit 1
         end
-        stdout.printf("%s\r\n", output.join("\t"))
+
+        options[:services] = options[:services].reduce({}) do |memo, service|
+          if service.split(':').length == 2
+            service, port = service.split(':')
+            memo[port.to_i] = service
+            memo
+          else
+            puts "Error: Incorrect service port arg `-s SERVICE:PORT,...`"
+            puts optparser
+            exit 1
+          end
+        end
+
+        options
       end
 
       def run(args)
         options = parse_args(args)
-        LitmusPaper.configure(options[:config])
-        output_service_status(options[:service], $stdout)
+        agent_check_server = LitmusPaper::AgentCheckServer.new(
+          options[:litmus_paper_config],
+          options[:services],
+          options[:workers],
+          options[:pid_file],
+          options[:daemonize],
+        )
+        agent_check_server.run
       end
 
     end
