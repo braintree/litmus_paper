@@ -1,3 +1,6 @@
+require 'sinatra/base'
+require 'litmus_paper/terminal_output'
+
 module LitmusPaper
   class App < Sinatra::Base
     disable :show_exceptions

@@ -3,6 +3,7 @@ ENV['RACK_ENV'] = 'test'
 require 'rspec'
 require 'rack/test'
 require 'litmus_paper'
+require 'litmus_paper/app'
 require 'tempfile'
 
 TEST_CONFIG_DIR = "/tmp/litmus_paper"

@@ -1,3 +1,5 @@
+require 'optparse'
+
 module LitmusPaper
   module CLI
     class AgentCheck
