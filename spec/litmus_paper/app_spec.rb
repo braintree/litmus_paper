@@ -418,22 +418,6 @@ describe LitmusPaper::App do
       last_response.headers["X-Health-Forced"].should == "up"
       last_response.body.should match(/Up for testing/)
     end
-
-    it "resets the Facter cache" do
-      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
-      LitmusPaper.services['test'] = test_service
-
-      get "/test/status"
-      last_response.should be_ok
-
-      facter_uptime = Facter.value("uptime_seconds")
-      sleep 1
-
-      get "/test/status"
-      last_response.should be_ok
-
-      Facter.value("uptime_seconds").should > facter_uptime
-    end
   end
 
   describe "server errors" do

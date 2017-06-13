@@ -17,10 +17,7 @@ require 'colorize'
 require 'resolv-replace'
 
 require 'sinatra/base'
-require 'facter'
 require 'remote_syslog_logger'
-
-require 'facts/loadaverage'
 
 require 'litmus_paper/app'
 require 'litmus_paper/configuration'
@@ -52,8 +49,6 @@ module LitmusPaper
   self.logger = Logger.new
 
   def self.check_service(service_name)
-    Facter.flush
-
     if service = services[service_name]
       service.current_health
     else

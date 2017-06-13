@@ -1,9 +1,8 @@
 module LitmusPaper
   module Metric
     class CPULoad
-      def initialize(weight, facter = Facter)
+      def initialize(weight)
         @weight = weight
-        @facter = facter
       end
 
       def current_health
@@ -11,11 +10,18 @@ module LitmusPaper
       end
 
       def processor_count
-        @processor_count ||= @facter.value('processorcount').to_i
+        @processor_count ||= File.readlines('/proc/cpuinfo').reduce(0) do |memo, line|
+          if line =~ /^processor/
+            memo + 1
+          else
+            memo
+          end
+        end
+
       end
 
       def load_average
-        @facter.value('loadaverage').split(' ').first.to_f
+        File.read('/proc/loadavg').split(' ').first.to_f
       end
 
       def to_s

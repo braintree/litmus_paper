@@ -3,14 +3,20 @@ require 'spec_helper'
 describe LitmusPaper::Metric::CPULoad do
   describe "#current_health" do
     it "is the percent of available cpu capacity" do
-      facter = StubFacter.new({"processorcount" => "4", "loadaverage" => "1.00 0.40 0.10"})
-      cpu_load = LitmusPaper::Metric::CPULoad.new(40, facter)
+      LitmusPaper::Metric::CPULoad.any_instance.stub(
+        :processor_count => 4,
+        :load_average => 1.00,
+      )
+      cpu_load = LitmusPaper::Metric::CPULoad.new(40)
       cpu_load.current_health.should == 30
     end
 
     it "is one when the load is above one per core" do
-      facter = StubFacter.new({"processorcount" => "4", "loadaverage" => "20.00 11.40 10.00"})
-      cpu_load = LitmusPaper::Metric::CPULoad.new(50, facter)
+      LitmusPaper::Metric::CPULoad.any_instance.stub(
+        :processor_count => 4,
+        :load_average => 20.00,
+      )
+      cpu_load = LitmusPaper::Metric::CPULoad.new(50)
       cpu_load.current_health.should == 1
     end
   end
@@ -22,7 +28,7 @@ describe LitmusPaper::Metric::CPULoad do
     end
 
     it "is cached" do
-      Facter.should_receive(:value).once.and_return("10")
+      File.should_receive(:readlines).with('/proc/cpuinfo').once.and_return(["processor       : 0\n"])
       cpu_load = LitmusPaper::Metric::CPULoad.new(50)
       cpu_load.processor_count
       cpu_load.processor_count
@@ -33,6 +39,13 @@ describe LitmusPaper::Metric::CPULoad do
   describe "#load_average" do
     it "is a floating point" do
       cpu_load = LitmusPaper::Metric::CPULoad.new(50)
+      cpu_load.load_average.should > 0.0
+    end
+
+    it "is not cached" do
+      File.should_receive(:read).with('/proc/loadavg').twice.and_return("0.08 0.12 0.15 2/1190 9152\n")
+      cpu_load = LitmusPaper::Metric::CPULoad.new(50)
+      cpu_load.load_average.should > 0.0
       cpu_load.load_average.should > 0.0
     end
   end
