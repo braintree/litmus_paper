@@ -33,7 +33,7 @@ describe 'litmusctl' do
   describe 'status' do
     it 'returns the status of a service' do
       _litmusctl('status test').should match("Health: 0")
-      _litmusctl('status passing_test').should match(/Health: \d\d/)
+      _litmusctl('status passing_test').should match(/Health: \d+/)
     end
 
     it "returns 'NOT FOUND' for a service that doesn't exist" do
@@ -79,7 +79,7 @@ describe 'litmusctl' do
       _litmusctl('force up test -d').should match("File deleted")
 
       status = _litmusctl('status passing_test')
-      status.should match(/Health: \d\d/)
+      status.should match(/Health: \d+/)
       status.should_not match(/for testing/)
     end
 
@@ -87,7 +87,7 @@ describe 'litmusctl' do
       _litmusctl('force health 88 test -r "for testing"').should match("File created")
       _litmusctl('force health test -d').should match("File deleted")
       status = _litmusctl('status passing_test')
-      status.should match(/Health: \d\d/)
+      status.should match(/Health: \d+/)
       status.should_not match(/for testing/)
     end
 
