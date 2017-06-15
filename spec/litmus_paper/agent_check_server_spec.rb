@@ -27,7 +27,7 @@ describe LitmusPaper::AgentCheckServer do
   describe "The agent-check text protocol" do
     it "returns the health from a passing test" do
       TCPSocket.open('localhost', 9191) do |s|
-        s.gets.should match(/ready\tup\t\d\d%\r\n/)
+        s.gets.should match(/ready\tup\t\d+%\r\n/)
       end
     end
     it "returns the health from a failing test" do
