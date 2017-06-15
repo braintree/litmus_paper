@@ -14,7 +14,7 @@ module LitmusPaper
       @workers = workers
       @pid_file = pid_file
       @daemonize = daemonize
-      @control_sockets = @services.map do |port, service|
+      @control_sockets = @services.keys.map do |port|
         TCPServer.new(port)
       end
       trap(:INT) { exit }
