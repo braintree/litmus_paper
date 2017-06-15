@@ -50,6 +50,8 @@ module LitmusPaper
 
         if !options.has_key?(:workers) || options[:workers] <= 0
           puts "Error: `-w WORKERS` required, and must be greater than 0"
+          puts "  Use a value equal to the number of expected concurrent"
+          puts "  agent checks from HAProxy"
           puts optparser
           exit 1
         end
