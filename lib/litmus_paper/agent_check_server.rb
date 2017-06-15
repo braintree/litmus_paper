@@ -23,8 +23,7 @@ module LitmusPaper
 
     # Stolen pattern from ruby Socket, modified to return the service based on
     # the accepting port
-    def accept_loop(*sockets)
-      sockets.flatten!(1)
+    def accept_loop(sockets)
       if sockets.empty?
         raise ArgumentError, "no sockets"
       end
