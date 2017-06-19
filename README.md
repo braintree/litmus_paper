@@ -20,8 +20,8 @@ Or install it yourself as:
 
 ## Usage
 
-Use the sample config to run it under unicorn. Or when running it as an
-agent-check for HAProxy use the sample xinetd config.
+Use the sample config to run it under unicorn. Or execute litmus-agent-check to
+use it as an agent-check for HAProxy.
 
 ## Contributing
 
