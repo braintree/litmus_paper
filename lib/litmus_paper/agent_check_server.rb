@@ -32,6 +32,8 @@ module LitmusPaper
         readable.each { |r|
           begin
             sock, addr = r.accept_nonblock
+            _, remote_port, _, remote_ip = sock.peeraddr
+            LitmusPaper.logger.debug "Received request from #{remote_ip}:#{remote_port}"
             service = @services[r.local_address.ip_port]
           rescue IO::WaitReadable
             next
