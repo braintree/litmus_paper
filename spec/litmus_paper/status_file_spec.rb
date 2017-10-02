@@ -22,11 +22,11 @@ describe LitmusPaper::StatusFile do
       status_file = LitmusPaper::StatusFile.new("foo", :up)
       status_file.create("for testing")
 
-      status_file.exists?.should be_true
+      status_file.exists?.should == true
 
       status_file.delete
 
-      status_file.exists?.should be_false
+      status_file.exists?.should == false
     end
   end
 end
