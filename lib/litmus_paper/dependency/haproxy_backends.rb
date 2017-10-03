@@ -13,8 +13,11 @@ module LitmusPaper
         stats = _parse_stats(_fetch_stats)
         backend = _find_backend(stats, @cluster)
 
-        if backend['status'] != 'UP'
-          LitmusPaper.logger.info("HAProxy available check failed, #{@cluster} backend is #{backend['status']}")
+        if backend['weight'].to_i == 0
+          LitmusPaper.logger.info(
+            "HAProxy available check failed, #{@cluster} backend is #{backend['status']} and has total
+            backend weight of #{backend['weight']}"
+          )
           return false
         end
         return true
