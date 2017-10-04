@@ -15,8 +15,7 @@ module LitmusPaper
 
         if backend['weight'].to_i == 0
           LitmusPaper.logger.info(
-            "HAProxy available check failed, #{@cluster} backend is #{backend['status']} and has total
-            backend weight of #{backend['weight']}"
+            "HAProxy available check failed for #{@cluster}, status: #{backend['status']}, weight: #{backend['weight']}"
           )
           return false
         end
