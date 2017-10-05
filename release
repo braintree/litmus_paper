@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -o xtrace
+
+chmod -R go+rX .
+rm -f *.gem
+gem build litmus_paper.gemspec
+gem push litmus_paper*.gem

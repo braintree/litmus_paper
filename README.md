@@ -23,6 +23,10 @@ Or install it yourself as:
 Use the sample config to run it under unicorn. Or execute litmus-agent-check to
 use it as an agent-check for HAProxy.
 
+## Releasing
+
+    $ ./release
+
 ## Contributing
 
 1. Fork it
