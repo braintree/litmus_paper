@@ -14,6 +14,7 @@ require 'forwardable'
 
 require 'remote_syslog_logger'
 
+require 'litmus_paper/cache'
 require 'litmus_paper/configuration'
 require 'litmus_paper/configuration_file'
 require 'litmus_paper/dependency/file_contents'
@@ -35,7 +36,7 @@ require 'litmus_paper/version'
 module LitmusPaper
   class << self
     extend Forwardable
-    def_delegators :@config, :services, :data_directory, :port
+    def_delegators :@config, :services, :data_directory, :port, :cache_location, :cache_ttl
     attr_accessor :logger
   end
 

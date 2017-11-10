@@ -34,7 +34,12 @@ module LitmusPaper
     end
 
     get "/:service/status" do
-      health = LitmusPaper.check_service(params[:service])
+      health = _cache.get(params[:service])
+      _cache.set(
+        params[:service],
+        health = LitmusPaper.check_service(params[:service])
+      ) unless health
+
       if health.nil?
         _text 404, "NOT FOUND", { "X-Health" => "0" }
       else
@@ -98,6 +103,14 @@ module LitmusPaper
 
     error do
       _text 500, "Server Error"
+    end
+
+    def _cache
+      @cache ||= LitmusPaper::Cache.new(
+        LitmusPaper.cache_location,
+        "litmus_cache",
+        LitmusPaper.cache_ttl
+      )
     end
 
     def _create_status_file(status_file)
