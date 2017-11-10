@@ -1,4 +1,11 @@
 module LitmusPaper
-  class Configuration < Struct.new(:port, :data_directory, :services)
+  fields = [
+    :port,
+    :data_directory,
+    :services,
+    :cache_location,
+    :cache_ttl
+  ]
+  class Configuration < Struct.new(*fields)
   end
 end

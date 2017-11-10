@@ -272,7 +272,7 @@ describe LitmusPaper::App do
       last_response.header["X-Health-Forced"].should == "health"
     end
 
-    it "returns the actualy health value for an unhealthy service when the measured health is less than the forced value" do
+    it "returns the actual health value for an unhealthy service when the measured health is less than the forced value" do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
       LitmusPaper.services['test'] = test_service
       LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
@@ -417,6 +417,45 @@ describe LitmusPaper::App do
       last_response.status.should == 200
       last_response.headers["X-Health-Forced"].should == "up"
       last_response.body.should match(/Up for testing/)
+    end
+
+    it "retrieves a cached value during the cache_ttl" do
+      begin
+        cache = LitmusPaper::Cache.new(
+          location = "/tmp/litmus_cache",
+          namespace = "test_cache",
+          ttl = 0.05
+        )
+        LitmusPaper::App.any_instance.stub(:_cache).and_return(cache)
+        test_service = LitmusPaper::Service.new(
+          'test',
+          [AlwaysAvailableDependency.new],
+          [LitmusPaper::Metric::ConstantMetric.new(100)]
+        )
+        LitmusPaper.services['test'] = test_service
+
+        post "/test/health", :reason => "health for testing", :health => 88
+        last_response.status.should == 201
+
+        get "/test/status"
+        last_response.status.should == 200
+        last_response.body.should match(/health for testing 88/)
+
+        delete "/test/health"
+        last_response.status.should == 200
+
+        get "/test/status"
+        last_response.should be_ok
+        last_response.body.should match(/health for testing 88/)
+
+        sleep ttl
+
+        get "/test/status"
+        last_response.should be_ok
+        last_response.body.should_not match(/health for testing 88/)
+      ensure
+        FileUtils.rm_rf(location)
+      end
     end
   end
 

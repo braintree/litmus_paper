@@ -5,13 +5,21 @@ module LitmusPaper
       @services = {}
       @port = 9292
       @data_directory = "/etc/litmus"
+      @cache_location = "/run/shm"
+      @cache_ttl = -1
     end
 
     def evaluate(file = @config_file_path)
       LitmusPaper.logger.info "Loading file #{file}"
       config_contents = File.read(file)
       instance_eval(config_contents)
-      LitmusPaper::Configuration.new(@port, @data_directory, @services)
+      LitmusPaper::Configuration.new(
+        @port,
+        @data_directory,
+        @services,
+        @cache_location,
+        @cache_ttl
+      )
     end
 
     def include_files(glob_pattern)
@@ -35,6 +43,14 @@ module LitmusPaper
       service = Service.new(name.to_s)
       block.call(service)
       @services[name.to_s] = service
+    end
+
+    def cache_location(location)
+      @cache_location = location
+    end
+
+    def cache_ttl(ttl)
+      @cache_ttl = ttl
     end
   end
 end
