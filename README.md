@@ -40,9 +40,28 @@ use it as an agent-check for HAProxy.
 
 ### Global configuration
 
+Example:
+
+```
+# /etc/litmus.conf
+
+include_files "litmus.d/*.conf"
+
+port 80
+
+data_directory "/litmus"
+```
+
+Available fields:
+- include_files: Tells Litmus to load health check configurations from a path.
+- port: Port Litmus unicorn server will listen on, defaults to 9292.
+- data_directory: Where to store force down, up, and health files. Defaults to "/etc/litmus".
+- cache_location: Where to store cached health information, defaults to "/run/shm".
+- cache_ttl: Time to live in seconds for cached health check values, defaults to -1.
+
 ### Service health check configuration
 
-Litmus Paper expects health check configurations in `/etc/litmus.d/`, written in ruby. Suppose you're writing a health check for a web application. You might start with a simple check to report if the server is responding at all:
+To add services and health checks, Litmus Paper loads configurations written in ruby. Suppose you're writing a health check for a web application. You might start with a simple check to report if the server is responding at all:
 
 ```ruby
 # /etc/litmus.d/myapp.conf
@@ -117,7 +136,7 @@ Here are all the types of checks currently implemented:
 - `Metric::BigBrotherService` -> Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
   * service
 
-### Configuring an agent check for HAProxy
+### HAProxy agent check configuration
 
 Litmus paper can also report health checks in HAProxy agent check format.
 
