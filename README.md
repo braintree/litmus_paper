@@ -1,6 +1,6 @@
 # LitmusPaper
 
-Backend health tester for HA Services, or as an agent-check for HAProxy.
+LitmusPaper is a backend health tester for HA Services.
 
 [![Build Status](https://secure.travis-ci.org/braintree/litmus_paper.png)](http://travis-ci.org/braintree/litmus_paper)
 
@@ -22,9 +22,9 @@ Or install it yourself as:
 
 Litmus Paper reports health for each service on a node on a 0-100 scale. Health is computed by aggregating the values returned from running various subchecks.
 
-There are two classes of subchecks: Dependencies and Metrics. Dependencies report either 0 or 100 health, and aggregate such that if any dependency is not 100 the whole service is down. Metrics report health on a sliding scale from 0-100 and aggregate as averages based on their weight.
+There are two classes of subchecks: Dependencies and Metrics. Dependencies report either 0 or 100 health, and aggregate such that if any dependency is not 100 the whole service is down. Metrics report health on a scale from 0-100 and aggregate as averages based on their weight.
 
-For maintenance or traffic shaping you can force a service to report a health value on a host.
+You can also force a service to report a health value on a host.
 Forcing a service up makes it report a health of 100, regardless of the measured health.
 Forcing a service down makes it report a health of 0.
 Forcing a service's health to a value between 0 and 100 causes it to report that value.
@@ -166,7 +166,7 @@ On the HAProxy server, add `agent-check agent-port 8080 agent-inter <seconds>s` 
   * DELETE: Deletes global force down, if one is in place. Any service-specific force downs remain in effect.
 
 - /up
-  * POST: Creates a global force up. Paramenters: reason => reason for the force up.
+  * POST: Creates a global force up. Parameters: reason => reason for the force up.
   * DELETE: Deletes global force up, if one is in place. Any service-specific force ups remain in effect.
 
 - /health
