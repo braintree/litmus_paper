@@ -114,27 +114,27 @@ Here are all the types of checks currently implemented:
   * regex
   * timeout (defaults to 5s)
 
-- `Dependency::Script` -> Checks whether the output of a command matches a string or regex.
+- `Dependency::Script`: Checks whether the output of a command matches a string or regex.
   * command
   * timeout (defaults to 5s)
 
-- `Metric::ConstantMetric` -> A dummy metric that always reports a constant.
+- `Metric::ConstantMetric`: A dummy metric that always reports a constant.
   * weight (0-100)
 
-- `Metric::CPULoad` -> Normalizes CPU load to a value between 0-100 and inverts it, so higher numbers mean less load and lower numbers mean more. Final health is weighted against other checks by `:weight`.
+- `Metric::CPULoad`: Normalizes CPU load to a value between 0-100 and inverts it, so higher numbers mean less load and lower numbers mean more. Final health is weighted against other checks by `:weight`.
   * weight (0-100)
 
-- `Metric::InternetHealth` -> Checks connectivity across a set of hosts and computes a weight based on how many are reachable. Helpful if you want to check outbound connectivity through multiple ISPs.
+- `Metric::InternetHealth`: Checks connectivity across a set of hosts and computes a weight based on how many are reachable. Helpful if you want to check outbound connectivity through multiple ISPs.
   * weight (0-100)
   * hosts
   * timeout (defaults to 5s)
 
-- `Metric::Script` -> Runs a script to obtain a health from 0-100. This is helpful for customized metrics.
+- `Metric::Script`: Runs a script to obtain a health from 0-100. This is helpful for customized metrics.
   * command
   * weight (0-100)
   * timeout (defaults to 5s)
 
-- `Metric::BigBrotherService` -> Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
+- `Metric::BigBrotherService`: Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
   * service
 
 ### HAProxy agent check configuration
@@ -202,7 +202,7 @@ On the HAProxy server, add `agent-check agent-port 8080 agent-inter <seconds>s` 
 
 - /`<service>`/health
   * POST: Creates a force health just for `<service>`. Parameters: reason => reason for the force health, health => health to force to.
-	* DELETE: Deletes force health for `<service>`, if one is in place. Global force healths remain in effect.
+  * DELETE: Deletes force health for `<service>`, if one is in place. Global force healths remain in effect.
 
 ### Litmusctl
 
