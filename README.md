@@ -35,8 +35,9 @@ Force downs take precedence, followed by force ups, and finally force healths. I
 
 ### Running Litmus Paper
 
-Use the sample config to run it under unicorn. Or execute litmus-agent-check to
-use it as an agent-check for HAProxy.
+Start the process under unicorn with `/usr/bin/litmus --unicorn-config <path_to_unicorn_conf>`. In the unicorn config file, set the number of worker processes, the pid, and the working directory. See the [unicorn documentation](https://bogomips.org/unicorn/Unicorn/Configurator.html#method-i-working_directory) for the config format.
+
+For HAProxy agent checks, run `/usr/bin/litmus-agent-check`. See `/usr/bin/litmus-agent-check -h` for run options.
 
 ### Global configuration
 
