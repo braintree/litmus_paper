@@ -139,7 +139,23 @@ Here are all the types of checks currently implemented:
 
 ### HAProxy agent check configuration
 
-Litmus paper can also report health checks in HAProxy agent check format.
+Litmus paper can also report health checks in HAProxy agent check format. The agent check functionality takes the health data from a service health check, and exposes it on a different port in the format HAProxy expects.
+
+There are no configuration files for the agent check, since all options are specified on the command line.
+
+```
+Usage: litmus-agent-check [options]
+    -s, --service SERVICE:PORT,...   agent-check service to port mappings
+    -c, --config CONFIG              Path to litmus paper config file
+    -p, --pid-file PID_FILE          Where to write the pid
+    -w, --workers WORKERS            Number of worker processes
+    -D, --daemonize                  Daemonize the process
+    -h, --help                       Help text
+```
+
+The service:port argument means that the server will expose the data from the litmus check for `service` on `port` in HAProxy agent check format. For example, if you wanted to serve status information about `myapp` on port `8080`, and already had a service config for it, you'd pass `-s myapp:8080`.
+
+On the HAProxy server, add `agent-check agent-port 8080 agent-inter <seconds>s` to the config line for each server listed for that backend. This tells HAProxy to query port 8080 on the backend every `<seconds>` seconds for health information.
 
 ### REST API
 
