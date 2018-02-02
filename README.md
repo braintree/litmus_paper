@@ -31,11 +31,13 @@ Forcing a service's health to a value between 0 and 100 causes it to report that
 
 Force downs take precedence, followed by force ups, and finally force healths. If you specify both a force up and a force down, the service will report 0 health. If you specify a force up and a force health, the force health will be ignored and the service will report 100 health.
 
+Using litmus-agent-check, Litmus can also output health information in haproxy agent check format.
+
 ## Usage
 
 ### Running Litmus Paper
 
-Start the process under unicorn with `/usr/bin/litmus --unicorn-config <path_to_unicorn_conf>`. In the unicorn config file, set the number of worker processes, the pid, and the working directory. See the [unicorn documentation](https://bogomips.org/unicorn/Unicorn/Configurator.html#method-i-working_directory) for the config format.
+Start the process under unicorn with `/usr/bin/litmus --unicorn-config <path_to_unicorn_conf>`. In the unicorn config file, set the number of worker processes, the pid, and the working directory. See the [unicorn documentation](https://bogomips.org/unicorn/Unicorn/Configurator.html) for the config format. There are also more options, see `/usr/bin/litmus -h` for a full list.
 
 For HAProxy agent checks, run `/usr/bin/litmus-agent-check`. See `/usr/bin/litmus-agent-check -h` for run options.
 
@@ -78,17 +80,6 @@ Maybe you also want to balance traffic based on CPU load:
 service "myapp" do |s|
   s.depends Dependency::HTTP, "http://localhost/heartbeat", :method => "GET", :ca_file => "/etc/ssl/certs/ca-certificates.crt"
   s.measure_health Metric::CPULoad, :weight => 100
-end
-```
-
-Or even the number of workers available to handle incoming requests:
-
-```ruby
-# /etc/litmus.d/myapp.conf
-service "myapp" do |s|
-  s.depends Dependency::HTTP, "http://localhost/heartbeat", :method => "GET", :ca_file => "/etc/ssl/certs/ca-certificates.crt"
-  s.measure_health Metric::CPULoad, :weight => 50
-  s.measure_health Metric::Script "/usr/bin/check_worker_health", :weight => 50, :timeout => 10
 end
 ```
 
