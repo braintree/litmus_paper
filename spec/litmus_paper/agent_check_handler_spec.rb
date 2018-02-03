@@ -2,6 +2,10 @@ require 'spec_helper'
 require 'litmus_paper/agent_check_handler'
 
 describe LitmusPaper::AgentCheckHandler do
+  def app
+    LitmusPaper::App
+  end
+
   before :each do
     LitmusPaper.configure(TEST_CONFIG)
   end
@@ -72,6 +76,40 @@ describe LitmusPaper::AgentCheckHandler do
       LitmusPaper.services['test'] = test_service
       LitmusPaper::StatusFile.global_up_file.create("Up for testing")
       LitmusPaper::AgentCheckHandler.handle("test").should == "ready\tup\t100%"
+    end
+
+    it "retrieves a cached value during the cache_ttl" do
+      begin
+        cache = LitmusPaper::AgentCheckHandler.instance_variable_get(:@cache)
+        cache.instance_variable_set(:@ttl, 0.05)
+        LitmusPaper::AgentCheckHandler.instance_variable_set(:@cache, cache)
+
+        test_service = LitmusPaper::Service.new(
+          'test',
+          [AlwaysAvailableDependency.new],
+          [LitmusPaper::Metric::ConstantMetric.new(100)]
+        )
+        LitmusPaper.services['test'] = test_service
+
+        post "/test/health", :reason => "health for testing", :health => 88
+        last_response.status.should == 201
+
+        LitmusPaper::AgentCheckHandler.handle('test').should == "ready\tup\t88%"
+
+        delete "/test/health"
+        last_response.status.should == 200
+
+        LitmusPaper::AgentCheckHandler.handle('test').should == "ready\tup\t88%"
+
+        sleep 0.05
+
+        LitmusPaper::AgentCheckHandler.handle('test').should_not == "ready\tup\t88%"
+      ensure
+        FileUtils.rm_rf(LitmusPaper.cache_location)
+        cache = LitmusPaper::AgentCheckHandler.instance_variable_get(:@cache)
+        cache.instance_variable_set(:@ttl, -1)
+        LitmusPaper::AgentCheckHandler.instance_variable_set(:@cache, cache)
+      end
     end
   end
 end
