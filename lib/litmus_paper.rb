@@ -31,6 +31,7 @@ require 'litmus_paper/metric/internet_health'
 require 'litmus_paper/metric/script'
 require 'litmus_paper/service'
 require 'litmus_paper/status_file'
+require 'litmus_paper/util'
 require 'litmus_paper/version'
 
 module LitmusPaper

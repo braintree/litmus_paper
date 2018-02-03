@@ -1,0 +1,20 @@
+# vim: set ft=ruby
+port: 9293
+data_directory: "/tmp/litmus_paper"
+cache_location: "/tmp/litmus_paper_cache"
+cache_ttl: -1
+services:
+  test:
+    dependencies:
+      - type: http
+        uri: 'http://localhost/heartbeat'
+    checks:
+      - type: cpu_load
+        weight: 50
+  passing_test:
+    dependencies:
+      - type: script
+        command: '/bin/true'
+    checks:
+      - type: cpu_load
+        weight: 50

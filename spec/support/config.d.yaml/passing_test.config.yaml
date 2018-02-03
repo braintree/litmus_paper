@@ -1,0 +1,6 @@
+# vim: ft=ruby
+service:
+  passing_test:
+    checks:
+      - type: cpu_load
+        weight: 50
