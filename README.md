@@ -1,6 +1,6 @@
 # LitmusPaper
 
-LitmusPaper is a backend health tester for HA Services.
+LitmusPaper is a backend health tester for Highly Available (HA) services.
 
 [![Build Status](https://secure.travis-ci.org/braintree/litmus_paper.png)](http://travis-ci.org/braintree/litmus_paper)
 
@@ -20,14 +20,14 @@ Or install it yourself as:
 
 ## Overview
 
-Litmus Paper reports health for each service on a node on a 0-100 scale. Health is computed by aggregating the values returned from running various subchecks.
+Litmus Paper reports health for each service on a node (like a server, vm, or container) on a 0-100 scale. Health is computed by aggregating the values returned from running various subchecks. Health information can be queried through a REST API for consumption by other services (like load balancers or monitoring systems), or queried on the command line.
 
 There are two classes of subchecks: Dependencies and Metrics. Dependencies report either 0 or 100 health, and aggregate such that if any dependency is not 100 the whole service is down. Metrics report health on a scale from 0-100 and aggregate as averages based on their weight.
 
 You can also force a service to report a health value on a host.
 Forcing a service up makes it report a health of 100, regardless of the measured health.
 Forcing a service down makes it report a health of 0.
-Forcing a service's health to a value between 0 and 100 causes it to report that value.
+Forcing a service's health to a value between 0 and 100 places a ceiling on its health. The service will report the lower of the measured health or the forced health value.
 
 Force downs take precedence, followed by force ups, and finally force healths. If you specify both a force up and a force down, the service will report 0 health. If you specify a force up and a force health, the force health will be ignored and the service will report 100 health.
 
@@ -37,9 +37,21 @@ Using litmus-agent-check, Litmus can also output health information in haproxy a
 
 ### Running Litmus Paper
 
-Start the process under unicorn with `/usr/bin/litmus --unicorn-config <path_to_unicorn_conf>`. In the unicorn config file, set the number of worker processes, the pid, and the working directory. See the [unicorn documentation](https://bogomips.org/unicorn/Unicorn/Configurator.html) for the config format. There are also more options, see `/usr/bin/litmus -h` for a full list.
+Start the process under unicorn with `/usr/bin/litmus --unicorn-config <path_to_unicorn_conf>`. In the unicorn config file, set the number of worker processes, the pid, and the working directory. See the [unicorn documentation](https://bogomips.org/unicorn/Unicorn/Configurator.html) for the config format. There are a few command line options:
 
-For HAProxy agent checks, run `/usr/bin/litmus-agent-check`. See `/usr/bin/litmus-agent-check -h` for run options.
+```
+Usage: litmus [options]
+
+    -b, --binding=ip                 Binds Litmus to the specified ip.
+                                     Default: 0.0.0.0
+    -d, --daemon                     Make server run as a Daemon.
+    -p, --port=port                  Listen Port
+    -c, --unicorn-config=config      Unicorn Config
+
+    -h, --help                       Show this help message.
+```
+
+For HAProxy agent checks, run `/usr/bin/litmus-agent-check`. See the "HAProxy Agent Check Configuration" section below for a full list of options.
 
 ### Global configuration
 
@@ -69,7 +81,7 @@ To add services and health checks, Litmus Paper loads configurations written in 
 ```ruby
 # /etc/litmus.d/myapp.conf
 service "myapp" do |s|
-  s.depends Dependency::HTTP, "http://localhost/heartbeat", :method => "GET", :ca_file => "/etc/ssl/certs/ca-certificates.crt"
+  s.depends Dependency::HTTP, "https://localhost/heartbeat", :method => "GET", :ca_file => "/etc/ssl/certs/ca-certificates.crt"
 end
 ```
 
@@ -78,7 +90,7 @@ Maybe you also want to balance traffic based on CPU load:
 ```ruby
 # /etc/litmus.d/myapp.conf
 service "myapp" do |s|
-  s.depends Dependency::HTTP, "http://localhost/heartbeat", :method => "GET", :ca_file => "/etc/ssl/certs/ca-certificates.crt"
+  s.depends Dependency::HTTP, "https://localhost/heartbeat", :method => "GET", :ca_file => "/etc/ssl/certs/ca-certificates.crt"
   s.measure_health Metric::CPULoad, :weight => 100
 end
 ```
@@ -112,8 +124,8 @@ Here are all the types of checks currently implemented:
 - `Metric::ConstantMetric`: A dummy metric that always reports a constant.
   * weight (0-100)
 
-- `Metric::CPULoad`: Normalizes CPU load to a value between 0-100 and inverts it, so higher numbers mean less load and lower numbers mean more. Final health is weighted against other checks by `:weight`.
-  * weight (0-100)
+- `Metric::CPULoad`: Normalizes CPU load to a value between 1-100 and inverts it, so higher numbers mean less load and lower numbers mean more. Final health is weighted against other checks by `:weight`. The lower bound of 1 ensures that nodes will not leave the cluster solely based on CPU load. An example of how allowing 0 can cause problems: If one node has 4 CPUs and a load of 4 with CPU usage weighted at 100, it will report its health as 0, and all traffic will be shifted towards other nodes. These nodes in turn hit 100% CPU usage and report 0 health, causing a cascade of exiting nodes that shuts down the service.
+  * weight (1-100)
 
 - `Metric::InternetHealth`: Checks connectivity across a set of hosts and computes a weight based on how many are reachable. Helpful if you want to check outbound connectivity through multiple ISPs.
   * weight (0-100)
@@ -146,9 +158,11 @@ Usage: litmus-agent-check [options]
 
 The service:port argument means that the server will expose the data from the litmus check for `service` on `port` in HAProxy agent check format. For example, if you wanted to serve status information about `myapp` on port `8080`, and already had a service config for it, you'd pass `-s myapp:8080`.
 
-On the HAProxy server, add `agent-check agent-port 8080 agent-inter <seconds>s` to the config line for each server listed for that backend. This tells HAProxy to query port 8080 on the backend every `<seconds>` seconds for health information.
+On the HAProxy server, add `agent-check agent-port 8080 agent-inter <seconds>s` to the config line for each server listed for that backend. This tells HAProxy to query port 8080 on the backend every `<seconds>` seconds for health information. See the [HAProxy agent check documentation](https://cbonte.github.io/haproxy-dconv/1.8/configuration.html#5.2-agent-check) for more details.
 
 ### REST API
+
+The REST API is the main way other services should interact with Litmus. For routes that take parameters, pass them as form parameters in the request body.
 
 - /
   * GET: Returns table with status of each service.
@@ -222,3 +236,10 @@ Run tests using `rake`. The default task runs all the tests.
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## TODO
+
+1. Accept configuration in either YAML or ruby format.
+2. Improve concurrency model, with a health-check process and a responder process.
+3. Improve concurrency of agent-check daemon.
+4. Provide a Vagrant or Docker configuration for demo and testing purposes.
