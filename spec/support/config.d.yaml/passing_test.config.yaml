@@ -1,5 +1,5 @@
 # vim: ft=ruby
-service:
+services:
   passing_test:
     checks:
       - type: cpu_load

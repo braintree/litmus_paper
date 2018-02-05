@@ -54,53 +54,58 @@ module LitmusPaper
     def yaml_service(value)
       value.each do |name, config|
         config = Util.symbolize_keys(config)
-        checks = []
-        dependencies = config.fetch(:dependencies, []).map do |dep|
-          dep_config = Util.symbolize_keys(dep)
-          case dep[:type].to_sym
-            when :file_contents
-              path = dep_config.delete(:path)
-              regex = dep_config.delete(:regex)
-              Dependency::FileContents.new(path, regex, dep_config)
-            when :haproxy_backends
-              domain_socket = dep_config.delete(:domain_socket)
-              cluster = dep_config.delete(:cluster)
-              Dependency::HaproxyBackends.new(domain_socket, cluster, dep_config)
-            when :http
-              uri = dep_config.delete(:uri)
-              Dependency::HTTP.new(uri, dep_config)
-            when "script"
-              command = dep_config.delete(:command)
-              Dependency::Script.new(command, options)
-            when "tcp"
-              ip = dep_config.delete(:ip)
-              port = dep_config.delete(:port)
-              Dependency::TCP.new(ip, port, dep_config)
-          end
-        end
-
-        checks = config.fetch(:checks, []).map do |check|
-          check_config = Util.symbolize_keys(check)
-          case check[:type].to_sym
-            when :big_brother_service
-              Metric::BigBrotherService.new(check_config.delete(:service))
-            when :cpu_load
-              Metric::CPULoad.new(check_config.delete(:weight))
-            when :constant_metric
-              Metric::ConstantMetric.new(check_config.delete(:weight))
-            when :internet_health
-              weight = check_config.delete(:weight)
-              hosts = check_config.delete(:hosts)
-              Metric::InternetHealth.new(weight, hosts, check_config)
-            when :script
-              command = check_config.delete(:command)
-              weight = check_config.delete(:weight)
-              Metric::Script.new(command, weight, check_config)
-          end
-        end
-
+        dependencies = parse_yaml_dependencies(config.fetch(:dependencies, []))
+        checks = parse_yaml_checks(config.fetch(:checks, []))
         service = Service.new(name.to_s, dependencies, checks)
         @services[name.to_s] = service
+      end
+    end
+
+    def parse_yaml_checks(config)
+      config.map do |check|
+        check_config = Util.symbolize_keys(check)
+        case check[:type].to_sym
+          when :big_brother_service
+            Metric::BigBrotherService.new(check_config.delete(:service))
+          when :cpu_load
+            Metric::CPULoad.new(check_config.delete(:weight))
+          when :constant_metric
+            Metric::ConstantMetric.new(check_config.delete(:weight))
+          when :internet_health
+            weight = check_config.delete(:weight)
+            hosts = check_config.delete(:hosts)
+            Metric::InternetHealth.new(weight, hosts, check_config)
+          when :script
+            command = check_config.delete(:command)
+            weight = check_config.delete(:weight)
+            Metric::Script.new(command, weight, check_config)
+        end
+      end
+    end
+
+    def parse_yaml_dependencies(config)
+      config.map do |dep|
+        dep_config = Util.symbolize_keys(dep)
+        case dep[:type].to_sym
+          when :file_contents
+            path = dep_config.delete(:path)
+            regex = dep_config.delete(:regex)
+            Dependency::FileContents.new(path, regex, dep_config)
+          when :haproxy_backends
+            domain_socket = dep_config.delete(:domain_socket)
+            cluster = dep_config.delete(:cluster)
+            Dependency::HaproxyBackends.new(domain_socket, cluster, dep_config)
+          when :http
+            uri = dep_config.delete(:uri)
+            Dependency::HTTP.new(uri, dep_config)
+          when "script"
+            command = dep_config.delete(:command)
+            Dependency::Script.new(command, options)
+          when "tcp"
+            ip = dep_config.delete(:ip)
+            port = dep_config.delete(:port)
+            Dependency::TCP.new(ip, port, dep_config)
+        end
       end
     end
 
@@ -119,7 +124,7 @@ module LitmusPaper
         case key
         when :include_files, :data_directory, :cache_location, :cache_ttl, :port
           send(key, value)
-        when :services, :service
+        when :services
           yaml_service(value)
         end
       end

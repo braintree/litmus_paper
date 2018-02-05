@@ -1,5 +1,5 @@
 # vim: ft=ruby
-service:
+services:
   test:
     dependencies:
       - type: http
