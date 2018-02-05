@@ -3,16 +3,18 @@ module LitmusPaper
     def self.handle(service)
       @cache ||= LitmusPaper::Cache.new(
         LitmusPaper.cache_location,
-        "litmus_cache",
+        "litmus_agent_cache",
         LitmusPaper.cache_ttl
       )
       output = []
 
       health = @cache.get(service)
-      @cache.set(
-        service,
-        health = LitmusPaper.check_service(service)
-      ) unless health
+      if !health
+        @cache.set(
+          service,
+          health = LitmusPaper.check_service(service)
+        )
+      end
 
       if health.nil?
         output << "failed#NOT_FOUND"
