@@ -144,7 +144,7 @@ Here are all the types of checks currently implemented:
 
 Litmus paper can also report health checks in HAProxy agent check format. The agent check functionality takes the health data from a service health check, and exposes it on a different port in the format HAProxy expects.
 
-There are no configuration files for the agent check, since all options are specified on the command line.
+There are no additional configuration files for the agent check, since all options are specified on the command line. Services are configured as normal litmus services as described above.
 
 ```
 Usage: litmus-agent-check [options]
