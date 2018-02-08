@@ -1,0 +1,2 @@
+# vim: ft=ruby
+include_files: 'config.d.yaml/*.config.yaml'

@@ -1,0 +1,9 @@
+# vim: ft=ruby
+services:
+  test:
+    dependencies:
+      - type: http
+        uri: 'http://localhost/heartbeat'
+    checks:
+      - type: cpu_load
+        weight: 50
