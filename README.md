@@ -237,9 +237,22 @@ Run tests using `rake`. The default task runs all the tests.
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
+## Docker
+
+We've provided a simple docker image that can be used to test litmus_paper, run tests, or to assist in feature development.
+
+To run it, from the top of your copy of the litmus_paper repository:
+
+```
+docker build -t litmus_paper .
+docker run --rm -it -v $(pwd):/home/litmus_paper -P litmus_paper /bin/bash
+# bin/litmus -p 9293 -d
+# curl localhost:9293
+```
+
+
 ## TODO
 
 1. Accept configuration in either YAML or ruby format.
 2. Improve concurrency model, with a health-check process and a responder process.
 3. Improve concurrency of agent-check daemon.
-4. Provide a Vagrant or Docker configuration for demo and testing purposes.
