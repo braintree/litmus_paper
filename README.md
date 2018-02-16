@@ -55,7 +55,9 @@ For HAProxy agent checks, run `/usr/bin/litmus-agent-check`. See the "HAProxy Ag
 
 ### Global configuration
 
-Example:
+This can be either yaml or ruby.
+
+Examples:
 
 ```
 # /etc/litmus.conf
@@ -67,6 +69,14 @@ port 80
 data_directory "/litmus"
 ```
 
+```yaml
+# /etc/litmus.conf.yaml
+---
+include-files: 'litmus.d/*.yaml'
+port: 80
+data_directory: '/litmus'
+```
+
 Available fields:
 - include_files: Tells Litmus to load health check configurations from a path.
 - port: Port Litmus unicorn server will listen on, defaults to 9292.
@@ -76,7 +86,21 @@ Available fields:
 
 ### Service health check configuration
 
-To add services and health checks, Litmus Paper loads configurations written in ruby. Suppose you're writing a health check for a web application. You might start with a simple check to report if the server is responding at all:
+To add services and health checks, Litmus Paper loads YAML configurations or ruby code. The examples below show both styles.
+
+Suppose you're writing a health check for a web application. You might start with a simple check to report if the server is responding at all:
+
+```yaml
+# /etc/litmus.d/myapp.yaml
+---
+services:
+  myapp:
+    dependencies:
+      - type: http
+        uri: 'https://localhost/heartbeat'
+        method: 'GET'
+        ca_file: '/etc/ssl/certs/ca-certificates.crt'
+```
 
 ```ruby
 # /etc/litmus.d/myapp.conf
@@ -86,6 +110,21 @@ end
 ```
 
 Maybe you also want to balance traffic based on CPU load:
+
+```yaml
+# /etc/litmus.d/myapp.yaml
+---
+services:
+  myapp:
+    dependencies:
+      - type: http
+        uri: 'https://localhost/heartbeat'
+        method: 'GET'
+        ca_file: '/etc/ssl/certs/ca-certificates.crt'
+    checks:
+      - type: cpu_load
+        weight: 100
+```
 
 ```ruby
 # /etc/litmus.d/myapp.conf
@@ -99,45 +138,45 @@ Once you've finished adding checks, restart litmus paper to pick up the new serv
 
 Here are all the types of checks currently implemented:
 
-- `Dependency::HTTP`: Checks HTTP 200 response from a URL.
-  * url
+- `http` (`Dependency::HTTP`): Checks HTTP 200 response from a URI.
+  * uri
   * method (defaults to get)
   * ca_file (defaults to nil)
   * timeout (defaults to 2s)
 
-- `Dependency::TCP`: Checks successful completion of a TCP handshake with an address.
+- `tcp` (`Dependency::TCP`): Checks successful completion of a TCP handshake with an address.
   * ip
   * port
   * input_data (defaults to nil)
   * expected_output (defaults to nil)
   * timeout (defaults to 2s)
 
-- `Dependency::FileContents`: Checks whether the contents of a file match a string or regex.
+- `file_contents` (`Dependency::FileContents`): Checks whether the contents of a file match a string or regex.
   * path
   * regex
   * timeout (defaults to 5s)
 
-- `Dependency::Script`: Checks whether the output of a command matches a string or regex.
+- `script` (`Dependency::Script`): Checks whether a command exits with 0 (success) or not (failure).
   * command
   * timeout (defaults to 5s)
 
-- `Metric::ConstantMetric`: A dummy metric that always reports a constant.
+- `constant_metric` (`Metric::ConstantMetric`): A dummy metric that always reports a constant.
   * weight (0-100)
 
-- `Metric::CPULoad`: Normalizes CPU load to a value between 1-100 and inverts it, so higher numbers mean less load and lower numbers mean more. Final health is weighted against other checks by `:weight`. The lower bound of 1 ensures that nodes will not leave the cluster solely based on CPU load. An example of how allowing 0 can cause problems: If one node has 4 CPUs and a load of 4 with CPU usage weighted at 100, it will report its health as 0, and all traffic will be shifted towards other nodes. These nodes in turn hit 100% CPU usage and report 0 health, causing a cascade of exiting nodes that shuts down the service.
+- `cpu_load` (`Metric::CPULoad`): Normalizes CPU load to a value between 1-100 and inverts it, so higher numbers mean less load and lower numbers mean more. Final health is weighted against other checks by `:weight`. The lower bound of 1 ensures that nodes will not leave the cluster solely based on CPU load. An example of how allowing 0 can cause problems: If one node has 4 CPUs and a load of 4 with CPU usage weighted at 100, it will report its health as 0, and all traffic will be shifted towards other nodes. These nodes in turn hit 100% CPU usage and report 0 health, causing a cascade of exiting nodes that shuts down the service.
   * weight (1-100)
 
-- `Metric::InternetHealth`: Checks connectivity across a set of hosts and computes a weight based on how many are reachable. Helpful if you want to check outbound connectivity through multiple ISPs.
+- `internet_health` (`Metric::InternetHealth`): Checks connectivity across a set of hosts and computes a weight based on how many are reachable. Helpful if you want to check outbound connectivity through multiple ISPs.
   * weight (0-100)
   * hosts
   * timeout (defaults to 5s)
 
-- `Metric::Script`: Runs a script to obtain a health from 0-100. This is helpful for customized metrics.
+- `script` (`Metric::Script`): Runs a script to obtain a health from 0-100. This is helpful for customized metrics.
   * command
   * weight (0-100)
   * timeout (defaults to 5s)
 
-- `Metric::BigBrotherService`: Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
+- `big_brother_service` (`Metric::BigBrotherService`): Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
   * service
 
 ### HAProxy agent check configuration
