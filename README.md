@@ -239,17 +239,32 @@ Run tests using `rake`. The default task runs all the tests.
 
 ## Docker
 
-We've provided a simple docker image that can be used to test litmus_paper, run tests, or to assist in feature development.
+We've provided a simple docker image that can be used to try out litmus_paper, run tests, or to assist in feature development.
 
 To run it, from the top of your copy of the litmus_paper repository:
 
 ```
 docker build -t litmus_paper .
-docker run --rm -it -v $(pwd):/home/litmus_paper -P litmus_paper /bin/bash
-# bin/litmus -p 9293 -d
+# Run litmus_paper
+docker run -d -p 9293:9293 litmus_paper
+```
+
+Then, you can `curl localhost:9293` from your host machine to interact with the REST API.
+
+To run interactively and attach to the container:
+
+```
+docker run -it litmus_paper /bin/bash
+# litmus -p 9293 -d
 # curl localhost:9293
 ```
 
+To run litmus-agent-check on port 9294:
+
+```
+# Run litmus paper with litmus-agent-check using 10 workers
+docker run -d -p 9294:9294 litmus_paper litmus-agent-check -s test:9294 -c /etc/litmus.conf -w 10
+```
 
 ## TODO
 

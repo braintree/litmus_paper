@@ -1,5 +1,6 @@
 FROM debian:stretch
 EXPOSE 9293/TCP
+EXPOSE 9294/TCP
 WORKDIR /home/litmus_paper
 RUN apt-get update && apt-get install -y ruby ruby-dev git curl rsyslog build-essential
 RUN gem install --no-ri --no-rdoc bundler \
@@ -15,3 +16,5 @@ COPY . /home/litmus_paper/
 RUN ln -sf /home/litmus_paper/docker/litmus.conf /etc/litmus.conf \
   && ln -sf /home/litmus_paper/docker/litmus_unicorn.rb /etc/litmus_unicorn.rb
 RUN gem build litmus_paper.gemspec && gem install litmus_paper*.gem
+
+CMD ["litmus", "-p", "9293", "-c", "/etc/litmus_unicorn.rb"]
