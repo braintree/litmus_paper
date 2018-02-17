@@ -12,9 +12,9 @@ RUN gem install --no-ri --no-rdoc bundler \
   && gem install rack-test --no-ri --no-rdoc --version "~> 0.6.1" \
   && gem install rake --no-ri --no-rdoc --version "~> 0.9.2.2" \
   && gem install rake_commit --no-ri --no-rdoc --version "~> 0.13"
-COPY . /home/litmus_paper/
+ADD . /home/litmus_paper
 RUN ln -sf /home/litmus_paper/docker/litmus.conf /etc/litmus.conf \
   && ln -sf /home/litmus_paper/docker/litmus_unicorn.rb /etc/litmus_unicorn.rb
 RUN gem build litmus_paper.gemspec && gem install litmus_paper*.gem
 
-CMD ["litmus", "-p", "9293", "-c", "/etc/litmus_unicorn.rb"]
+CMD ["bin/litmus", "-p", "9293", "-c", "/etc/litmus_unicorn.rb"]

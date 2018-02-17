@@ -255,7 +255,7 @@ To run interactively and attach to the container:
 
 ```
 docker run -it litmus_paper /bin/bash
-# litmus -p 9293 -d
+# bin/litmus -p 9293 -d
 # curl localhost:9293
 ```
 
@@ -263,7 +263,7 @@ To run litmus-agent-check on port 9294:
 
 ```
 # Run litmus paper with litmus-agent-check using 10 workers
-docker run -d -p 9294:9294 litmus_paper litmus-agent-check -s test:9294 -c /etc/litmus.conf -w 10
+docker run -d -p 9294:9294 litmus_paper bin/litmus-agent-check -s test:9294 -c /etc/litmus.conf -w 10
 ```
 
 ## TODO
