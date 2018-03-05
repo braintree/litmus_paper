@@ -70,5 +70,13 @@ describe LitmusPaper::Cache do
       sleep ttl
       cache.get(key).should be_nil
     end
+
+    it "works when setting multiple entries" do
+      key = "key"
+      cache = LitmusPaper::Cache.new(@location, @namespace, 1)
+      cache.set(key, "some value")
+      cache.set(key, "other value")
+      cache.get(key).should == "other value"
+    end
   end
 end
