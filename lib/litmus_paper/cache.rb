@@ -11,12 +11,18 @@ module LitmusPaper
 
     def set(key, value)
       return unless @ttl > 0
-      File.open(File.join(@path, key), "a") do |f|
-        f.flock(File::LOCK_EX)
-        f.rewind
-        f.write("#{Time.now.to_f + @ttl} #{YAML::dump(value)}")
-        f.flush
-        f.truncate(f.pos)
+      filepath = File.join(@path, key)
+      begin
+        File.open(filepath, "r+") do |f|
+          f.flock(File::LOCK_EX)
+          f.rewind
+          f.write("#{Time.now.to_f + @ttl} #{YAML::dump(value)}")
+          f.flush
+          f.truncate(f.pos)
+        end
+      rescue Errno::ENOENT => e
+        File.open(filepath, "a") {}
+        set(key, value)
       end
     end
 
