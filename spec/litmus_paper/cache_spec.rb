@@ -71,7 +71,7 @@ describe LitmusPaper::Cache do
       cache.get(key).should be_nil
     end
 
-    it "it works when setting multiple entries" do
+    it "works when setting multiple entries" do
       key = "key"
       cache = LitmusPaper::Cache.new(@location, @namespace, 1)
       cache.set(key, "some value")
