@@ -1,3 +1,5 @@
+require 'fileutils'
+require 'tempfile'
 require 'yaml'
 
 module LitmusPaper
