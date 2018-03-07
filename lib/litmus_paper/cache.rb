@@ -11,18 +11,24 @@ module LitmusPaper
 
     def set(key, value)
       return unless @ttl > 0
-      filepath = File.join(@path, key)
-      begin
-        File.open(filepath, "r+") do |f|
+      filename = File.join(@path, key)
+      if File.exist?(filename)
+        File.open(filename, "r+") do |f|
           f.flock(File::LOCK_EX)
           f.rewind
-          f.write("#{Time.now.to_f + @ttl} #{YAML::dump(value)}")
+          f.write(_entry(@ttl, value))
           f.flush
           f.truncate(f.pos)
         end
-      rescue Errno::ENOENT => e
-        File.open(filepath, "a") {}
-        set(key, value)
+      else
+        temp = Tempfile.new("#{key}_init", @path)
+        begin
+          temp.write(_entry(@ttl, value))
+          temp.flush
+        ensure
+          temp.close
+        end
+        FileUtils.mv(temp.path, filename)
       end
     end
 
@@ -34,6 +40,10 @@ module LitmusPaper
         expires_at, value = entry.split(" ", 2)
         expires_at.to_f < Time.now.to_f ? nil : YAML::load(value)
       end
+    end
+
+    def _entry(ttl, value)
+      "#{Time.now.to_f + ttl} #{YAML::dump(value)}"
     end
   end
 end
