@@ -81,7 +81,7 @@ describe LitmusPaper::AgentCheckHandler do
     it "retrieves a cached value during the cache_ttl" do
       begin
         cache = LitmusPaper::AgentCheckHandler.instance_variable_get(:@cache)
-        cache.instance_variable_set(:@ttl, 0.05)
+        cache.instance_variable_set(:@ttl, 0.25)
         LitmusPaper::AgentCheckHandler.instance_variable_set(:@cache, cache)
 
         test_service = LitmusPaper::Service.new(
@@ -101,7 +101,7 @@ describe LitmusPaper::AgentCheckHandler do
 
         LitmusPaper::AgentCheckHandler.handle('test').should == "ready\tup\t88%"
 
-        sleep 0.05
+        sleep 0.25
 
         LitmusPaper::AgentCheckHandler.handle('test').should_not == "ready\tup\t88%"
       ensure
