@@ -62,7 +62,6 @@ module LitmusPaper
           response_code = 503
           status = "down"
         end
-        json[:status] = status
         json[:response_code] = response_code
 
         headers = {"X-Health" => health.value.to_s}
@@ -80,6 +79,8 @@ module LitmusPaper
         if health.forced?
           headers["X-Health-Forced"] = status
         end
+        json[:status] = status
+
         LitmusPaper.services[params[:service]].dependencies.each do |d|
           json[:dependencies][d] = health.ensure(d)
         end
