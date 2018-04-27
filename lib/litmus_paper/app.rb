@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require 'litmus_paper/terminal_output'
+require 'json'
 
 module LitmusPaper
   class App < Sinatra::Base
@@ -7,6 +8,10 @@ module LitmusPaper
 
     get "/" do
       _text 200, LitmusPaper::TerminalOutput.service_status
+    end
+
+    get "/status.json" do
+      _json 200, LitmusPaper::TerminalOutput.service_status_json
     end
 
     delete "/down" do
@@ -31,6 +36,59 @@ module LitmusPaper
 
     post "/health" do
       _create_status_file(StatusFile.global_health_file)
+    end
+
+    get "/:service/status.json" do
+      health = _cache.get(params[:service])
+      _cache.set(
+        params[:service],
+        health = LitmusPaper.check_service(params[:service])
+      ) unless health
+
+      if health.nil?
+        _json 404, { "status" => "NOT FOUND" }, { "X-Health" => "0" }
+      else
+        json = {
+          :version => LitmusPaper::VERSION,
+          :name => params[:service],
+          :health => {},
+          :checks => {},
+          :dependencies => {}
+        }
+        if health.ok?
+          response_code = 200
+          status = "up"
+        else
+          response_code = 503
+          status = "down"
+        end
+        json[:status] = status
+        json[:response_code] = response_code
+
+        headers = {"X-Health" => health.value.to_s}
+        json[:health][:reported_health] = health.value
+        json[:health][:measured_health] = health.measured_health
+        if health.forced?
+          if health.direction == :health
+            status = "health"
+            reason = health.forced_reason.split("\n").join(" ")
+          else
+            reason = health.forced_reason
+          end
+          json[:health][:forced] = reason
+        end
+        if health.forced?
+          headers["X-Health-Forced"] = status
+        end
+        LitmusPaper.services[params[:service]].dependencies.each do |d|
+          json[:dependencies][d] = health.ensure(d)
+        end
+
+        LitmusPaper.services[params[:service]].checks.each do |c|
+          json[:checks][c] = health.perform(c)
+        end
+        _json response_code, json, headers
+      end
     end
 
     get "/:service/status" do
@@ -125,6 +183,10 @@ module LitmusPaper
       else
         _text 404, "NOT FOUND"
       end
+    end
+
+    def _json(response_code, body, headers={})
+      [response_code, { "Content-Type" => "application/json" }.merge(headers), body.to_json]
     end
 
     def _text(response_code, body, headers ={})

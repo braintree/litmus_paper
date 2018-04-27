@@ -53,6 +53,7 @@ module LitmusPaper
 
       @value += health
       @summary << "#{metric}: #{health}\n"
+      health
     end
 
     def ensure(dependency)
@@ -60,6 +61,7 @@ module LitmusPaper
 
       @dependencies_available &&= available
       @summary << "#{dependency}: #{available ? 'OK' : 'FAIL'}\n"
+      available
     end
   end
 end

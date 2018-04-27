@@ -1,5 +1,6 @@
 module LitmusPaper
   class Service
+    attr_reader :dependencies, :checks
     def initialize(name, dependencies = [], checks = [])
       @name = name
       @dependencies = dependencies

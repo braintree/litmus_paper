@@ -3,6 +3,33 @@ require 'colorize'
 
 module LitmusPaper
   class TerminalOutput
+    def self.service_status_json
+      json = {:version => LitmusPaper::VERSION, :services => {}}
+
+      LitmusPaper.services.keys.sort.each do |service_name|
+        health = LitmusPaper.services[service_name].current_health
+        measured_health = health.measured_health
+        reported_health = health.value
+        service_forced = if health.forced?
+                           message = "Yes,"
+                           forced_reason, forced_health = health.forced_reason.split("\n")
+                           if forced_health
+                             message += " Health: #{forced_health}"
+                           end
+                           message += " Reason: #{forced_reason}"
+                         else
+                           "No"
+                         end
+        json[:services][service_name] = {
+          :forced => service_forced,
+          :measured_health => measured_health,
+          :reported_health => reported_health,
+        }
+      end
+
+      return json
+    end
+
     def self.service_status
       max_service_length = (LitmusPaper.services.keys << "Service").max { |a, b| a.length <=> b.length }.length
 

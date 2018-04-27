@@ -62,6 +62,49 @@ describe LitmusPaper::App do
     end
   end
 
+  describe "GET /status.json" do
+    it "returns the list of services litmus monitors in json format" do
+      LitmusPaper.services['test'] = LitmusPaper::Service.new('test')
+      LitmusPaper.services['another'] = LitmusPaper::Service.new('another')
+
+      get "/status.json"
+
+      parsed_body = JSON.parse(last_response.body)
+      parsed_body['services'].keys.should include('test', 'another')
+    end
+
+    it "includes the litmus version" do
+      get "/status.json"
+
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 200
+      parsed_body['version'].should == "#{LitmusPaper::VERSION}"
+    end
+
+    it "includes the measured_health, reported_health, and forced status of each service" do
+      LitmusPaper.services['test'] = LitmusPaper::Service.new('test')
+      LitmusPaper.services['another'] = LitmusPaper::Service.new('another')
+
+      get "/status.json"
+
+      parsed_body = JSON.parse(last_response.body)
+      parsed_body['services'].each do |svc, svc_data|
+        svc_data.should include('reported_health', 'measured_health', 'forced')
+      end
+    end
+
+    it "includes the health value if health is forced" do
+      LitmusPaper.services['test'] = LitmusPaper::Service.new('test')
+      LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
+
+      get "/status.json"
+
+      parsed_body = JSON.parse(last_response.body)
+      parsed_body['services']['test']['forced'].should include('Forcing health', '88')
+    end
+  end
+
   describe "POST /up" do
     it "creates a global upfile" do
       test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
@@ -255,6 +298,225 @@ describe LitmusPaper::App do
       delete "/test/health"
 
       last_response.status.should == 404
+    end
+  end
+
+  describe "GET /:service/status.json" do
+    it "returns the forced health value for a healthy service" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+      LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
+
+      get "/test/status.json"
+      last_response.should be_ok
+      last_response.header["X-Health"].should == "88"
+      last_response.header["X-Health-Forced"].should == "health"
+
+      parsed_body = JSON.parse(last_response.body)
+      parsed_body['health']['reported_health'].should ==  88
+      parsed_body['health']['measured_health'].should == 100
+      parsed_body['health']['forced'].should == 'Forcing health 88'
+    end
+
+    it "returns the actual health value for an unhealthy service when the measured health is less than the forced value" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+      LitmusPaper::StatusFile.service_health_file("test").create("Forcing health", 88)
+
+      get "/test/status.json"
+      last_response.should_not be_ok
+      last_response.header["X-Health"].should == "0"
+      last_response.header["X-Health-Forced"].should == "health"
+
+      parsed_body = JSON.parse(last_response.body)
+      parsed_body['health']['reported_health'].should ==  0
+      parsed_body['health']['measured_health'].should == 0
+      parsed_body['health']['forced'].should == 'Forcing health 88'
+    end
+
+    it "is successful when the service is passing" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      get "/test/status.json"
+      last_response.should be_ok
+      last_response.header["Content-Type"].should == "application/json"
+      last_response.header["X-Health"].should == "100"
+      last_response.header.should_not have_key("X-Health-Forced")
+
+      parsed_body = JSON.parse(last_response.body)
+      parsed_body['health']['reported_health'].should ==  100
+      parsed_body['health']['measured_health'].should == 100
+      parsed_body['dependencies']['AlwaysAvailableDependency'].should == true
+      parsed_body['checks']['Metric::ConstantMetric(100)'].should == 100
+    end
+
+    it "is 'service unavailable' when the check fails" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      get "/test/status.json"
+      last_response.status.should == 503
+      last_response.header["Content-Type"].should == "application/json"
+      last_response.header["X-Health"].should == "0"
+
+      parsed_body = JSON.parse(last_response.body)
+      parsed_body['health']['reported_health'].should ==  0
+      parsed_body['health']['measured_health'].should == 0
+    end
+
+    it "is 'not found' when the service is unknown" do
+      get "/unknown/status.json"
+
+      last_response.status.should == 404
+      last_response.header["Content-Type"].should == "application/json"
+    end
+
+    it "is 'service unavailable' when an up file and down file exists" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
+      LitmusPaper::StatusFile.service_down_file("test").create("Down for testing")
+
+      get "/test/status.json"
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 503
+      last_response.headers["X-Health-Forced"].should == "down"
+      parsed_body['health']['forced'].should == 'Down for testing'
+    end
+
+    it "still reports the health, dependencies, and metrics when forced down" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.service_down_file("test").create("Down for testing")
+
+      get "/test/status.json"
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 503
+      last_response.headers["X-Health-Forced"].should == "down"
+      parsed_body['health']['measured_health'].should == 100
+      parsed_body['health']['forced'].should == 'Down for testing'
+      parsed_body['dependencies']['AlwaysAvailableDependency'].should == true
+      parsed_body['checks']['Metric::ConstantMetric(100)'].should == 100
+    end
+
+    it "still reports the health, dependencies, and metrics when forced up" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
+
+      get "/test/status.json"
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 200
+      last_response.headers["X-Health-Forced"].should == "up"
+      parsed_body['health']['measured_health'].should == 100
+      parsed_body['dependencies']['AlwaysAvailableDependency'].should == true
+      parsed_body['checks']['Metric::ConstantMetric(100)'].should == 100
+    end
+
+    it "is 'service available' when an up file exists" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.service_up_file("test").create("Up for testing")
+
+      get "/test/status.json"
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 200
+      last_response.headers["X-Health-Forced"].should == "up"
+      parsed_body['health']['forced'].should == 'Up for testing'
+    end
+
+    it "is 'service unavailable' when a global down file and up file exists" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.global_down_file.create("Down for testing")
+      LitmusPaper::StatusFile.global_up_file.create("Up for testing")
+
+      get "/test/status.json"
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 503
+      last_response.headers["X-Health-Forced"].should == "down"
+      parsed_body['health']['forced'].should == 'Down for testing'
+    end
+
+    it "is 'service unavailable' when a global down file exists" do
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.global_down_file.create("Down for testing")
+
+      get "/test/status.json"
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 503
+      last_response.headers["X-Health-Forced"].should == "down"
+      parsed_body['health']['forced'].should == 'Down for testing'
+    end
+
+    it "is successful when a global up file exists" do
+      test_service = LitmusPaper::Service.new('test', [NeverAvailableDependency.new], [LitmusPaper::Metric::ConstantMetric.new(100)])
+      LitmusPaper.services['test'] = test_service
+
+      LitmusPaper::StatusFile.global_up_file.create("Up for testing")
+
+      get "/test/status.json"
+      parsed_body = JSON.parse(last_response.body)
+
+      last_response.status.should == 200
+      last_response.headers["X-Health-Forced"].should == "up"
+      parsed_body['health']['forced'].should == 'Up for testing'
+    end
+
+    it "retrieves a cached value during the cache_ttl" do
+      begin
+        cache = LitmusPaper::Cache.new(
+          location = "/tmp/litmus_cache",
+          namespace = "test_cache",
+          ttl = 0.05
+        )
+        LitmusPaper::App.any_instance.stub(:_cache).and_return(cache)
+        test_service = LitmusPaper::Service.new(
+          'test',
+          [AlwaysAvailableDependency.new],
+          [LitmusPaper::Metric::ConstantMetric.new(100)]
+        )
+        LitmusPaper.services['test'] = test_service
+
+        post "/test/health", :reason => "health for testing", :health => 88
+        last_response.status.should == 201
+
+        get "/test/status.json"
+        parsed_body = JSON.parse(last_response.body)
+        last_response.status.should == 200
+        parsed_body['health']['forced'].should == 'health for testing 88'
+
+        delete "/test/health"
+        last_response.status.should == 200
+
+        get "/test/status.json"
+        last_response.should be_ok
+        parsed_body = JSON.parse(last_response.body)
+        parsed_body['health']['forced'].should == 'health for testing 88'
+
+        sleep ttl
+
+        get "/test/status.json"
+        last_response.should be_ok
+        parsed_body = JSON.parse(last_response.body)
+        parsed_body['health'].should_not include(:forced)
+      ensure
+        FileUtils.rm_rf(location)
+      end
     end
   end
 

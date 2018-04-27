@@ -11,7 +11,8 @@ RUN gem install --no-ri --no-rdoc bundler \
   && gem install rspec --no-ri --no-rdoc --version "~> 2.9.0" \
   && gem install rack-test --no-ri --no-rdoc --version "~> 0.6.1" \
   && gem install rake --no-ri --no-rdoc --version "~> 0.9.2.2" \
-  && gem install rake_commit --no-ri --no-rdoc --version "~> 0.13"
+  && gem install rake_commit --no-ri --no-rdoc --version "~> 0.13" \
+  && gem install json --no-ri --no-rdoc
 ADD . /home/litmus_paper
 RUN ln -sf /home/litmus_paper/docker/litmus.conf /etc/litmus.conf \
   && ln -sf /home/litmus_paper/docker/litmus_unicorn.rb /etc/litmus_unicorn.rb
