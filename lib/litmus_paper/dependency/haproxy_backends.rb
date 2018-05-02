@@ -50,6 +50,8 @@ module LitmusPaper
 
       def _find_backend(stats, cluster)
         stats.detect do |line|
+          # type ~ (0=frontend, 1=backend, 2=server, 3=socket/listener)
+          # https://cbonte.github.io/haproxy-dconv/1.8/management.html#9.1
           line['# pxname'] == cluster && line['type'] == '1'
         end
       end
