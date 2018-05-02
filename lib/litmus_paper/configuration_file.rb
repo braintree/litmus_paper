@@ -72,10 +72,9 @@ module LitmusPaper
           when :constant_metric
             Metric::ConstantMetric.new(check_config.delete(:weight))
           when :haproxy_weight
-            weight = check_config.delete(:weight)
             socket = check_config.delete(:socket)
             backend = check_config.delete(:backend)
-            Metric::HaproxyWeight.new(weight, socket, backend, check_config)
+            Metric::HaproxyWeight.new(socket, backend, check_config)
           when :internet_health
             weight = check_config.delete(:weight)
             hosts = check_config.delete(:hosts)
