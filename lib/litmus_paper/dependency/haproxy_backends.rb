@@ -38,10 +38,10 @@ module LitmusPaper
         return total_servers == 0 ? 0 : total_weight / total_servers
       rescue Timeout::Error
         LitmusPaper.logger.info("HAProxy average_weight check timed out for #{@cluster}")
-        false
+        0
       rescue => e
         LitmusPaper.logger.info("HAProxy average_weight check failed for #{@cluster} with #{e.message}")
-        false
+        0
       end
 
       def to_s

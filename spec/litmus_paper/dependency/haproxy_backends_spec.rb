@@ -34,18 +34,18 @@ describe LitmusPaper::Dependency::HaproxyBackends do
 
     it "returns average weight if at least one backend is up" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "yellow_cluster")
-      haproxy.average_weight.should_be 90
+      haproxy.average_weight.should be 90
     end
 
     it "returns 0 if no nodes are available" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/tmp/stub-haproxy-stats", "orange_cluster")
-      haproxy.average_weight.should_be 0
+      haproxy.average_weight.should be 0
     end
 
-    it "logs exceptions and returns false" do
+    it "logs exceptions and returns 0" do
       haproxy = LitmusPaper::Dependency::HaproxyBackends.new("/dev/null", "yellow_cluster")
       LitmusPaper.logger.should_receive(:info)
-      haproxy.should_not be_available
+      haproxy.average_weight.should be 0
     end
   end
 
