@@ -28,13 +28,31 @@ module LitmusPaper
         false
       end
 
+      def average_weight
+        stats = _parse_stats(_fetch_stats)
+        backend = _find_backend(stats, @cluster)
+
+        total_weight = backend['weight'].to_i
+        total_servers = backend['act'].to_i
+
+        return total_servers == 0 ? 0 : total_weight / total_servers
+      rescue Timeout::Error
+        LitmusPaper.logger.info("HAProxy average_weight check timed out for #{@cluster}")
+        0
+      rescue => e
+        LitmusPaper.logger.info("HAProxy average_weight check failed for #{@cluster} with #{e.message}")
+        0
+      end
+
       def to_s
         "Dependency::HaproxyBackends(#{@domain_socket}, #{@cluster})"
       end
 
       def _find_backend(stats, cluster)
         stats.detect do |line|
-          line['# pxname'] == cluster && line['svname'] == 'BACKEND'
+          # type ~ (0=frontend, 1=backend, 2=server, 3=socket/listener)
+          # https://cbonte.github.io/haproxy-dconv/1.8/management.html#9.1
+          line['# pxname'] == cluster && line['type'] == '1'
         end
       end
 
