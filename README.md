@@ -167,8 +167,8 @@ Here are all the types of checks currently implemented:
   * weight (1-100)
 
 - `haproxy_weight` (`Metric::HaproxyWeight`): Reports the average weight across servers for a Haproxy backend.
-  * stats socket path
-  * backend name
+  * socket
+  * backend
   * timeout (defaults to 2s)
 
 - `internet_health` (`Metric::InternetHealth`): Checks connectivity across a set of hosts and computes a weight based on how many are reachable. Helpful if you want to check outbound connectivity through multiple ISPs.
