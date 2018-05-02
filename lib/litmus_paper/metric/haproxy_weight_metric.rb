@@ -1,8 +1,8 @@
 module LitmusPaper
   module Metric
     class HaproxyWeightMetric
-      def initialize(domain_socket, cluster, options = {})
-        @haproxy_backends = Dependency::HaproxyBackends.new(domain_socket, cluster, options)
+      def initialize(haproxy_backends)
+        @haproxy_backends = haproxy_backends
 
       end
 
