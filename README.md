@@ -167,6 +167,7 @@ Here are all the types of checks currently implemented:
   * weight (1-100)
 
 - `haproxy_weight` (`Metric::HaproxyWeight`): Reports the average weight across servers for a Haproxy backend.
+  * weight (0-100)
   * socket
   * backend
   * timeout (defaults to 2s)
