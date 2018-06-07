@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe LitmusPaper::Dependency::TCP do
+describe LitmusPaper::Metric::InternetHealth do
 
   describe "#current_health" do
     before(:all) do
