@@ -11,7 +11,7 @@ describe LitmusPaper::AgentCheckServer do
     port_open = false
     while ! port_open do
       begin
-        TCPSocket.new('localhost', 9191)
+        TCPSocket.new('127.0.0.1', 9191)
       rescue StandardError => e
         sleep 0.1
         next
@@ -26,12 +26,12 @@ describe LitmusPaper::AgentCheckServer do
 
   describe "The agent-check text protocol" do
     it "returns the health from a passing test" do
-      TCPSocket.open('localhost', 9191) do |s|
+      TCPSocket.open('127.0.0.1', 9191) do |s|
         s.gets.should match(/ready\tup\t\d+%\r\n/)
       end
     end
     it "returns the health from a failing test" do
-      TCPSocket.open('localhost', 9192) do |s|
+      TCPSocket.open('127.0.0.1', 9192) do |s|
         s.gets.should match(/down\t0%\r\n/)
       end
     end
