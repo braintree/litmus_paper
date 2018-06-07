@@ -179,7 +179,7 @@ Here are all the types of checks currently implemented:
 - `big_brother_service` (`Metric::BigBrotherService`): Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
   * service
 
-- `haproxy_backends_health` (`Metric::HaproxyBackendsHealth`): Checks connectivity across a set of servers in a Haproxy cluster and computers a weight based on how many are UP.
+- `haproxy_backends_health` (`Metric::HaproxyBackendsHealth`): Checks UP/DOWN status across a set of servers in a Haproxy cluster and computes a weight based on how many are UP.
   * haproxy socket
   * cluster
   * timeout (defaults to 2s)
