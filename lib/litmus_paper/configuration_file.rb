@@ -82,7 +82,7 @@ module LitmusPaper
           when :haproxy_backends_health
             domain_socket = dep_config.delete(:domain_socket)
             cluster = dep_config.delete(:cluster)
-            Metric::HaproxyBackendsHealth(domain_socket, cluster, check_config)
+            Metric::HaproxyBackendsHealth.new(domain_socket, cluster, check_config)
         end
       end
     end
