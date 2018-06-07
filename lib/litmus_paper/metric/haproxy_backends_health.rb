@@ -5,7 +5,8 @@ module LitmusPaper
     class HaproxyBackendsHealth
       include LitmusPaper::HaproxyUtil
 
-      def initialize(domain_socket, cluster, options = {})
+      def initialize(weight, domain_socket, cluster, options = {})
+        @weight = weight
         @domain_socket = domain_socket
         @cluster = cluster
         @timeout = options.fetch(:timeout_seconds, 2)
@@ -21,11 +22,11 @@ module LitmusPaper
         total_weight = servers
           .inject(0) { |sum, server| sum + server["weight"].to_f }
 
-        ((up_weight / total_weight) * 100).to_i
+        ((up_weight / total_weight) * @weight).to_i
       end
 
       def to_s
-        "Metric::HaproxyBackendsHealth(#{@cluster})"
+        "Metric::HaproxyBackendsHealth(#{@weight}, #{@cluster})"
       end
     end
   end
