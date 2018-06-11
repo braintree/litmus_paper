@@ -1,8 +1,10 @@
-require 'csv'
+require 'litmus_paper/haproxy_util'
 
 module LitmusPaper
   module Dependency
     class HaproxyBackends
+      include LitmusPaper::HaproxyUtil
+
       def initialize(domain_socket, cluster, options = {})
         @domain_socket = domain_socket
         @cluster = cluster
@@ -10,8 +12,7 @@ module LitmusPaper
       end
 
       def available?
-        stats = _parse_stats(_fetch_stats)
-        backend = _find_backend(stats, @cluster)
+        backend = find_backend(@domain_socket, @timeout, @cluster)
 
         if backend['weight'].to_i == 0
           LitmusPaper.logger.info(
@@ -30,27 +31,6 @@ module LitmusPaper
 
       def to_s
         "Dependency::HaproxyBackends(#{@domain_socket}, #{@cluster})"
-      end
-
-      def _find_backend(stats, cluster)
-        stats.detect do |line|
-          line['# pxname'] == cluster && line['svname'] == 'BACKEND'
-        end
-      end
-
-      def _parse_stats(csv)
-        stats = CSV.parse(csv)
-        headers = stats.shift
-        stats.map { |stat| Hash[headers.zip(stat)] }
-      end
-
-      def _fetch_stats
-        Timeout.timeout(@timeout) do
-          UNIXSocket.open(@domain_socket) do |socket|
-            socket.send("show stat\n", 0)
-            socket.read
-          end
-        end
       end
     end
   end

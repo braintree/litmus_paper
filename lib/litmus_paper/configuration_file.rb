@@ -79,6 +79,11 @@ module LitmusPaper
             command = check_config.delete(:command)
             weight = check_config.delete(:weight)
             Metric::Script.new(command, weight, check_config)
+          when :haproxy_backends_health
+            weight = check_config.delete(:weight)
+            domain_socket = dep_config.delete(:domain_socket)
+            cluster = dep_config.delete(:cluster)
+            Metric::HaproxyBackendsHealth.new(weight, domain_socket, cluster, check_config)
         end
       end
     end

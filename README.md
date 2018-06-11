@@ -179,6 +179,12 @@ Here are all the types of checks currently implemented:
 - `big_brother_service` (`Metric::BigBrotherService`): Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
   * service
 
+- `haproxy_backends_health` (`Metric::HaproxyBackendsHealth`): Checks UP/DOWN status across a set of servers in a Haproxy cluster and computes a litmus weight based on the HAProxy weights of the servers which have an UP status.
+  * weight (0-100)
+  * haproxy socket
+  * cluster
+  * timeout (defaults to 2s)
+
 ### HAProxy agent check configuration
 
 Litmus paper can also report health checks in HAProxy agent check format. The agent check functionality takes the health data from a service health check, and exposes it on a different port in the format HAProxy expects.
