@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe LitmusPaper::Dependency::TCP do
+describe LitmusPaper::Metric::InternetHealth do
 
   describe "#current_health" do
     before(:all) do
@@ -85,11 +85,11 @@ describe LitmusPaper::Dependency::TCP do
       internet_health = LitmusPaper::Metric::InternetHealth.new(
         100,
         [
-          "127.0.0.1:6000",
-          "127.0.0.1:6001",
           "127.0.0.1:6002",
           "127.0.0.1:6003",
           "127.0.0.1:6004",
+          "127.0.0.1:6005",
+          "127.0.0.1:6006",
         ],
       )
       internet_health.current_health.should == 0
