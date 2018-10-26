@@ -176,6 +176,11 @@ Here are all the types of checks currently implemented:
   * weight (0-100)
   * timeout (defaults to 5s)
 
+- `unix_socket_utilization` (`Metric::UnixSocketUtilitization`): Compares the number of active, queued requests against the maximum number of expected connections, [see](lib/litmus_paper/metric/unix_socket_utilization.rb) for the implementation of the algorithm.
+  * weight (0-100)
+  * socket_path (path on the filesystem where the socket is located)
+  * maxconn (maximum number of concurrent connection the server backing the socket is supposed to handle)
+
 - `big_brother_service` (`Metric::BigBrotherService`): Used in conjunction with [Big Brother](https://github.com/braintree/big_brother), reports health based on the overall health of another load balanced service.
   * service
 
