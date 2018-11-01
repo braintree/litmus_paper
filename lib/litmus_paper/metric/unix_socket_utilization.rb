@@ -24,7 +24,7 @@ module LitmusPaper
       end
 
       def _stats
-        Raindrops::Linux.unix_listener_stats([socket_path])[socket_path]
+        Raindrops::Linux.unix_listener_stats([@socket_path])[@socket_path]
       end
 
       def to_s
