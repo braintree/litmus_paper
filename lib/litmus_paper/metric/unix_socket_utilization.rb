@@ -28,7 +28,7 @@ module LitmusPaper
       end
 
       def to_s
-        "Metric::UnixSocketUtilitization(weight: #{@weight}, maxconn: #{@maxconn}, path: #{@socket_path})"
+        "Metric::UnixSocketUtilitization(weight: #{@weight}, maxconn: #{@maxconn}, active: #{_stats.active.to_i}, queued: #{_stats.queued.to_i}, path: #{@socket_path})"
       end
     end
   end
