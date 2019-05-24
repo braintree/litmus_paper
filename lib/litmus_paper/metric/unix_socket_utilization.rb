@@ -7,17 +7,21 @@ module LitmusPaper
         @weight = weight
         @socket_path = socket_path
         @maxconn = maxconn
+        @active = 0
+        @queued = 0
       end
 
       def current_health
         stats = _stats
-        if stats.queued == 0
+        @active = stats.active
+        @queued = stats.queued
+        if @queued == 0
           return @weight
         else
           return [
             @weight - (
-              (@weight * _stats.active.to_f) / (3 * @maxconn.to_f) +
-              (2 * @weight * _stats.queued.to_f) / (3 * @maxconn.to_f)
+              (@weight * @active.to_f) / (3 * @maxconn.to_f) +
+              (2 * @weight * @queued.to_f) / (3 * @maxconn.to_f)
             ), 1
           ].max
         end
@@ -28,7 +32,7 @@ module LitmusPaper
       end
 
       def to_s
-        "Metric::UnixSocketUtilitization(weight: #{@weight}, maxconn: #{@maxconn}, path: #{@socket_path})"
+        "Metric::UnixSocketUtilitization(weight: #{@weight}, maxconn: #{@maxconn}, active: #{@active.to_i}, queued: #{@queued.to_i}, path: #{@socket_path})"
       end
     end
   end
