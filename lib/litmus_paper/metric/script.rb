@@ -60,6 +60,10 @@ module LitmusPaper
         LitmusPaper.logger.info("Attempted to reap PID #{pid} but it has already been reaped (ECHILD)")
       end
 
+      def stats
+        {}
+      end
+
       def to_s
         "Metric::Script(#{@command}, #{@weight})"
       end

@@ -27,6 +27,15 @@ module LitmusPaper
         end
       end
 
+      def stats
+        current_health
+        {
+          :socket_active => @active,
+          :socket_queued => @queued,
+          :socket_utilization => ((@queued / @maxconn.to_f) * 100).round,
+        }
+      end
+
       def _stats
         Raindrops::Linux.unix_listener_stats([@socket_path])[@socket_path]
       end

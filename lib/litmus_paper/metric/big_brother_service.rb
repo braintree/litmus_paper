@@ -14,6 +14,10 @@ module LitmusPaper
         end
       end
 
+      def stats
+        {}
+      end
+
       def to_s
         "Metric::BigBrotherService(#{@service})"
       end

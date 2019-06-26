@@ -459,6 +459,36 @@ describe LitmusPaper::App do
     end
   end
 
+  describe "GET /:service/metrics" do
+    it "returns the forced health value for a healthy service" do
+      LitmusPaper::Metric::UnixSocketUtilitization.any_instance.stub(
+        :_stats => OpenStruct.new({:queued => 7, :active => 10}),
+      )
+      LitmusPaper::Metric::CPULoad.any_instance.stub(
+        :load_average => 0.1
+      )
+      cpu_load = LitmusPaper::Metric::CPULoad.new(50)
+      socket_utilization = LitmusPaper::Metric::UnixSocketUtilitization.new(100, '/var/run/foo.sock', 10)
+      internet_health = LitmusPaper::Metric::InternetHealth.new(100, [
+        "127.0.0.1:3000",
+        "127.0.0.1:3001",
+      ])
+      test_service = LitmusPaper::Service.new('test', [AlwaysAvailableDependency.new], [
+        cpu_load,
+        socket_utilization,
+        internet_health,
+      ])
+      LitmusPaper.services['test'] = test_service
+
+      get "/test/metrics"
+      last_response.should be_ok
+      last_response.body.should match %r(cpu_load_average{service="test"} 0.1)
+      last_response.body.should match %r(active{service="test"} 10)
+      last_response.body.should match %r(queued{service="test"} 7)
+      last_response.body.should match %r(utilization{service="test"} 70)
+    end
+  end
+
   describe "server errors" do
     it "responds with a text/plain 500 response" do
       old_environment = :test

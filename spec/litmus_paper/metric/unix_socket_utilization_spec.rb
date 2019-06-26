@@ -38,4 +38,22 @@ describe LitmusPaper::Metric::UnixSocketUtilitization do
       health.should == 1
     end
   end
+
+  describe "#stats" do
+    it "reports metrics" do
+      LitmusPaper::Metric::UnixSocketUtilitization.any_instance.stub(
+        :_stats => OpenStruct.new({:queued => 7, :active => 10}),
+      )
+      metric = LitmusPaper::Metric::UnixSocketUtilitization.new(
+        100,
+        '/var/run/foo.sock',
+        10
+      )
+      metric.stats.should == {
+        :socket_active => 10,
+        :socket_queued => 7,
+        :socket_utilization => 70,
+      }
+    end
+  end
 end

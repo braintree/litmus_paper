@@ -24,6 +24,12 @@ module LitmusPaper
         File.read('/proc/loadavg').split(' ').first.to_f
       end
 
+      def stats
+        {
+          :cpu_load_average => load_average,
+        }
+      end
+
       def to_s
         "Metric::CPULoad(#{@weight})"
       end
