@@ -98,14 +98,22 @@ module LitmusPaper
     end
 
     get "/:service/metrics" do
-      timestamp = (Time.now.utc.to_f * 1000).to_i
-      service = LitmusPaper.services[params[:service]]
-      metrics = service.checks.map do |check|
-        check.stats.map do |key, value|
-          %(#{key}{service="#{params[:service]}"} #{value} #{timestamp})
-        end.join("\n")
+      cache_key = "#{params[:service]}_metrics"
+      metrics = _cache.get(cache_key)
+
+      if metrics != nil
+        return _text(200, metrics)
       end
-      _text 200, metrics.join("\n") + "\n"
+
+      metrics = LitmusPaper.services[params[:service]].checks.map do |check|
+        check.stats.map do |key, value|
+          %(#{key}{service="#{params[:service]}"} #{value} #{(Time.now.utc.to_f * 1000).to_i})
+        end.join("\n")
+      end.join("\n") + "\n"
+
+      _cache.set(cache_key, metrics)
+
+      _text(200, metrics)
     end
 
     get "/test/error" do
