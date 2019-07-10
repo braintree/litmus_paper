@@ -32,6 +32,10 @@ module LitmusPaper
         health.to_i
       end
 
+      def stats
+        {}
+      end
+
       def to_s
         "Metric::InternetHealth(#{@weight}, #{@hosts.inspect}, #{@options.inspect})"
       end

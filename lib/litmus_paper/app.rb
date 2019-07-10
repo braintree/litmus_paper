@@ -97,6 +97,25 @@ module LitmusPaper
       _create_status_file(StatusFile.service_up_file(params[:service]))
     end
 
+    get "/:service/metrics" do
+      cache_key = "#{params[:service]}_metrics"
+      metrics = _cache.get(cache_key)
+
+      if metrics != nil
+        return _text(200, metrics)
+      end
+
+      metrics = LitmusPaper.services[params[:service]].checks.map do |check|
+        check.stats.map do |key, value|
+          %(#{key}{service="#{params[:service]}"} #{value} #{(Time.now.utc.to_f * 1000).to_i})
+        end.join("\n")
+      end.join("\n") + "\n"
+
+      _cache.set(cache_key, metrics)
+
+      _text(200, metrics)
+    end
+
     get "/test/error" do
       raise "an error"
     end

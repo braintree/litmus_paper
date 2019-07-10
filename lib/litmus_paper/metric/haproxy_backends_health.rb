@@ -25,6 +25,10 @@ module LitmusPaper
         ((up_weight / total_weight) * @weight).to_i
       end
 
+      def stats
+        {}
+      end
+
       def to_s
         "Metric::HaproxyBackendsHealth(#{@weight}, #{@cluster})"
       end

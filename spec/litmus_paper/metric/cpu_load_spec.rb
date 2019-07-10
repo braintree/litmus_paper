@@ -50,6 +50,16 @@ describe LitmusPaper::Metric::CPULoad do
     end
   end
 
+  describe "#stats" do
+    it "reports metrics" do
+      File.should_receive(:read).with('/proc/loadavg').and_return("0.08 0.12 0.15 2/1190 9152\n")
+      cpu_load = LitmusPaper::Metric::CPULoad.new(50)
+      cpu_load.stats.should == {
+        :cpu_load_average => 0.08
+      }
+    end
+  end
+
   describe "#to_s" do
     it "is the check name and the maximum weight" do
       cpu_load = LitmusPaper::Metric::CPULoad.new(50)

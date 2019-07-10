@@ -7,24 +7,32 @@ module LitmusPaper
         @weight = weight
         @socket_path = socket_path
         @maxconn = maxconn
-        @active = 0
-        @queued = 0
       end
 
       def current_health
         stats = _stats
-        @active = stats.active
-        @queued = stats.queued
-        if @queued == 0
+
+        if stats.queued == 0
           return @weight
-        else
-          return [
-            @weight - (
-              (@weight * @active.to_f) / (3 * @maxconn.to_f) +
-              (2 * @weight * @queued.to_f) / (3 * @maxconn.to_f)
-            ), 1
-          ].max
         end
+
+        [
+          @weight - (
+            (@weight * stats.active.to_f) / (3 * @maxconn.to_f) +
+            (2 * @weight * stats.queued.to_f) / (3 * @maxconn.to_f)
+          ),
+          1
+        ].max
+      end
+
+      def stats
+        stats = _stats
+
+        {
+          :socket_active => stats.active,
+          :socket_queued => stats.queued,
+          :socket_utilization => ((stats.queued / @maxconn.to_f) * 100).round,
+        }
       end
 
       def _stats
