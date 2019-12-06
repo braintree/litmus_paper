@@ -176,7 +176,12 @@ Here are all the types of checks currently implemented:
   * weight (0-100)
   * timeout (defaults to 5s)
 
-- `unix_socket_utilization` (`Metric::UnixSocketUtilitization`): Compares the number of active, queued requests against the maximum number of expected connections, [see](lib/litmus_paper/metric/unix_socket_utilization.rb) for the implementation of the algorithm.
+- `tcp_socket_utilization` (`Metric::TcpSocketUtilization`): Compares the number of active, queued requests against the maximum number of expected connections, [see](lib/litmus_paper/metric/socket_utilization.rb) for the implementation of the algorithm.
+  * weight (0-100)
+  * address (IP:port combination, e.g. `0.0.0.0:8192`)
+  * maxconn (maximum number of concurrent connection the server backing the socket is supposed to handle)
+
+- `unix_socket_utilization` (`Metric::UnixSocketUtilization`): Compares the number of active, queued requests against the maximum number of expected connections, [see](lib/litmus_paper/metric/socket_utilization.rb) for the implementation of the algorithm.
   * weight (0-100)
   * socket_path (path on the filesystem where the socket is located)
   * maxconn (maximum number of concurrent connection the server backing the socket is supposed to handle)
