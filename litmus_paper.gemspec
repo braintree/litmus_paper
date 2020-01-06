@@ -8,6 +8,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Backend health tester for HA Services}
   gem.summary       = %q{Backend health tester for HA Services, partner project of big_brother}
   gem.homepage      = "https://github.com/braintree/litmus_paper"
+  gem.licenses      = ['MIT']
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
