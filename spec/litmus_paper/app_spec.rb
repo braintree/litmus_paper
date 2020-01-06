@@ -461,14 +461,14 @@ describe LitmusPaper::App do
 
   describe "GET /:service/metrics" do
     it "returns the forced health value for a healthy service" do
-      LitmusPaper::Metric::UnixSocketUtilitization.any_instance.stub(
+      LitmusPaper::Metric::UnixSocketUtilization.any_instance.stub(
         :_stats => OpenStruct.new({:queued => 7, :active => 10}),
       )
       LitmusPaper::Metric::CPULoad.any_instance.stub(
         :load_average => 0.1
       )
       cpu_load = LitmusPaper::Metric::CPULoad.new(50)
-      socket_utilization = LitmusPaper::Metric::UnixSocketUtilitization.new(100, '/var/run/foo.sock', 10)
+      socket_utilization = LitmusPaper::Metric::UnixSocketUtilization.new(100, '/var/run/foo.sock', 10)
       internet_health = LitmusPaper::Metric::InternetHealth.new(100, [
         "127.0.0.1:3000",
         "127.0.0.1:3001",

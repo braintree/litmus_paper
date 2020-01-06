@@ -84,6 +84,16 @@ module LitmusPaper
             domain_socket = dep_config.delete(:domain_socket)
             cluster = dep_config.delete(:cluster)
             Metric::HaproxyBackendsHealth.new(weight, domain_socket, cluster, check_config)
+          when :tcp_socket_utilization
+            weight = check_config.delete(:weight)
+            address = check_config.delete(:address)
+            maxconn = check_config.delete(:maxconn)
+            Metric::TcpSocketUtilization.new(weight, address, maxconn)
+          when :unix_socket_utilization
+            weight = check_config.delete(:weight)
+            socket_path = check_config.delete(:socket_path)
+            maxconn = check_config.delete(:maxconn)
+            Metric::UnixSocketUtilization.new(weight, socket_path, maxconn)
         end
       end
     end
