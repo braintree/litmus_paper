@@ -1,25 +1,29 @@
-FROM ruby:2.6.5-alpine3.11
+FROM debian:buster-slim
 
 EXPOSE 9293/TCP
-EXPOSE 9294/TCP
 
 ENV APP_USER litmus_paper
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-RUN apk add --update --no-cache \
-  build-base \
-  linux-headers \
-  tzdata \
-  rsyslog \
-  libgcc libstdc++ \
-  git \
-  curl \
-  procps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ruby \
+    ruby-dev \
+    bundler \
+    git \
+    curl \
+    rsyslog \
+    procps \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN addgroup -g 1000 -S $APP_USER && \
-    adduser -u 1000 -S $APP_USER -G $APP_USER -D
+RUN addgroup --gid 1000 --system $APP_USER && \
+    adduser --uid 1000 --ingroup $APP_USER --system $APP_USER
+
+ENV GEM_HOME /usr/local/bundle
+ENV BUNDLE_APP_CONFIG $GEM_HOME
+ENV PATH $GEM_HOME/bin:$PATH
 
 ADD litmus_paper.gemspec /home/$APP_USER/
 ADD lib/litmus_paper/version.rb /home/$APP_USER/lib/litmus_paper/version.rb
