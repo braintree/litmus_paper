@@ -1,20 +1,52 @@
-FROM debian:stretch
+FROM debian:buster-slim
+
 EXPOSE 9293/TCP
-EXPOSE 9294/TCP
-WORKDIR /home/litmus_paper
-RUN apt-get update && apt-get install -y ruby ruby-dev git curl rsyslog build-essential
-RUN gem install --no-ri --no-rdoc bundler \
-  && gem install sinatra --no-ri --no-rdoc --version "~> 1.3.2" \
-  && gem install remote_syslog_logger --no-ri --no-rdoc --version "~> 1.0.3" \
-  && gem install unicorn --no-ri --no-rdoc --version "~> 4.6.2" \
-  && gem install colorize --no-ri --no-rdoc \
-  && gem install rspec --no-ri --no-rdoc --version "~> 2.9.0" \
-  && gem install rack-test --no-ri --no-rdoc --version "~> 0.6.1" \
-  && gem install rake --no-ri --no-rdoc --version "~> 0.9.2.2" \
-  && gem install rake_commit --no-ri --no-rdoc --version "~> 0.13"
-ADD . /home/litmus_paper
-RUN ln -sf /home/litmus_paper/docker/litmus.conf /etc/litmus.conf \
-  && ln -sf /home/litmus_paper/docker/litmus_unicorn.rb /etc/litmus_unicorn.rb
+
+ENV APP_USER litmus_paper
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ruby \
+    ruby-dev \
+    bundler \
+    git \
+    curl \
+    rsyslog \
+    procps \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN addgroup --gid 1000 --system $APP_USER && \
+    adduser --uid 1000 --ingroup $APP_USER --system $APP_USER
+
+ENV GEM_HOME /usr/local/bundle
+ENV BUNDLE_APP_CONFIG $GEM_HOME
+ENV PATH $GEM_HOME/bin:$PATH
+
+ADD litmus_paper.gemspec /home/$APP_USER/
+ADD lib/litmus_paper/version.rb /home/$APP_USER/lib/litmus_paper/version.rb
+ADD Gemfile* /home/$APP_USER/
+
+WORKDIR /home/$APP_USER
+
+RUN bundle config --global frozen 1 && \
+  bundle install \
+  -j2 \
+  --retry 3 \
+  # Remove unneeded files (cached *.gem, *.o, *.c)
+  && rm -rf /usr/local/bundle/cache/*.gem \
+  && find /usr/local/bundle/gems/ -name "*.c" -delete \
+  && find /usr/local/bundle/gems/ -name "*.o" -delete
+
+ADD . /home/$APP_USER
+RUN ln -sf /home/$APP_USER/docker/litmus.conf /etc/litmus.conf \
+  && ln -sf /home/$APP_USER/docker/litmus_unicorn.rb /etc/litmus_unicorn.rb
 RUN gem build litmus_paper.gemspec && gem install litmus_paper*.gem
+RUN chown -R $APP_USER:$APP_USER /home/$APP_USER
+
+# Drop to app user
+USER $APP_USER
 
 CMD ["bin/litmus", "-p", "9293", "-c", "/etc/litmus_unicorn.rb"]
