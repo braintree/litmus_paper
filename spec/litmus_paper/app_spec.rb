@@ -60,6 +60,16 @@ describe LitmusPaper::App do
       last_response.body.should include('Forcing health')
       last_response.body.should include('88')
     end
+
+    it "returns successfully if a haproxy backend socket is unreachable" do
+      LitmusPaper.services['test'] = LitmusPaper::Service.new('test', [], [LitmusPaper::Metric::HaproxyBackendsHealth.new(100, "/tmp/non-existant-socketfile", "haproxy")])
+
+      get "/"
+
+      last_response.status.should == 200
+      last_response.body.should include('test')
+      last_response.body.should include('0')
+    end
   end
 
   describe "POST /up" do

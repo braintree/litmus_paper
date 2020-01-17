@@ -23,6 +23,13 @@ module LitmusPaper
           .inject(0) { |sum, server| sum + server["weight"].to_f }
 
         ((up_weight / total_weight) * @weight).to_i
+
+      rescue Timeout::Error
+        LitmusPaper.logger.info("HAProxy available check timed out for #{@cluster}")
+        0
+      rescue => e
+        LitmusPaper.logger.info("HAProxy available check failed for #{@cluster} with #{e.message}")
+        0
       end
 
       def stats
