@@ -28,6 +28,11 @@ describe LitmusPaper::Metric::HaproxyBackendsHealth do
       health = LitmusPaper::Metric::HaproxyBackendsHealth.new(50, "/tmp/stub-haproxy-stats", "yellow_cluster")
       health.current_health.should == 16
     end
+
+    it "should return a health of 0 if haproxy is not running" do
+      health = LitmusPaper::Metric::HaproxyBackendsHealth.new(100, "/tmp/non-existant-socketfile", "red_cluster")
+      health.current_health.should == 0
+    end
   end
 
   describe "#to_s" do
