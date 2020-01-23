@@ -25,7 +25,7 @@ module LitmusPaper
     end
 
     def self.const_missing(const_name)
-      super unless const_name == :UnixSocketUtilitization
+      return super unless const_name == :UnixSocketUtilitization
       warn "`LitmusPaper::Metric::UnixSocketUtilitization` has been deprecated. Use `LitmusPaper::Metric::UnixSocketUtilization` instead."
       UnixSocketUtilization
     end
