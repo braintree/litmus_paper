@@ -5,20 +5,23 @@ require 'socket'
 require 'litmus_paper/agent_check_handler'
 
 module LitmusPaper
-  class AgentCheckServer
-    CRLF = "\r\n"
+  module AgentCheckServer
+    CRLF = "\r\n".freeze
 
-    def initialize(litmus_paper_config, services, workers, pid_file, daemonize)
+    attr_reader :control_sockets, :pid_file, :services, :workers
+
+    def initialize(litmus_paper_config, daemonize, pid_file, workers)
       LitmusPaper.configure(litmus_paper_config)
-      @services = services
-      @workers = workers
-      @pid_file = pid_file
       @daemonize = daemonize
-      @control_sockets = @services.keys.map do |port|
-        TCPServer.new(port)
-      end
+      @pid_file = pid_file
+      @workers = workers
+
       trap(:INT) { exit }
       trap(:TERM) { exit }
+    end
+
+    def daemonize?
+      !!@daemonize
     end
 
     # Stolen pattern from ruby Socket, modified to return the service based on
@@ -32,15 +35,17 @@ module LitmusPaper
         readable.each { |r|
           begin
             sock, addr = r.accept_nonblock
-            _, remote_port, _, remote_ip = sock.peeraddr
-            LitmusPaper.logger.debug "Received request from #{remote_ip}:#{remote_port}"
-            service = @services[r.local_address.ip_port]
+            service = service_for_connection(sock, addr)
           rescue IO::WaitReadable
             next
           end
           yield sock, service
         }
       }
+    end
+
+    def service_for_connection(sock, addr)
+      raise "Consumers must implemented service_for_connection(sock, addr)"
     end
 
     def respond(sock, message)
@@ -55,13 +60,13 @@ module LitmusPaper
     end
 
     def run
-      if @daemonize
+      if daemonize?
         Process.daemon
       end
-      write_pid(@pid_file)
+      write_pid(pid_file)
       child_pids = []
 
-      @workers.times do
+      workers.times do
         child_pids << spawn_child
       end
 
@@ -72,7 +77,7 @@ module LitmusPaper
           rescue Errno::ESRCH
           end
         end
-        File.delete(@pid_file) if File.exists?(@pid_file)
+        File.delete(pid_file) if File.exists?(pid_file)
         exit
       }
 
@@ -89,7 +94,7 @@ module LitmusPaper
 
     def spawn_child
       fork do
-        accept_loop(@control_sockets) do |sock, service|
+        accept_loop(control_sockets) do |sock, service|
           respond(sock, AgentCheckHandler.handle(service))
           sock.close
         end
