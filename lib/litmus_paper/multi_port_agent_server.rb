@@ -4,6 +4,8 @@ module LitmusPaper
   class MultiPortAgentServer
     include AgentCheckServer
 
+    attr_reader :services
+
     def initialize(litmus_paper_config, daemonize, pid_file, services, workers)
       super(litmus_paper_config, daemonize, pid_file, workers)
       @services = services

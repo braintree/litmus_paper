@@ -8,7 +8,6 @@ module LitmusPaper
 
     def initialize(litmus_paper_config, daemonize, pid_file, port, workers)
       super(litmus_paper_config, daemonize, pid_file, workers)
-      @services = LitmusPaper.services
       @control_sockets = [TCPServer.new(port)]
     end
 

@@ -8,7 +8,7 @@ module LitmusPaper
   module AgentCheckServer
     CRLF = "\r\n".freeze
 
-    attr_reader :control_sockets, :pid_file, :services, :workers
+    attr_reader :control_sockets, :pid_file, :workers
 
     def initialize(litmus_paper_config, daemonize, pid_file, workers)
       LitmusPaper.configure(litmus_paper_config)
