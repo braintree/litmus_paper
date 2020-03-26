@@ -57,9 +57,22 @@ describe LitmusPaper::SinglePortAgentServer do
       children = `ps --no-headers --ppid #{pid}|wc -l`
       children.strip.to_i == 10
     end
-  end
 
-  describe "server" do
+    it "doesn't crash if a client hangs up" do
+      pid = File.read('/tmp/litmus-agent-check.pid').to_i
+      child_pids = `ps --no-headers --ppid #{pid}|wc -l`
+      original_pids = `pgrep -P #{pid}`.chomp.split("\n")
+
+      TCPSocket.open('127.0.0.1', 9191) do |s|
+        # Do nothing (e.g. haproxy w/o agent-send setup correctly)
+      end
+
+      sleep 0.5
+
+      current_pids = `pgrep -P #{pid}`.chomp.split("\n")
+      current_pids.should eql(original_pids)
+    end
+
     it "if a child dies you get a new one" do
       pid = File.read('/tmp/litmus-agent-check.pid').to_i
       Kernel.system("kill -9 $(ps --no-headers --ppid #{pid} -o pid=|tail -1)")
