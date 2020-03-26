@@ -24,28 +24,9 @@ module LitmusPaper
       !!@daemonize
     end
 
-    # Stolen pattern from ruby Socket, modified to return the service based on
-    # the accepting port
-    def accept_loop(sockets)
-      if sockets.empty?
-        raise ArgumentError, "no sockets"
-      end
-      loop {
-        readable, _, _ = IO.select(sockets)
-        readable.each { |r|
-          begin
-            sock, addr = r.accept_nonblock
-            service = service_for_connection(sock, addr)
-          rescue IO::WaitReadable
-            next
-          end
-          yield sock, service
-        }
-      }
-    end
 
-    def service_for_connection(sock, addr)
-      raise "Consumers must implemented service_for_connection(sock, addr)"
+    def service_for_socket(sock, addr)
+      raise "Consumers must implemented service_for_socket(sock, addr)"
     end
 
     def respond(sock, message)
@@ -94,7 +75,8 @@ module LitmusPaper
 
     def spawn_child
       fork do
-        accept_loop(control_sockets) do |sock, service|
+        Socket.accept_loop(control_sockets) do |sock|
+          service = service_for_socket(sock)
           respond(sock, AgentCheckHandler.handle(service))
           sock.close
         end

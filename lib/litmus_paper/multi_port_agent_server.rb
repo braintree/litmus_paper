@@ -12,10 +12,10 @@ module LitmusPaper
       end
     end
 
-    def service_for_connection(sock, addr)
-      _, remote_port, _, remote_ip = sock.peeraddr
+    def service_for_socket(socket)
+      _, remote_port, _, remote_ip = socket.peeraddr
       LitmusPaper.logger.debug "Received request from #{remote_ip}:#{remote_port}"
-      services[sock.local_address.ip_port]
+      services[socket.local_address.ip_port]
     end
   end
 end
