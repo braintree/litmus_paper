@@ -5,42 +5,28 @@ require 'socket'
 require 'litmus_paper/agent_check_handler'
 
 module LitmusPaper
-  class AgentCheckServer
-    CRLF = "\r\n"
+  module AgentCheckServer
+    CRLF = "\r\n".freeze
 
-    def initialize(litmus_paper_config, services, workers, pid_file, daemonize)
+    attr_reader :control_sockets, :pid_file, :workers
+
+    def initialize(litmus_paper_config, daemonize, pid_file, workers)
       LitmusPaper.configure(litmus_paper_config)
-      @services = services
-      @workers = workers
-      @pid_file = pid_file
       @daemonize = daemonize
-      @control_sockets = @services.keys.map do |port|
-        TCPServer.new(port)
-      end
+      @pid_file = pid_file
+      @workers = workers
+
       trap(:INT) { exit }
       trap(:TERM) { exit }
     end
 
-    # Stolen pattern from ruby Socket, modified to return the service based on
-    # the accepting port
-    def accept_loop(sockets)
-      if sockets.empty?
-        raise ArgumentError, "no sockets"
-      end
-      loop {
-        readable, _, _ = IO.select(sockets)
-        readable.each { |r|
-          begin
-            sock, addr = r.accept_nonblock
-            _, remote_port, _, remote_ip = sock.peeraddr
-            LitmusPaper.logger.debug "Received request from #{remote_ip}:#{remote_port}"
-            service = @services[r.local_address.ip_port]
-          rescue IO::WaitReadable
-            next
-          end
-          yield sock, service
-        }
-      }
+    def daemonize?
+      !!@daemonize
+    end
+
+
+    def service_for_socket(socket)
+      raise "Consumers must implemented service_for_socket(socket)"
     end
 
     def respond(sock, message)
@@ -55,13 +41,13 @@ module LitmusPaper
     end
 
     def run
-      if @daemonize
+      if daemonize?
         Process.daemon
       end
-      write_pid(@pid_file)
+      write_pid(pid_file)
       child_pids = []
 
-      @workers.times do
+      workers.times do
         child_pids << spawn_child
       end
 
@@ -72,7 +58,7 @@ module LitmusPaper
           rescue Errno::ESRCH
           end
         end
-        File.delete(@pid_file) if File.exists?(@pid_file)
+        File.delete(pid_file) if File.exists?(pid_file)
         exit
       }
 
@@ -89,9 +75,16 @@ module LitmusPaper
 
     def spawn_child
       fork do
-        accept_loop(@control_sockets) do |sock, service|
-          respond(sock, AgentCheckHandler.handle(service))
-          sock.close
+        Socket.accept_loop(control_sockets) do |sock, addr|
+          _, remote_port, _, remote_ip = sock.peeraddr(:numeric)
+
+          begin
+            service = service_for_socket(sock)
+            respond(sock, AgentCheckHandler.handle(service))
+            sock.close
+          rescue Errno::ECONNRESET, Errno::EPIPE, Errno::ENOTCONN
+            LitmusPaper.logger.debug "Received request from #{remote_ip}:#{remote_port}, but client hung up."
+          end
         end
       end
     end

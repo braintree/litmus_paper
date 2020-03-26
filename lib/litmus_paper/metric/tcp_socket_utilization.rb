@@ -20,7 +20,7 @@ module LitmusPaper
         queued = current_stats[:socket_queued]
         utilization = current_stats[:socket_utilization]
 
-        "Metric::TcpSocketUtilitization(weight: #{weight}, maxconn: #{maxconn}, active: #{active}, queued: #{queued}, utilization: #{utilization}, address: #{address})"
+        "Metric::TcpSocketUtilization(weight: #{weight}, maxconn: #{maxconn}, active: #{active}, queued: #{queued}, utilization: #{utilization}, address: #{address})"
       end
     end
   end

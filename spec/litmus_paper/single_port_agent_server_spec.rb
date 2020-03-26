@@ -1,11 +1,11 @@
 require 'spec_helper'
-require 'litmus_paper/agent_check_server'
+require 'litmus_paper/single_port_agent_server'
 
-describe LitmusPaper::AgentCheckServer do
+describe LitmusPaper::SinglePortAgentServer do
   pid = nil
 
   before :all do
-    if ! Kernel.system("bundle exec litmus-agent-check -s passing_test:9191,test:9192 -c spec/support/test.config -w 10 -D")
+    if ! Kernel.system("bundle exec litmus-agent-check -P 9191 -c spec/support/test.config -w 10 -D")
       fail('Unable to start server')
     end
     port_open = false
@@ -27,12 +27,26 @@ describe LitmusPaper::AgentCheckServer do
   describe "The agent-check text protocol" do
     it "returns the health from a passing test" do
       TCPSocket.open('127.0.0.1', 9191) do |s|
+        s.puts "passing_test"
         s.gets.should match(/ready\tup\t\d+%\r\n/)
       end
     end
     it "returns the health from a failing test" do
-      TCPSocket.open('127.0.0.1', 9192) do |s|
+      TCPSocket.open('127.0.0.1', 9191) do |s|
+        s.puts "test"
         s.gets.should match(/down\t0%\r\n/)
+      end
+    end
+    it "returns a failure for a non-existent service" do
+      TCPSocket.open('127.0.0.1', 9191) do |s|
+        s.puts "foo"
+        s.gets.should match(/failed#NOT_FOUND\r\n/)
+      end
+    end
+    it "returns a failure for a bad message" do
+      TCPSocket.open('127.0.0.1', 9191) do |s|
+        s.puts "\n"
+        s.gets.should match(/failed#BAD_INPUT\r\n/)
       end
     end
   end
@@ -43,9 +57,22 @@ describe LitmusPaper::AgentCheckServer do
       children = `ps --no-headers --ppid #{pid}|wc -l`
       children.strip.to_i == 10
     end
-  end
 
-  describe "server" do
+    it "doesn't crash if a client hangs up" do
+      pid = File.read('/tmp/litmus-agent-check.pid').to_i
+      child_pids = `ps --no-headers --ppid #{pid}|wc -l`
+      original_pids = `pgrep -P #{pid}`.chomp.split("\n")
+
+      TCPSocket.open('127.0.0.1', 9191) do |s|
+        # Do nothing (e.g. haproxy w/o agent-send setup correctly)
+      end
+
+      sleep 0.5
+
+      current_pids = `pgrep -P #{pid}`.chomp.split("\n")
+      current_pids.should eql(original_pids)
+    end
+
     it "if a child dies you get a new one" do
       pid = File.read('/tmp/litmus-agent-check.pid').to_i
       Kernel.system("kill -9 $(ps --no-headers --ppid #{pid} -o pid=|tail -1)")

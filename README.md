@@ -203,15 +203,18 @@ There are no additional configuration files for the agent check, since all optio
 
 ```
 Usage: litmus-agent-check [options]
-    -s, --service SERVICE:PORT,...   agent-check service to port mappings
+    -s, --service SERVICE:PORT,...   agent-check service to port mappings (multi-port mode)
     -c, --config CONFIG              Path to litmus paper config file
     -p, --pid-file PID_FILE          Where to write the pid
+    -P, --port PORT                  Port for agent check. Can be used with HAProxy 1.7+ with agent-send directive (single-port mode)
     -w, --workers WORKERS            Number of worker processes
     -D, --daemonize                  Daemonize the process
     -h, --help                       Help text
 ```
 
-The service:port argument means that the server will expose the data from the litmus check for `service` on `port` in HAProxy agent check format. For example, if you wanted to serve status information about `myapp` on port `8080`, and already had a service config for it, you'd pass `-s myapp:8080`.
+In single-port mode, the `-P` or `--port` argument specifies the port that the server will expose the data for all services litmus is configured for on `port` in HAProxy agent check format. This can be used on HAProxy 1.7+ with the `agent-send` directive to specify a backend name to be sent by HAProxy and have litmus paper do the lookup. For example, `agent-send "my_service\n"`.
+
+In multi-port mode, the service:port argument means that the server will expose the data from the litmus check for `service` on `port` in HAProxy agent check format. For example, if you wanted to serve status information about `myapp` on port `8080`, and already had a service config for it, you'd pass `-s myapp:8080`.
 
 On the HAProxy server, add `agent-check agent-port 8080 agent-inter <seconds>s` to the config line for each server listed for that backend. This tells HAProxy to query port 8080 on the backend every `<seconds>` seconds for health information. See the [HAProxy agent check documentation](https://cbonte.github.io/haproxy-dconv/1.8/configuration.html#5.2-agent-check) for more details.
 

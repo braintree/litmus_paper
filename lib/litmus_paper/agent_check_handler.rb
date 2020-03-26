@@ -8,6 +8,10 @@ module LitmusPaper
       )
       output = []
 
+      if !service
+        return "failed#BAD_INPUT"
+      end
+
       health = @cache.get(service)
       if !health
         @cache.set(
