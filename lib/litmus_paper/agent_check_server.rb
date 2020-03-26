@@ -25,7 +25,7 @@ module LitmusPaper
     end
 
 
-    def service_for_socket(sock, addr)
+    def service_for_socket(socket)
       raise "Consumers must implemented service_for_socket(socket)"
     end
 
