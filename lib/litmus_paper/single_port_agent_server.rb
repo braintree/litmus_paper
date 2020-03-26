@@ -13,7 +13,7 @@ module LitmusPaper
     end
 
     def service_for_socket(socket)
-      _, remote_port, _, remote_ip = socket.peeraddr
+      _, remote_port, _, remote_ip = socket.peeraddr(:numeric)
 
       msg = socket.gets
 
