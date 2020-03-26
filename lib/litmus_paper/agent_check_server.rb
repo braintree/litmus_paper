@@ -26,7 +26,7 @@ module LitmusPaper
 
 
     def service_for_socket(sock, addr)
-      raise "Consumers must implemented service_for_socket(sock, addr)"
+      raise "Consumers must implemented service_for_socket(socket)"
     end
 
     def respond(sock, message)
@@ -75,10 +75,16 @@ module LitmusPaper
 
     def spawn_child
       fork do
-        Socket.accept_loop(control_sockets) do |sock|
-          service = service_for_socket(sock)
-          respond(sock, AgentCheckHandler.handle(service))
-          sock.close
+        Socket.accept_loop(control_sockets) do |sock, addr|
+          _, remote_port, _, remote_ip = sock.peeraddr(:numeric)
+
+          begin
+            service = service_for_socket(sock)
+            respond(sock, AgentCheckHandler.handle(service))
+            sock.close
+          rescue Errno::ECONNRESET, Errno::EPIPE, Errno::ENOTCONN
+            LitmusPaper.logger.debug "Received request from #{remote_ip}:#{remote_port}, but client hung up."
+          end
         end
       end
     end
