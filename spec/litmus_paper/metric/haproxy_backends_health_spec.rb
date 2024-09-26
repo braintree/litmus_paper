@@ -13,6 +13,10 @@ describe LitmusPaper::Metric::HaproxyBackendsHealth do
       health.current_health.should == 33
     end
 
+    it "should report as 50 if 1/3 nodes are down, 1/3 nodes are up, and 1/3 nodes are maint (blue cluster)" do
+      health = LitmusPaper::Metric::HaproxyBackendsHealth.new(100, "/tmp/stub-haproxy-stats", "blue_cluster")
+      health.current_health.should == 50
+    end
 
     it "should report as 0 if all of the nodes are down (orange cluster)" do
       health = LitmusPaper::Metric::HaproxyBackendsHealth.new(100, "/tmp/stub-haproxy-stats", "orange_cluster")
