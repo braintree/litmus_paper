@@ -20,6 +20,7 @@ module LitmusPaper
           .inject(0) { |sum, server| sum + server["weight"].to_f }
 
         total_weight = servers
+          .reject { |server| server["status"].include?("MAINT") }
           .inject(0) { |sum, server| sum + server["weight"].to_f }
 
         ((up_weight / total_weight) * @weight).to_i
