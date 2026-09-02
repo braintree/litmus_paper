@@ -34,7 +34,7 @@ module LitmusPaper
         LitmusPaper.logger.info("Timeout running command: '#{@command}'")
         false
       rescue => e
-        LitmusPaper.logger.info("Available check to #{@uri} failed with #{e.message}")
+        LitmusPaper.logger.info("Available check to #{@command} failed with #{e.message}")
         false
       end
 
